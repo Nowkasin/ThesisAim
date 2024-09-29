@@ -103,14 +103,18 @@ class HealthManager: ObservableObject {
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
         let healthTypes = [steps, calories, heartRate, distance]
-        
+
         for type in healthTypes {
-            let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] _, completionHandler, error in
+            // Use HKObserverQuery to detect changes in data from Apple Watch
+            let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
+            
+            let query = HKObserverQuery(sampleType: type, predicate: devicePredicate, updateHandler: { [weak self] _, completionHandler, error in
                 if let error = error {
                     print("Error observing \(type.identifier): \(error.localizedDescription)")
                     return
                 }
-                
+
+                // Call a function to fetch data from Apple Watch
                 DispatchQueue.main.async {
                     switch type {
                     case steps:
@@ -125,12 +129,13 @@ class HealthManager: ObservableObject {
                         break
                     }
                 }
-                
-                completionHandler()
-            }
+
+                completionHandler() // Inform HealthKit that the work is done
+            })
             healthStore.execute(query)
         }
     }
+
     
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)

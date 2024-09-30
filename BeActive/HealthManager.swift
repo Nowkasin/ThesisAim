@@ -326,4 +326,30 @@ class HealthManager: ObservableObject {
                print("Alert dismissed, resetting timer.")
            }
        }
+    
+    func requestAuthorization() {
+        // ตรวจสอบว่า HealthKit สามารถใช้งานได้
+        guard HKHealthStore.isHealthDataAvailable() else {
+            print("HealthKit is not available on this device.")
+            return
+        }
+        
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        
+        let typesToShare: Set = [heartRateType, stepCountType]
+        let typesToRead: Set = [heartRateType, stepCountType]
+
+        healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
+            if success {
+                print("Permission granted")
+            } else {
+                if let error = error {
+                    print("Permission denied: \(error.localizedDescription)")
+                } else {
+                    print("Permission denied: Unknown error")
+                }
+            }
+        }
+    }
 }

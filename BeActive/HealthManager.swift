@@ -88,7 +88,7 @@ class HealthManager: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.publish(every: 30, on: .main, in: .common) // Change to 30 seconds
+        timer = Timer.publish(every: 2, on: .main, in: .common) // Change to 2 seconds
             .autoconnect()
             .sink { [weak self] _ in
                 self?.fetchTodaySteps()

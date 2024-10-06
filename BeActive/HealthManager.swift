@@ -263,7 +263,7 @@ class HealthManager: ObservableObject {
                     let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
                     print("Elapsed Time in target range: \(elapsedTime) seconds")
                     
-                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minutes
+                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minute
                         self?.triggerMoveAlert()
                         // Wait for the user to dismiss the alert before resetting startTime
                     }
@@ -312,7 +312,7 @@ class HealthManager: ObservableObject {
     private func triggerMoveAlert() {
            DispatchQueue.main.async {
                print("Triggering alert")
-               self.alertMessage = "Your heart rate has been in the target range for 5 minutes. Time to move!"
+               self.alertMessage = "คุณนั่งมา 2 ชั่วโมงแล้ว ลุกขึ้นไปเดินได้แล้วโว้ยยยยยย"
                self.showAlert = true
                self.alertActive = true // Set alert to active
                NotificationCenter.default.post(name: .moveAlert, object: self.alertMessage)

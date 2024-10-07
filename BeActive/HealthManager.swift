@@ -310,8 +310,8 @@ class HealthManager: ObservableObject {
     
     private func triggerMoveAlert() {
         let content = UNMutableNotificationContent()
-        content.title = "Time to Move!"
-        content.body = "Your heart rate has been in range for 5 minutes. Time to move!"
+        content.title = "เดินได้แล้ว!"
+        content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้วโว้ย"
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)

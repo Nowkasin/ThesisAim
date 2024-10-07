@@ -8,7 +8,7 @@
 import Foundation
 import HealthKit
 import Combine
-
+import UserNotifications
 // Extension for date handling
 extension Date {
     static var startOfDay: Date {
@@ -103,14 +103,18 @@ class HealthManager: ObservableObject {
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
         let healthTypes = [steps, calories, heartRate, distance]
-        
+
         for type in healthTypes {
-            let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] _, completionHandler, error in
+            // Use HKObserverQuery to detect changes in data from Apple Watch
+            let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
+            
+            let query = HKObserverQuery(sampleType: type, predicate: devicePredicate, updateHandler: { [weak self] _, completionHandler, error in
                 if let error = error {
                     print("Error observing \(type.identifier): \(error.localizedDescription)")
                     return
                 }
-                
+
+                // Call a function to fetch data from Apple Watch
                 DispatchQueue.main.async {
                     switch type {
                     case steps:
@@ -125,12 +129,13 @@ class HealthManager: ObservableObject {
                         break
                     }
                 }
-                
-                completionHandler()
-            }
+
+                completionHandler() // Inform HealthKit that the work is done
+            })
             healthStore.execute(query)
         }
     }
+
     
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
@@ -258,7 +263,7 @@ class HealthManager: ObservableObject {
                     let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
                     print("Elapsed Time in target range: \(elapsedTime) seconds")
                     
-                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minutes
+                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minute
                         self?.triggerMoveAlert()
                         // Wait for the user to dismiss the alert before resetting startTime
                     }
@@ -303,16 +308,23 @@ class HealthManager: ObservableObject {
         healthStore.execute(query)
     }
     
-    
     private func triggerMoveAlert() {
-           DispatchQueue.main.async {
-               print("Triggering alert")
-               self.alertMessage = "Your heart rate has been in the target range for 5 minutes. Time to move!"
-               self.showAlert = true
-               self.alertActive = true // Set alert to active
-               NotificationCenter.default.post(name: .moveAlert, object: self.alertMessage)
-           }
-       }
+        let content = UNMutableNotificationContent()
+        content.title = "Time to Move!"
+        content.body = "Your heart rate has been in range for 5 minutes. Time to move!"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error triggering notification: \(error.localizedDescription)")
+            } else {
+                print("Notification scheduled successfully")
+            }
+        }
+    }
 
        func handleAlertDismiss() {
            DispatchQueue.main.async {
@@ -321,4 +333,30 @@ class HealthManager: ObservableObject {
                print("Alert dismissed, resetting timer.")
            }
        }
+    
+    func requestAuthorization() {
+        // ตรวจสอบว่า HealthKit สามารถใช้งานได้
+        guard HKHealthStore.isHealthDataAvailable() else {
+            print("HealthKit is not available on this device.")
+            return
+        }
+        
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        
+        let typesToShare: Set = [heartRateType, stepCountType]
+        let typesToRead: Set = [heartRateType, stepCountType]
+
+        healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
+            if success {
+                print("Permission granted")
+            } else {
+                if let error = error {
+                    print("Permission denied: \(error.localizedDescription)")
+                } else {
+                    print("Permission denied: Unknown error")
+                }
+            }
+        }
+    }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E24968D2CC0E6360017C07C /* mainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E24968C2CC0E6360017C07C /* mainView.swift */; };
 		8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */; };
 		8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1C2C06D72400E0A56E /* ContentView.swift */; };
 		8E8FFA1F2C06D72600E0A56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8E24968C2CC0E6360017C07C /* mainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mainView.swift; sourceTree = "<group>"; };
 		8E8FFA172C06D72400E0A56E /* BeActive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeActive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveApp.swift; sourceTree = "<group>"; };
 		8E8FFA1C2C06D72400E0A56E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
 				8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */,
+				8E24968C2CC0E6360017C07C /* mainView.swift */,
 			);
 			path = BeActive;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 			files = (
 				8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */,
 				8E8FFA4F2C06E5A400E0A56E /* HealthManager.swift in Sources */,
+				8E24968D2CC0E6360017C07C /* mainView.swift in Sources */,
 				8E8FFA492C06DA6E00E0A56E /* HomeView.swift in Sources */,
 				8E8FFA472C06D90200E0A56E /* BeActiTabView.swift in Sources */,
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,

@@ -59,6 +59,7 @@ class HealthManager: ObservableObject {
         "todayCalories": Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: "0"),
         "todayHeartRate": Activity(id: 2, title: "Today Heart Rate", subtitle: "Goal 60-100 BPM", image: "heart.fill", tintColor: .red, amount: "0 BPM"),
         "dayDistance": Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: "0")
+        
     ]
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ไม่ได้รับข้อมูลมาจาก health
     @Published var mockActivities: [String: Activity] = [
@@ -298,8 +299,8 @@ class HealthManager: ObservableObject {
             }
             
             let distanceInMeters = quantity.doubleValue(for: .meter())
-            let distanceInKm = distanceInMeters / 1000
-            let activity = Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: distanceInKm.formattedString())
+            let distanceInKilometers = distanceInMeters / 1000.0
+            let activity = Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: distanceInKilometers.formattedString())
             
             DispatchQueue.main.async {
                 self?.activities["dayDistance"] = activity

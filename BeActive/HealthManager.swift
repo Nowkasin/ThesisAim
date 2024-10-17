@@ -41,6 +41,8 @@ extension Double {
 class HealthManager: ObservableObject {
     let healthStore = HKHealthStore()
     private var timer: AnyCancellable?
+    private var moveAlertTimer: Timer?
+    private var isAlertActive = false
     private var startTime: Date?
     private var alertStartTime: Date?
     
@@ -89,7 +91,7 @@ class HealthManager: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.publish(every: 30, on: .main, in: .common) // Change to 30 seconds
+        timer = Timer.publish(every: 2, on: .main, in: .common) // Change to 30 seconds
             .autoconnect()
             .sink { [weak self] _ in
                 self?.fetchTodaySteps()
@@ -277,6 +279,28 @@ class HealthManager: ObservableObject {
         healthStore.execute(query)
     }
 
+    func Waterperday() {
+        // Create a notification content
+        let content = UNMutableNotificationContent()
+        content.title = "ดื่มน้ำแล้ว!"
+        content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
+        content.sound = .default
+        
+        // Set up notification trigger to repeat every hour
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true)
+        
+        // Create a notification request
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        
+        // Add the notification request to the notification center
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling water reminder notification: \(error.localizedDescription)")
+            } else {
+                print("Water reminder notification scheduled successfully.")
+            }
+        }
+    }
     
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
@@ -310,20 +334,32 @@ class HealthManager: ObservableObject {
     }
     
     private func triggerMoveAlert() {
-        let content = UNMutableNotificationContent()
-        content.title = "เดินได้แล้ว!"
-        content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้ว!"
-        content.sound = .default
+        if !isAlertActive { // ตรวจสอบว่ามีการแจ้งเตือนอยู่หรือไม่
+            let content = UNMutableNotificationContent()
+            content.title = "เดินได้แล้ว!"
+            content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้ว!"
+            content.sound = .default
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error triggering notification: \(error.localizedDescription)")
-            } else {
-                print("Notification scheduled successfully")
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Error triggering notification: \(error.localizedDescription)")
+                } else {
+                    print("Notification scheduled successfully")
+                    self.isAlertActive = true  // ตั้งค่าว่ามีการแจ้งเตือนแล้ว
+                    self.start5MinuteTimer()   // เริ่มการหน่วงเวลา 5 นาที
+                }
             }
+        }
+    }
+
+    private func start5MinuteTimer() {
+        moveAlertTimer?.invalidate()  // ยกเลิก Timer ก่อนหน้า (ถ้ามี)
+        moveAlertTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: false) { _ in
+            self.isAlertActive = false  // ปลดล็อกให้สามารถแจ้งเตือนอีกครั้ง
+            self.triggerMoveAlert()  // เรียกการแจ้งเตือนอีกครั้งหลังจาก 5 นาที
         }
     }
 

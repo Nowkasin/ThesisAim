@@ -340,7 +340,8 @@ class HealthManager: ObservableObject {
             content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้ว!"
             content.sound = .default
 
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            // กำหนดให้แจ้งเตือนซ้ำทุก 5 นาที
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)  // เริ่มต้นทันที
             let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
 
             UNUserNotificationCenter.current().add(request) { error in
@@ -349,17 +350,27 @@ class HealthManager: ObservableObject {
                 } else {
                     print("Notification scheduled successfully")
                     self.isAlertActive = true  // ตั้งค่าว่ามีการแจ้งเตือนแล้ว
-                    self.start5MinuteTimer()   // เริ่มการหน่วงเวลา 5 นาที
+                    print("isAlertActive set to true")
+
+                    // เริ่มการนับเวลาใหม่
+                    self.scheduleNextAlertAfterDelay()  // ไม่มีความจำเป็นต้องใช้ resetTimer parameter
                 }
             }
+        } else {
+            print("Alert is already active, waiting for 5 minutes.")
         }
     }
 
-    private func start5MinuteTimer() {
-        moveAlertTimer?.invalidate()  // ยกเลิก Timer ก่อนหน้า (ถ้ามี)
-        moveAlertTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: false) { _ in
+    private func scheduleNextAlertAfterDelay() {
+        print("Starting 5 minute delay")
+
+        // หน่วงเวลา 5 นาทีโดยใช้ DispatchQueue
+        DispatchQueue.main.asyncAfter(deadline: .now() + 300) { // 300 วินาที = 5 นาที
             self.isAlertActive = false  // ปลดล็อกให้สามารถแจ้งเตือนอีกครั้ง
-            self.triggerMoveAlert()  // เรียกการแจ้งเตือนอีกครั้งหลังจาก 5 นาที
+            print("5 minutes passed, isAlertActive set to false")
+            
+            // เรียกใช้งานแจ้งเตือนถัดไป
+            self.triggerMoveAlert()  // เริ่มการแจ้งเตือนใหม่
         }
     }
 

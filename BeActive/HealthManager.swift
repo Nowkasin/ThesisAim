@@ -230,47 +230,39 @@ class HealthManager: ObservableObject {
             }
 
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            
+
             // Define heart rate ranges
             let sleepHeartRateRange = 40.0...64.0
             let restingHeartRateRange = 65.0...85.0 // Adjust based on gender
             let walkingHeartRateRange = 86.0...120.0 // Adjust based on gender
-            
+
             print("Current Heart Rate: \(heartRate)")
 
             DispatchQueue.main.async {
                 var state: String = "Unknown"
-                
+
                 // Determine the state based on heart rate range
                 if restingHeartRateRange.contains(heartRate) {
                     state = "Resting"
-                } else if walkingHeartRateRange.contains(heartRate) {
-                    state = "Walking"
-                } else if sleepHeartRateRange.contains(heartRate){
-                    state = "Sleep"
-                }
-                else {
-                    self?.startTime = nil
-                    print("Heart rate out of target range. Resetting timer.")
-                }
-                
-                print("Current State: \(state)")
-                
-                if walkingHeartRateRange.contains(heartRate) || restingHeartRateRange.contains(heartRate) {
+                    // Start timer for Resting state
                     if self?.startTime == nil && self?.alertActive == false {
-                        // Start timer when heart rate is in range and no alert is active
                         self?.startTime = Date()
                         print("Started timing: \(self?.startTime ?? Date())")
                     }
                     
                     let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
-                    print("Elapsed Time in target range: \(elapsedTime) seconds")
+                    print("Elapsed Time in resting range: \(elapsedTime) seconds")
                     
-                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minute
+                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minutes
                         self?.triggerMoveAlert()
-                        // Wait for the user to dismiss the alert before resetting startTime
                     }
+                } else {
+                    // Reset timer and do not trigger notification for non-resting states
+                    self?.startTime = nil
+                    print("Heart rate not in resting range. Timer reset and no alert triggered.")
                 }
+
+                print("Current State: \(state)")
 
                 let activity = Activity(id: 2, title: "Today Heart Rate (\(state))", subtitle: "Goal 60-120 BPM", image: "heart.fill", tintColor: .red, amount: heartRate.formattedString())
                 self?.activities["todayHeartRate"] = activity

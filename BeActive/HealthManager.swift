@@ -77,7 +77,8 @@ class HealthManager: ObservableObject {
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
-        let healthTypes: Set = [steps, calories, heartRate, distance]
+        let water = HKQuantityType(.dietaryWater)
+        let healthTypes: Set = [steps, calories, heartRate, distance, water]
         
         Task {
             do {
@@ -98,6 +99,7 @@ class HealthManager: ObservableObject {
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
+                self?.Waterperday()
             }
     }
     func startObservingHealthData() {
@@ -105,7 +107,8 @@ class HealthManager: ObservableObject {
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
-        let healthTypes = [steps, calories, heartRate, distance]
+        let water = HKQuantityType(.dietaryWater)
+        let healthTypes = [steps, calories, heartRate, distance, water]
 
         for type in healthTypes {
             // Use HKObserverQuery to detect changes in data from Apple Watch
@@ -128,6 +131,8 @@ class HealthManager: ObservableObject {
                         self?.fetchTodayHeartRate()
                     case distance:
                         self?.fetchTodayDistance()
+                    case water:
+                        self?.Waterperday()
                     default:
                         break
                     }

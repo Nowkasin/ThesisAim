@@ -43,12 +43,12 @@ class HealthManager: ObservableObject {
     private var timer: AnyCancellable?
     private var moveAlertTimer: Timer?
     private var isAlertActive = false
+    private var isWaterAlertActive = false
     private var startTime: Date?
     private var alertStartTime: Date?
     
     // Properties for handling alerts
-    @Published var alertMessage: String = ""
-    @Published var showAlert: Bool = false
+    
     private var alertActive: Bool = false
     
     // Properties for tracking score and steps
@@ -99,7 +99,7 @@ class HealthManager: ObservableObject {
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
-                self?.Waterperday()
+                self?.triggerWaterAlert()
             }
     }
     func startObservingHealthData() {
@@ -131,8 +131,6 @@ class HealthManager: ObservableObject {
                         self?.fetchTodayHeartRate()
                     case distance:
                         self?.fetchTodayDistance()
-                    case water:
-                        self?.Waterperday()
                     default:
                         break
                     }
@@ -275,29 +273,6 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-
-    func Waterperday() {
-        // Create a notification content
-        let content = UNMutableNotificationContent()
-        content.title = "ดื่มน้ำแล้ว!"
-        content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
-        content.sound = .default
-        
-        // Set up notification trigger to repeat every hour
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true)
-        
-        // Create a notification request
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-        
-        // Add the notification request to the notification center
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling water reminder notification: \(error.localizedDescription)")
-            } else {
-                print("Water reminder notification scheduled successfully.")
-            }
-        }
-    }
     
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
@@ -328,6 +303,43 @@ class HealthManager: ObservableObject {
             }
         }
         healthStore.execute(query)
+    }
+    
+    //ส่วนของการแจ้งเตือน
+    private func triggerWaterAlert() {
+        print("Attempting to trigger water alert...")
+        if !isWaterAlertActive {
+            let content = UNMutableNotificationContent()
+            content.title = "ดื่มน้ำได้แล้ว!"
+            content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false) // Start immediately
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Error triggering water reminder notification: \(error.localizedDescription)")
+                } else {
+                    print("Water reminder notification scheduled successfully")
+                    self.isWaterAlertActive = true
+                    print("isWaterAlertActive set to true")
+                    self.scheduleNextWaterAlertAfterDelay() // Schedule the next alert
+                }
+            }
+        } else {
+            print("Water reminder alert is already active, waiting for the next alert.")
+        }
+    }
+
+    private func scheduleNextWaterAlertAfterDelay() {
+        print("Starting 10 minute delay for water reminder")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 600) { // 600 seconds = 10 minutes
+            self.isWaterAlertActive = false
+            print("10 minutes passed, isWaterAlertActive set to false")
+            self.triggerWaterAlert() // Restart the alert
+        }
     }
     
     private func triggerMoveAlert() {

@@ -109,12 +109,12 @@
 				8E8FFA1C2C06D72400E0A56E /* ContentView.swift */,
 				8E8FFA4C2C06DD6000E0A56E /* ActivityCard.swift */,
 				8E8FFA462C06D90200E0A56E /* BeActiTabView.swift */,
+				8E2850042CCE437100059D4E /* ChartView.swift */,
 				8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */,
 				8E8FFA202C06D72600E0A56E /* Preview Content */,
 				8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
 				8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */,
-				8E2850042CCE437100059D4E /* ChartView.swift */,
 			);
 			path = BeActive;
 			sourceTree = "<group>";

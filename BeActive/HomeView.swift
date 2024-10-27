@@ -17,64 +17,81 @@ struct HomeView: View {
     // State variables for the alert
     @State private var showAlert = false
     @State private var alertMessage = ""
+    // Selected tab variable
+    @State private var selectedTab = "Home"
 
     var body: some View {
-        ZStack {
-            VStack(alignment: .leading) {
-                Text(welcomeArray[currentIndex])
-                    .font(.largeTitle)
-                    .padding()
-                    .foregroundColor(.secondary)
-                    .animation(.easeInOut(duration: 1), value: currentIndex)
-                    .onAppear {
-                        startWelcomeTimer()
-                        requestNotificationPermission()
-                        // Optionally trigger a notification here
-                        // triggerNotification(message: "This is a test notification!")
+        TabView(selection: $selectedTab) {
+            ZStack {
+                VStack(alignment: .leading) {
+                    Text(welcomeArray[currentIndex])
+                        .font(.largeTitle)
+                        .padding()
+                        .foregroundColor(.secondary)
+                        .animation(.easeInOut(duration: 1), value: currentIndex)
+                        .onAppear {
+                            startWelcomeTimer()
+                            requestNotificationPermission()
+                            // Optionally trigger a notification here
+                            // triggerNotification(message: "This is a test notification!")
+                        }
+                    
+                    LazyVGrid(columns: Array(repeating: GridItem(spacing: 20), count: 2)) {
+                        ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
+                            ActivityCard(activity: item.value)
+                        }
                     }
+                    .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .onReceive(manager.objectWillChange) { _ in
+                    // UI updates handled through @Published in HealthManager
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .moveAlert)) { notification in
+                    if let message = notification.object as? String {
+                        self.alertMessage = message
+                        self.showAlert = true
+                        triggerNotification(message: message) // Trigger local notification
+                    }
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("Time to Move!"),
+                        message: Text(alertMessage),
+                        dismissButton: .default(Text("OK")) {
+                            manager.handleAlertDismiss() // Call the function correctly
+                        }
+                    )
+                }
                 
-                LazyVGrid(columns: Array(repeating: GridItem(spacing: 20), count: 2)) {
-                    ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                        ActivityCard(activity: item.value)
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("Score: \(manager.stepScore)")
+                            .padding(8)
+                            .background(Color.white)
+                            .foregroundColor(.black)
+                            .cornerRadius(15)
+                            .padding(.trailing, 20)
+                            .padding(.top, 20)
                     }
-                }
-                .padding(.horizontal)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .onReceive(manager.objectWillChange) { _ in
-                // UI updates handled through @Published in HealthManager
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .moveAlert)) { notification in
-                if let message = notification.object as? String {
-                    self.alertMessage = message
-                    self.showAlert = true
-                    triggerNotification(message: message) // Trigger local notification
-                }
-            }
-            .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("Time to Move!"),
-                    message: Text(alertMessage),
-                    dismissButton: .default(Text("OK")) {
-                        manager.handleAlertDismiss() // Call the function correctly
-                    }
-                )
-            }
-            
-            VStack {
-                HStack {
                     Spacer()
-                    Text("Score: \(manager.stepScore)")
-                        .padding(8)
-                        .background(Color.white)
-                        .foregroundColor(.black)
-                        .cornerRadius(15)
-                        .padding(.trailing, 20)
-                        .padding(.top, 20)
                 }
-                Spacer()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .tabItem {
+                Image(systemName: "house")
+                Text("Home")
+            }
+            .tag("Home")
+            
+            // Replace `ContentView()` with your actual content view
+            ContentView()
+                .tabItem {
+                    Image(systemName: "person")
+                    Text("Content")
+                }
+                .tag("Content")
         }
     }
     

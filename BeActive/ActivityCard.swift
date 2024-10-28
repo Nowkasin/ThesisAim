@@ -33,7 +33,7 @@ struct ActivityCard: View {
                                 .foregroundColor(.primary)
                             Text(activity.subtitle)
                                 .font(.system(size: 12))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.black)
                         }
                         
                         Spacer()
@@ -45,6 +45,7 @@ struct ActivityCard: View {
                     Text(activity.amount)
                         .font(.system(size: 24))
                         .minimumScaleFactor(0.6)
+                        .foregroundColor(.black)
                         .bold()
                         .padding()
                 }

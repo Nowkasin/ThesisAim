@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8E2850052CCE437100059D4E /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2850042CCE437100059D4E /* ChartView.swift */; };
+		8E81C2642CCF594F00F940AE /* notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E81C2632CCF594F00F940AE /* notification.swift */; };
 		8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */; };
 		8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1C2C06D72400E0A56E /* ContentView.swift */; };
 		8E8FFA1F2C06D72600E0A56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */; };
@@ -40,6 +41,7 @@
 
 /* Begin PBXFileReference section */
 		8E2850042CCE437100059D4E /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		8E81C2632CCF594F00F940AE /* notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = notification.swift; sourceTree = "<group>"; };
 		8E8FFA172C06D72400E0A56E /* BeActive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeActive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveApp.swift; sourceTree = "<group>"; };
 		8E8FFA1C2C06D72400E0A56E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
 				8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */,
+				8E81C2632CCF594F00F940AE /* notification.swift */,
 			);
 			path = BeActive;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				8E8FFA4F2C06E5A400E0A56E /* HealthManager.swift in Sources */,
 				8E8FFA492C06DA6E00E0A56E /* HomeView.swift in Sources */,
 				8E2850052CCE437100059D4E /* ChartView.swift in Sources */,
+				8E81C2642CCF594F00F940AE /* notification.swift in Sources */,
 				8E8FFA472C06D90200E0A56E /* BeActiTabView.swift in Sources */,
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,
 				8E8FFA4D2C06DD6000E0A56E /* ActivityCard.swift in Sources */,

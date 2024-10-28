@@ -8,7 +8,6 @@
 import Foundation
 import HealthKit
 import Combine
-import UserNotifications
 // Extension for date handling
 extension Date {
     static var startOfDay: Date {
@@ -40,10 +39,8 @@ extension Double {
 // HealthManager class
 class HealthManager: ObservableObject {
     let healthStore = HKHealthStore()
+    var alertsManager: AlertsManager?
     private var timer: AnyCancellable?
-    private var moveAlertTimer: Timer?
-    private var isAlertActive = false
-    private var isWaterAlertActive = false
     private var startTime: Date?
     private var alertStartTime: Date?
     
@@ -79,6 +76,7 @@ class HealthManager: ObservableObject {
         let distance = HKQuantityType(.distanceWalkingRunning)
         let water = HKQuantityType(.dietaryWater)
         let healthTypes: Set = [steps, calories, heartRate, distance, water]
+        self.alertsManager = AlertsManager()
         
         Task {
             do {
@@ -99,7 +97,7 @@ class HealthManager: ObservableObject {
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
-                self?.triggerWaterAlert()
+                self?.alertsManager?.triggerWaterAlert()
             }
     }
     func startObservingHealthData() {
@@ -256,8 +254,8 @@ class HealthManager: ObservableObject {
                     let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
                     print("Elapsed Time in resting range: \(elapsedTime) seconds")
                     
-                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minutes
-                        self?.triggerMoveAlert()
+                    if elapsedTime >= 3600 && self?.alertActive == false { // 5 minutes
+                        self?.alertsManager?.triggerMoveAlert()
                     }
                 } else {
                     // Reset timer and do not trigger notification for non-resting states
@@ -303,84 +301,6 @@ class HealthManager: ObservableObject {
             }
         }
         healthStore.execute(query)
-    }
-    
-    //ส่วนของการแจ้งเตือน
-    private func triggerWaterAlert() {
-        print("Attempting to trigger water alert...")
-        if !isWaterAlertActive {
-            let content = UNMutableNotificationContent()
-            content.title = "ดื่มน้ำได้แล้ว!"
-            content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
-            content.sound = .default
-
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false) // Start immediately
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print("Error triggering water reminder notification: \(error.localizedDescription)")
-                } else {
-                    print("Water reminder notification scheduled successfully")
-                    self.isWaterAlertActive = true
-                    print("isWaterAlertActive set to true")
-                    self.scheduleNextWaterAlertAfterDelay() // Schedule the next alert
-                }
-            }
-        } else {
-            print("Water reminder alert is already active, waiting for the next alert.")
-        }
-    }
-
-    private func scheduleNextWaterAlertAfterDelay() {
-        print("Starting 10 minute delay for water reminder")
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 600) { // 600 seconds = 10 minutes
-            self.isWaterAlertActive = false
-            print("10 minutes passed, isWaterAlertActive set to false")
-            self.triggerWaterAlert() // Restart the alert
-        }
-    }
-    
-    private func triggerMoveAlert() {
-        if !isAlertActive { // ตรวจสอบว่ามีการแจ้งเตือนอยู่หรือไม่
-            let content = UNMutableNotificationContent()
-            content.title = "เดินได้แล้ว!"
-            content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้ว!"
-            content.sound = .default
-
-            // กำหนดให้แจ้งเตือนซ้ำทุก 5 นาที
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)  // เริ่มต้นทันที
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print("Error triggering notification: \(error.localizedDescription)")
-                } else {
-                    print("Notification scheduled successfully")
-                    self.isAlertActive = true  // ตั้งค่าว่ามีการแจ้งเตือนแล้ว
-                    print("isAlertActive set to true")
-
-                    // เริ่มการนับเวลาใหม่
-                    self.scheduleNextAlertAfterDelay()  // ไม่มีความจำเป็นต้องใช้ resetTimer parameter
-                }
-            }
-        } else {
-            print("Alert is already active, waiting for 5 minutes.")
-        }
-    }
-
-    private func scheduleNextAlertAfterDelay() {
-        print("Starting 5 minute delay")
-
-        // หน่วงเวลา 5 นาทีโดยใช้ DispatchQueue
-        DispatchQueue.main.asyncAfter(deadline: .now() + 300) { // 300 วินาที = 5 นาที
-            self.isAlertActive = false  // ปลดล็อกให้สามารถแจ้งเตือนอีกครั้ง
-            print("5 minutes passed, isAlertActive set to false")
-            
-            // เรียกใช้งานแจ้งเตือนถัดไป
-            self.triggerMoveAlert()  // เริ่มการแจ้งเตือนใหม่
-        }
     }
 
        func handleAlertDismiss() {

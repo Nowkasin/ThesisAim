@@ -18,84 +18,86 @@ struct HomeView: View {
     @State private var selectedTab = "Home"
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            ZStack {
-                VStack(alignment: .leading) {
-                    // Welcome message and date
+        GeometryReader { geometry in
+            TabView(selection: $selectedTab) {
+                ZStack {
                     VStack(alignment: .leading) {
-                        Text("Hey, User")
-                            .font(.system(size: 36, weight: .bold))
-                            .foregroundColor(.primary)
+                        // Welcome message and date
+                        VStack(alignment: .leading) {
+                            Text("Hey, User")
+                                .font(.system(size: geometry.size.width * 0.08, weight: .bold)) // Font size responsive to screen width
+                                .foregroundColor(.primary)
+                                .padding(.horizontal)
+                            
+                            Text(getFormattedDate())
+                                .font(.system(size: 16))
+                                .foregroundColor(getDayColor()) // Use system accent color
+                                .padding(.horizontal)
+                        }
+                        
+                        Spacer().frame(height: geometry.size.height * 0.01)
+                        
+                        // Today Activities section
+                        Text("Today Activities")
+                            .font(.headline)
                             .padding(.horizontal)
                         
-                        Text(getFormattedDate())
-                            .font(.system(size: 16))
-                            .foregroundColor(Color.accentColor) // Use system accent color
+                        TodayActivitiesView(manager: _manager)
+                        
+                        Spacer().frame(height: geometry.size.height * 0.01)
+                        
+                        // Reminders section
+                        Text("Reminders")
+                            .font(.headline)
                             .padding(.horizontal)
-                    }
-                    
-                    Spacer().frame(height: 10)
-                    
-                    // Today Activities section
-                    Text("Today Activities")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    TodayActivitiesView(manager: _manager)
-                    
-                    Spacer().frame(height: 5)
-                    
-                    // Reminders section
-                    Text("Reminders")
-                        .font(.headline)
-                        .padding(.horizontal)
-                        .padding(.bottom, 5)
+                            .padding(.bottom, 5)
 
-                    VStack(spacing: 15) {
-                        ReminderSection(title: "Task to Complete", color: .yellow)
-                        ReminderSection(title: "Water to Drink", color: .blue)
-                        ReminderSection(title: "Voucher Shop", color: .red)
-                        ReminderSection(title: "Mates Shop", color: .green)
-                    }
-                    .padding(.horizontal)
-                    Spacer()
-                }
-                .onAppear {
-                    startWelcomeTimer()
-                    requestNotificationPermission()
-                }
-                .onReceive(manager.objectWillChange) { _ in
-                    // UI updates handled through @Published in HealthManager
-                }
-                .onReceive(NotificationCenter.default.publisher(for: .moveAlert)) { notification in
-                    if let message = notification.object as? String {
-                        self.alertMessage = message
-                        self.showAlert = true
-                        triggerNotification(message: message)
-                    }
-                }
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("Time to Move!"),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("OK")) {
-                            manager.handleAlertDismiss()
+                        VStack(spacing: 15) {
+                            ReminderSection(title: "Task to Complete", color: .yellow)
+                            ReminderSection(title: "Water to Drink", color: .blue)
+                            ReminderSection(title: "Voucher Shop", color: .red)
+                            ReminderSection(title: "Mates Shop", color: .green)
                         }
-                    )
+                        .padding(.horizontal)
+                        Spacer()
+                    }
+                    .onAppear {
+                        startWelcomeTimer()
+                        requestNotificationPermission()
+                    }
+                    .onReceive(manager.objectWillChange) { _ in
+                        // UI updates handled through @Published in HealthManager
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: .moveAlert)) { notification in
+                        if let message = notification.object as? String {
+                            self.alertMessage = message
+                            self.showAlert = true
+                            triggerNotification(message: message)
+                        }
+                    }
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("Time to Move!"),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("OK")) {
+                                manager.handleAlertDismiss()
+                            }
+                        )
+                    }
                 }
-            }
-            .tabItem {
-                Image(systemName: "house")
-                Text("Home")
-            }
-            .tag("Home")
-            
-            ContentView()
                 .tabItem {
-                    Image(systemName: "person")
-                    Text("Content")
+                    Image(systemName: "house")
+                    Text("Home")
                 }
-                .tag("Content")
+                .tag("Home")
+                
+                ContentView()
+                    .tabItem {
+                        Image(systemName: "person")
+                        Text("Content")
+                    }
+                    .tag("Content")
+            }
         }
     }
     
@@ -121,9 +123,17 @@ struct HomeView: View {
     }
     func getFormattedDate() -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "th_TH")
         dateFormatter.dateFormat = "EEEE - dd/MM/yyyy" // Day name and date format
         return dateFormatter.string(from: Date()) // Current date
     }
+    
+    func getDayColor() -> Color {
+        let colors: [Color] = [.red, .yellow, .pink, .green, .orange, .blue, .purple]
+        let weekday = Calendar.current.component(.weekday, from: Date()) - 1
+        return colors[weekday]
+    }
+
 
     // Trigger a local notification
     func triggerNotification(message: String) {

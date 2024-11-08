@@ -26,6 +26,7 @@ struct HomeView: View {
                             // Welcome message and date
                             VStack(alignment: .leading) {
                                 Text("Hey \(welcomeArray[currentIndex])")
+                                    .padding(.top, 10)
                                     .font(.system(size: geometry.size.width * 0.08, weight: .bold)) // Font size responsive to screen width
                                     .foregroundColor(.primary)
                                     .padding(.horizontal)
@@ -64,7 +65,7 @@ struct HomeView: View {
                                     .navigate(to: ChartView())
                                 ReminderSection(title: "Voucher Shop", color: .red, icon: Image(systemName: "ticket.fill"))
                                     .navigate(to: VoucherView())
-                                ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "shop.fill"))
+                                ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "cart"))
                                     .navigate(to: MatesView()) // ใช้ extension navigate เพื่อไปยัง WaterView
                             }
                             .padding(.horizontal)
@@ -107,7 +108,7 @@ struct HomeView: View {
                         .tag("Content")
                 }
             }
-            .navigationTitle("Home") // ชื่อหน้าหลักใน NavigationView
+//            .navigationBarHidden(true)// ชื่อหน้าหลักใน NavigationView
         }
     }
     

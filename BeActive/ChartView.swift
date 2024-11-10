@@ -8,27 +8,22 @@
 import SwiftUI
 
 struct ChartView: View {
-    @Environment(\.dismiss) var dismiss  // สำหรับให้ปุ่มสามารถกลับไปยังหน้า Home
+    @Environment(\.presentationMode) var presentationMode // ตัวแปรสำหรับควบคุมการนำทาง
 
     var body: some View {
         VStack {
-            Text("Hello, Chart!")
+            Text("Hello, World!")
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {  // ปุ่มวางที่มุมบนซ้าย
+            ToolbarItem(placement: .navigationBarLeading) { // ปุ่ม Back ที่มุมซ้ายบน
                 Button(action: {
-                    dismiss()  // กลับไปยังหน้า Home
+                    presentationMode.wrappedValue.dismiss() // กลับไปยังหน้า Home
                 }) {
-                    Image(systemName: "chevron.left") // ไอคอนลูกศรซ้าย
-                    Text("Back") // ข้อความ "Back"
+                    Image(systemName: "chevron.left") // ไอคอนลูกศรย้อนกลับ
+                    Text("Home")
                 }
             }
         }
     }
 }
 
-#Preview {
-    NavigationStack {
-        ChartView()
-    }
-}

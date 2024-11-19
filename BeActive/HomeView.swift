@@ -32,7 +32,7 @@ struct HomeView: View {
                                     .onAppear {
                                         startWelcomeTimer()
                                     }
-
+                                
                                 Text(getFormattedDate())
                                     .font(.system(size: 16))
                                     .foregroundColor(getDayColor())
@@ -57,8 +57,6 @@ struct HomeView: View {
                             VStack(spacing: 15) {
                                 ReminderSection(title: "Water to Drink", color: .blue, icon: Image(systemName: "drop.fill"))
                                     .navigate(to: WaterView())
-                                ReminderSection(title: "Task to Complete", color: .yellow, icon: Image(systemName: "chart.bar.fill"))
-                                    .navigate(to: ChartView())
                                 ReminderSection(title: "Voucher Shop", color: .red, icon: Image(systemName: "ticket.fill"))
                                     .navigate(to: VoucherView())
                                 ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "cart"))
@@ -159,7 +157,7 @@ struct ReminderSection: View {
     var title: String
     var color: Color
     var icon: Image
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {

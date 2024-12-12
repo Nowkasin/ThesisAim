@@ -101,13 +101,23 @@ class HealthManager: ObservableObject {
             }
     }
     func startObservingHealthData() {
+        // Define health data types
         let steps = HKQuantityType(.stepCount)
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
         let water = HKQuantityType(.dietaryWater)
-        let healthTypes = [steps, calories, heartRate, distance, water]
 
+        // Create a dictionary to map health types to corresponding fetch functions
+        let healthDataMap: [HKQuantityType: () -> Void] = [
+            steps: { [weak self] in self?.fetchTodaySteps() },
+            calories: { [weak self] in self?.fetchTodayCalories() },
+            heartRate: { [weak self] in self?.fetchTodayHeartRate() },
+            distance: { [weak self] in self?.fetchTodayDistance() }
+        ]
+        
+        let healthTypes = [steps, calories, heartRate, distance, water]
+        
         for type in healthTypes {
             // Use HKObserverQuery to detect changes in data from Apple Watch
             let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
@@ -118,20 +128,9 @@ class HealthManager: ObservableObject {
                     return
                 }
 
-                // Call a function to fetch data from Apple Watch
+                // Fetch the corresponding data based on the health data type
                 DispatchQueue.main.async {
-                    switch type {
-                    case steps:
-                        self?.fetchTodaySteps()
-                    case calories:
-                        self?.fetchTodayCalories()
-                    case heartRate:
-                        self?.fetchTodayHeartRate()
-                    case distance:
-                        self?.fetchTodayDistance()
-                    default:
-                        break
-                    }
+                    healthDataMap[type]?() // Call the associated fetch function
                 }
 
                 completionHandler() // Inform HealthKit that the work is done
@@ -139,7 +138,6 @@ class HealthManager: ObservableObject {
             healthStore.execute(query)
         }
     }
-
     
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
@@ -179,11 +177,12 @@ class HealthManager: ObservableObject {
         healthStore.execute(query)
     }
 
-    
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
-        let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
+        
+        // Define a reusable function to handle the fetched result
+        let processCaloriesResult: (HKStatisticsQuery, HKStatistics?, Error?) -> Void = { [weak self] _, result, error in
             if let error = error {
                 print("Error fetching today's Calories data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
@@ -201,14 +200,29 @@ class HealthManager: ObservableObject {
             }
             
             let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
-            let activity = Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
+            let activity = Activity(
+                id: 1,
+                title: "Today Calories",
+                subtitle: "Goal 900",
+                image: "flame",
+                tintColor: .red,
+                amount: caloriesBurned.formattedString()
+            )
             
             DispatchQueue.main.async {
                 self?.activities["todayCalories"] = activity
             }
         }
+        // Create the query
+        let query = HKStatisticsQuery(
+            quantityType: calories,
+            quantitySamplePredicate: predicate,
+            options: .cumulativeSum,
+            completionHandler: processCaloriesResult
+        )
         healthStore.execute(query)
     }
+
     
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)

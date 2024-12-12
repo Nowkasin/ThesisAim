@@ -178,52 +178,35 @@ class HealthManager: ObservableObject {
     }
 
     func fetchTodayCalories() {
-        let calories = HKQuantityType(.activeEnergyBurned)
-        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
-        
-        // Define a reusable function to handle the fetched result
-        let processCaloriesResult: (HKStatisticsQuery, HKStatistics?, Error?) -> Void = { [weak self] _, result, error in
-            if let error = error {
-                print("Error fetching today's Calories data: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
-                }
-                return
-            }
-            
-            guard let quantity = result?.sumQuantity() else {
-                print("No calories data available for today.")
-                DispatchQueue.main.async {
-                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
-                }
-                return
-            }
-            
-            let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
-            let activity = Activity(
-                id: 1,
-                title: "Today Calories",
-                subtitle: "Goal 900",
-                image: "flame",
-                tintColor: .red,
-                amount: caloriesBurned.formattedString()
-            )
-            
-            DispatchQueue.main.async {
-                self?.activities["todayCalories"] = activity
-            }
-        }
-        // Create the query
-        let query = HKStatisticsQuery(
-            quantityType: calories,
-            quantitySamplePredicate: predicate,
-            options: .cumulativeSum,
-            completionHandler: processCaloriesResult
-        )
-        healthStore.execute(query)
-    }
+           let calories = HKQuantityType(.activeEnergyBurned)
+           let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+           let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
+               if let error = error {
+                   print("Error fetching today's Calories data: \(error.localizedDescription)")
+                   DispatchQueue.main.async {
+                       self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                   }
+                   return
+               }
+               
+               guard let quantity = result?.sumQuantity() else {
+                   print("No calories data available for today.")
+                   DispatchQueue.main.async {
+                       self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                   }
+                   return
+               }
+               
+               let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
+               let activity = Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
+               
+               DispatchQueue.main.async {
+                   self?.activities["todayCalories"] = activity
+               }
+           }
+           healthStore.execute(query)
+       }
 
-    
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())

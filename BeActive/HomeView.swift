@@ -41,10 +41,6 @@ struct HomeView: View {
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
-                            Text("Today Activities")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
                             TodayActivitiesView(manager: _manager)
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
@@ -178,19 +174,37 @@ struct ReminderSection: View {
 
 struct TodayActivitiesView: View {
     @EnvironmentObject var manager: HealthManager
-    
+
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 1) {
-                ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                    ActivityCard(activity: item.value)
-                        .frame(width: 200, height: 180)
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Today Activities")
+                    .font(.headline)
+                Spacer() // ดันไอคอนไปด้านขวา
+                HStack {
+                    Image("dollar") // ใช้รูปเหรียญที่อยู่ในโปรเจค
+                        .resizable()
+                        .frame(width: 20, height: 20) // กำหนดขนาดไอคอน
+                    Text("\(manager.stepScore)") // คะแนน
+                        .font(.headline)
                 }
             }
             .padding(.horizontal)
+            .padding(.bottom, 5) // เพิ่มระยะห่างด้านล่าง HStack
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 1) {
+                    ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
+                        ActivityCard(activity: item.value)
+                            .frame(width: 200, height: 180)
+                    }
+                }
+                .padding(.horizontal)
+            }
         }
     }
 }
+
 
 struct ReminderCard: View {
     var color: Color

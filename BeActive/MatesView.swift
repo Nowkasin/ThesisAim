@@ -8,8 +8,26 @@
 import SwiftUI
 
 struct MatesView: View {
+    @Environment(\.presentationMode) var presentationMode // ตัวแปรสำหรับควบคุมการนำทาง
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            VStack {
+                Text("Mate")
+                    .font(.largeTitle)
+                    .padding()
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) { // ปุ่ม Back ที่มุมซ้ายบน
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss() // กลับไปยังหน้า Home
+                    }) {
+                        Image(systemName: "chevron.left") // ไอคอนลูกศรย้อนกลับ
+                        Text("Home")
+                    }
+                }
+            }
+        }
     }
 }
 

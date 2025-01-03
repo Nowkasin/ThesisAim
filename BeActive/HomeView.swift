@@ -174,7 +174,7 @@ struct ReminderSection: View {
 
 struct TodayActivitiesView: View {
     @EnvironmentObject var manager: HealthManager
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -182,16 +182,20 @@ struct TodayActivitiesView: View {
                     .font(.headline)
                 Spacer() // ดันไอคอนไปด้านขวา
                 HStack {
-                    Image("dollar") // ใช้รูปเหรียญที่อยู่ในโปรเจค
+                    Image(systemName: "star.circle") // ไอคอนรูปเหรียญ
                         .resizable()
                         .frame(width: 20, height: 20) // กำหนดขนาดไอคอน
+                        .foregroundColor(.yellow) // สีไอคอน
                     Text("\(manager.stepScore)") // คะแนน
-                        .font(.headline)
+                            .font(.headline)
+                            .padding(8) // เพิ่มระยะห่างรอบข้อความ
+                            .background(Color.gray) // พื้นหลังสีเทา
+                            .foregroundColor(.white) // ตัวเลขสีขาว
+                            .cornerRadius(10) // มุมโค้งมนให้กับพื้นหลัง
                 }
             }
             .padding(.horizontal)
             .padding(.bottom, 5) // เพิ่มระยะห่างด้านล่าง HStack
-
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 1) {
                     ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in

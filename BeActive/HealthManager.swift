@@ -140,42 +140,43 @@ class HealthManager: ObservableObject {
     }
     
     func fetchTodaySteps() {
-        let steps = HKQuantityType(.stepCount)
-        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())//เริ่มจับการเคลื่อนไหวเมื่อถึงเที่ยงคืนวันต่อไป และจะรีเซ็ตค่าเมื่อสิ้นสุดวันนั้น
-        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in//สร้างเพื่อนับจำนวนก้าวที่เกิดขึ้นในช่วงเวลานั้น
-            if let error = error {
-                print("Error fetching today's step data: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
-                }//ตรวจสอบข้อผิดพลาด
-                return
-            }
-            //ตรวจสอบว่ามีข้อมูลจำนวนก้าวหรือไม่ ถ้าไม่มีให้แสดงข้อมูลแบบจำลองแทน
-            guard let quantity = result?.sumQuantity() else {
-                print("No step data available for today.")
-                DispatchQueue.main.async {
-                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+            let steps = HKQuantityType(.stepCount)
+            let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())//เริ่มจับการเคลื่อนไหวเมื่อถึงเที่ยงคืนวันต่อไป และจะรีเซ็ตค่าเมื่อสิ้นสุดวันนั้น
+            let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in//สร้างเพื่อนับจำนวนก้าวที่เกิดขึ้นในช่วงเวลานั้น
+                if let error = error {
+                    print("Error fetching today's step data: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                    }//ตรวจสอบข้อผิดพลาด
+                    return
                 }
-                return
-            }
-            //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
-            let stepCount = quantity.doubleValue(for: .count())
-            let activity = Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
-            //อัปเดตข้อมูลใหม่ไปยังหน้า ui
-            DispatchQueue.main.async {
-                self?.activities["todaySteps"] = activity
-                
-                // Update step score with new rule: 100 steps = 1 point
-                let newPoints = Int(stepCount / 100) - Int(self?.previousStepCount ?? 0) / 100
-                if newPoints > 0 {
-                    self?.stepScore += newPoints
+                //ตรวจสอบว่ามีข้อมูลจำนวนก้าวหรือไม่ ถ้าไม่มีให้แสดงข้อมูลแบบจำลองแทน
+                guard let quantity = result?.sumQuantity() else {
+                    print("No step data available for today.")
+                    DispatchQueue.main.async {
+                        self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                    }
+                    return
                 }
-                
-                self?.previousStepCount = stepCount
+                //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
+                let stepCount = quantity.doubleValue(for: .count())
+                let activity = Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
+                //อัปเดตข้อมูลใหม่ไปยังหน้า ui
+                DispatchQueue.main.async {
+                    self?.activities["todaySteps"] = activity
+                    
+                    // Update step score with new rule: 100 steps = 1 point
+                    let newPoints = Int(stepCount / 100) - Int(self?.previousStepCount ?? 0) / 100
+                    if newPoints > 0 {
+                        self?.stepScore += newPoints
+                    }
+                    
+                    self?.previousStepCount = stepCount
+                }
             }
+            healthStore.execute(query)
         }
-        healthStore.execute(query)
-    }
+    
 
     func fetchTodayCalories() {
            let calories = HKQuantityType(.activeEnergyBurned)

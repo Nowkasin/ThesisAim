@@ -187,11 +187,11 @@ struct TodayActivitiesView: View {
                         .frame(width: 20, height: 20) // กำหนดขนาดไอคอน
                         .foregroundColor(.yellow) // สีไอคอน
                     Text("\(manager.stepScore)") // คะแนน
-                            .font(.headline)
-                            .padding(8) // เพิ่มระยะห่างรอบข้อความ
-                            .background(Color.gray) // พื้นหลังสีเทา
-                            .foregroundColor(.white) // ตัวเลขสีขาว
-                            .cornerRadius(10) // มุมโค้งมนให้กับพื้นหลัง
+                        .font(.headline)
+                        .padding(8) // เพิ่มระยะห่างรอบข้อความ
+                        .background(Color.gray) // พื้นหลังสีเทา
+                        .foregroundColor(.white) // ตัวเลขสีขาว
+                        .cornerRadius(10) // มุมโค้งมนให้กับพื้นหลัง
                 }
             }
             .padding(.horizontal)

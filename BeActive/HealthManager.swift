@@ -13,7 +13,7 @@ extension Date {
     static var startOfDay: Date {
         Calendar.current.startOfDay(for: Date())
     }
-
+    
     static var startOfWeek: Date {
         let calendar = Calendar.current
         var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
@@ -107,7 +107,7 @@ class HealthManager: ObservableObject {
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
         let water = HKQuantityType(.dietaryWater)
-
+        
         // Create a dictionary to map health types to corresponding fetch functions
         let healthDataMap: [HKQuantityType: () -> Void] = [
             steps: { [weak self] in self?.fetchTodaySteps() },
@@ -127,12 +127,12 @@ class HealthManager: ObservableObject {
                     print("Error observing \(type.identifier): \(error.localizedDescription)")
                     return
                 }
-
+                
                 // Fetch the corresponding data based on the health data type
                 DispatchQueue.main.async {
                     healthDataMap[type]?() // Call the associated fetch function
                 }
-
+                
                 completionHandler() // Inform HealthKit that the work is done
             })
             healthStore.execute(query)
@@ -140,74 +140,73 @@ class HealthManager: ObservableObject {
     }
     
     func fetchTodaySteps() {
-            let steps = HKQuantityType(.stepCount)
-            let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())//เริ่มจับการเคลื่อนไหวเมื่อถึงเที่ยงคืนวันต่อไป และจะรีเซ็ตค่าเมื่อสิ้นสุดวันนั้น
-            let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in//สร้างเพื่อนับจำนวนก้าวที่เกิดขึ้นในช่วงเวลานั้น
-                if let error = error {
-                    print("Error fetching today's step data: \(error.localizedDescription)")
-                    DispatchQueue.main.async {
-                        self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
-                    }//ตรวจสอบข้อผิดพลาด
-                    return
-                }
-                //ตรวจสอบว่ามีข้อมูลจำนวนก้าวหรือไม่ ถ้าไม่มีให้แสดงข้อมูลแบบจำลองแทน
-                guard let quantity = result?.sumQuantity() else {
-                    print("No step data available for today.")
-                    DispatchQueue.main.async {
-                        self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
-                    }
-                    return
-                }
-                //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
-                let stepCount = quantity.doubleValue(for: .count())
-                let activity = Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
-                //อัปเดตข้อมูลใหม่ไปยังหน้า ui
+        let steps = HKQuantityType(.stepCount)
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())//เริ่มจับการเคลื่อนไหวเมื่อถึงเที่ยงคืนวันต่อไป และจะรีเซ็ตค่าเมื่อสิ้นสุดวันนั้น
+        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in//สร้างเพื่อนับจำนวนก้าวที่เกิดขึ้นในช่วงเวลานั้น
+            if let error = error {
+                print("Error fetching today's step data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self?.activities["todaySteps"] = activity
-                    
-                    // Update step score with new rule: 100 steps = 1 point
-                    let newPoints = Int(stepCount / 100) - Int(self?.previousStepCount ?? 0) / 100
-                    if newPoints > 0 {
-                        self?.stepScore += newPoints
-                    }
-                    
-                    self?.previousStepCount = stepCount
-                }
+                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                }//ตรวจสอบข้อผิดพลาด
+                return
             }
-            healthStore.execute(query)
+            //ตรวจสอบว่ามีข้อมูลจำนวนก้าวหรือไม่ ถ้าไม่มีให้แสดงข้อมูลแบบจำลองแทน
+            guard let quantity = result?.sumQuantity() else {
+                print("No step data available for today.")
+                DispatchQueue.main.async {
+                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                }
+                return
+            }
+            //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
+            let stepCount = quantity.doubleValue(for: .count())
+            let activity = Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
+            //อัปเดตข้อมูลใหม่ไปยังหน้า ui
+            DispatchQueue.main.async {
+                self?.activities["todaySteps"] = activity
+                
+                // Update step score with new rule: 100 steps = 1 point
+                let newPoints = Int(stepCount / 100) - Int(self?.previousStepCount ?? 0) / 100
+                if newPoints > 0 {
+                    self?.stepScore += newPoints
+                }
+                
+                self?.previousStepCount = stepCount
+            }
         }
+        healthStore.execute(query)
+    }
     
-
     func fetchTodayCalories() {
-           let calories = HKQuantityType(.activeEnergyBurned)
-           let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
-           let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
-               if let error = error {
-                   print("Error fetching today's Calories data: \(error.localizedDescription)")
-                   DispatchQueue.main.async {
-                       self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
-                   }
-                   return
-               }
-               
-               guard let quantity = result?.sumQuantity() else {
-                   print("No calories data available for today.")
-                   DispatchQueue.main.async {
-                       self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
-                   }
-                   return
-               }
-               
-               let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
-               let activity = Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
-               
-               DispatchQueue.main.async {
-                   self?.activities["todayCalories"] = activity
-               }
-           }
-           healthStore.execute(query)
-       }
-
+        let calories = HKQuantityType(.activeEnergyBurned)
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
+            if let error = error {
+                print("Error fetching today's Calories data: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                }
+                return
+            }
+            
+            guard let quantity = result?.sumQuantity() else {
+                print("No calories data available for today.")
+                DispatchQueue.main.async {
+                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                }
+                return
+            }
+            
+            let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
+            let activity = Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
+            
+            DispatchQueue.main.async {
+                self?.activities["todayCalories"] = activity
+            }
+        }
+        healthStore.execute(query)
+    }
+    
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -219,7 +218,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             guard let samples = samples as? [HKQuantitySample], let latestSample = samples.first else {
                 print("No heart rate samples found.")
                 DispatchQueue.main.async {
@@ -227,19 +226,19 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-
+            
             // Define heart rate ranges
             let sleepHeartRateRange = 40.0...64.0
             let restingHeartRateRange = 65.0...85.0 // Adjust based on gender
             let walkingHeartRateRange = 86.0...120.0 // Adjust based on gender
-
+            
             print("Current Heart Rate: \(heartRate)")
-
+            
             DispatchQueue.main.async {
                 var state: String = "Unknown"
-
+                
                 // Determine the state based on heart rate range
                 if restingHeartRateRange.contains(heartRate) {
                     state = "Resting"
@@ -260,9 +259,9 @@ class HealthManager: ObservableObject {
                     self?.startTime = nil
                     print("Heart rate not in resting range. Timer reset and no alert triggered.")
                 }
-
+                
                 print("Current State: \(state)")
-
+                
                 let activity = Activity(id: 2, title: "Today Heart Rate (\(state))", subtitle: "Goal 60-120 BPM", image: "heart.fill", tintColor: .red, amount: heartRate.formattedString())
                 self?.activities["todayHeartRate"] = activity
             }
@@ -300,14 +299,14 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-
-       func handleAlertDismiss() {
-           DispatchQueue.main.async {
-               self.alertActive = false // Alert is no longer active
-               self.startTime = nil // Reset the timer now that the alert is dismissed
-               print("Alert dismissed, resetting timer.")
-           }
-       }
+    
+    func handleAlertDismiss() {
+        DispatchQueue.main.async {
+            self.alertActive = false // Alert is no longer active
+            self.startTime = nil // Reset the timer now that the alert is dismissed
+            print("Alert dismissed, resetting timer.")
+        }
+    }
     
     func requestAuthorization() {
         // ตรวจสอบว่า HealthKit สามารถใช้งานได้
@@ -321,7 +320,7 @@ class HealthManager: ObservableObject {
         
         let typesToShare: Set = [heartRateType, stepCountType]
         let typesToRead: Set = [heartRateType, stepCountType]
-
+        
         healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
             if success {
                 print("Permission granted")

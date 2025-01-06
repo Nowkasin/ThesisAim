@@ -9,6 +9,7 @@ import SwiftUI
 import UserNotifications
 
 struct HomeView: View {
+    @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว
     @EnvironmentObject var manager: HealthManager
     let welcomeArray = ["Hello", "Bienvenido", "Bienvenue"]
     @State private var currentIndex = 0
@@ -22,12 +23,15 @@ struct HomeView: View {
             GeometryReader { geometry in
                 TabView(selection: $selectedTab) {
                     ZStack {
+                        themeManager.backgroundColor
+                            .edgesIgnoringSafeArea(.all)
+                        
                         VStack(alignment: .leading) {
                             VStack(alignment: .leading) {
                                 Text("Hey \(welcomeArray[currentIndex])")
                                     .padding(.top, 10)
                                     .font(.system(size: geometry.size.width * 0.08, weight: .bold))
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(themeManager.textColor)
                                     .padding(.horizontal)
                                     .onAppear {
                                         startWelcomeTimer()
@@ -41,21 +45,22 @@ struct HomeView: View {
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
-                            TodayActivitiesView(manager: _manager)
+                            TodayActivitiesView(manager: _manager, textColor: themeManager.textColor)
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
                             Text("Reminders")
                                 .font(.headline)
+                                .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal)
                                 .padding(.bottom, 5)
                             
                             VStack(spacing: 15) {
-                                ReminderSection(title: "Water to Drink", color: .blue, icon: Image(systemName: "drop.fill"))
+                                ReminderSection(title: "Water to Drink", color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
                                     .navigate(to: WaterView())
-                                ReminderSection(title: "Voucher Shop", color: .red, icon: Image(systemName: "ticket.fill"))
+                                ReminderSection(title: "Voucher Shop", color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
                                     .navigate(to: VoucherView())
-                                ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "cart"))
+                                ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
                                     .navigate(to: MatesView())
                             }
                             .padding(.horizontal)
@@ -149,11 +154,13 @@ struct HomeView: View {
     }
 }
 
+
+
 struct ReminderSection: View {
     var title: String
     var color: Color
     var icon: Image
-    
+    var textColor: Color
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -162,7 +169,7 @@ struct ReminderSection: View {
                     .font(.system(size: 20))
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(textColor)
             }
             .padding(.horizontal)
             .padding(.bottom, 5)
@@ -174,12 +181,13 @@ struct ReminderSection: View {
 
 struct TodayActivitiesView: View {
     @EnvironmentObject var manager: HealthManager
-    
+    var textColor: Color
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Today Activities")
                     .font(.headline)
+                    .foregroundColor(textColor)
                 Spacer() // ดันไอคอนไปด้านขวา
                 HStack {
                     Image(systemName: "star.circle") // ไอคอนรูปเหรียญ

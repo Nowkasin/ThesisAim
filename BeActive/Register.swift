@@ -15,6 +15,13 @@ struct RegisterView: View {
     @State private var password = ""
     @StateObject var themeManager = ThemeManager()
 
+    // เพิ่ม FocusState เพื่อควบคุมการ focus ของแต่ละช่องกรอกข้อมูล
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case email, firstName, lastName, phoneNumber, password
+    }
+
     var body: some View {
         ZStack {
             themeManager.backgroundColor
@@ -34,17 +41,22 @@ struct RegisterView: View {
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
+                        .focused($focusedField, equals: .email)
 
                     CustomTextField(placeholder: "First Name", textColor: themeManager.textColor, text: $firstName)
                         .autocapitalization(.words)
+                        .focused($focusedField, equals: .firstName)
 
                     CustomTextField(placeholder: "Last Name", textColor: themeManager.textColor, text: $lastName)
                         .autocapitalization(.words)
+                        .focused($focusedField, equals: .lastName)
 
                     CustomTextField(placeholder: "Phone number", textColor: themeManager.textColor, text: $phoneNumber)
                         .keyboardType(.phonePad)
+                        .focused($focusedField, equals: .phoneNumber)
 
                     CustomSecureField(placeholder: "Password", textColor: themeManager.textColor, text: $password)
+                        .focused($focusedField, equals: .password)
                 }
 
                 // Button
@@ -60,7 +72,7 @@ struct RegisterView: View {
                 }
                 .padding(.top, 30)
 
-                Spacer()
+                Spacer() // ระยะห่างด้านล่าง
             }
             .padding(.horizontal, 30)
         }
@@ -84,8 +96,8 @@ struct CustomTextField: View {
     var body: some View {
         VStack {
             TextField(placeholder, text: $text)
-                .foregroundColor(textColor) // ตั้งค่าสีข้อความที่ต้องการจาก themeManager
-                .font(.system(size: 16)) // ใช้ฟอนต์ที่ต้องการ
+                .foregroundColor(textColor)
+                .font(.system(size: 16))
                 .padding(.vertical, 10)
                 .padding(.horizontal, 5)
                 .overlay(
@@ -96,13 +108,12 @@ struct CustomTextField: View {
                 )
                 .placeholder(when: text.isEmpty) {
                     Text(placeholder)
-                        .foregroundColor(textColor) // ใช้สี textColor สำหรับ placeholder
+                        .foregroundColor(textColor)
                 }
         }
         .padding(.bottom, 15)
     }
 }
-
 
 // Custom SecureField Component
 struct CustomSecureField: View {
@@ -113,8 +124,8 @@ struct CustomSecureField: View {
     var body: some View {
         VStack {
             SecureField(placeholder, text: $text)
-                .foregroundColor(textColor) // ตั้งค่าสีข้อความที่ต้องการจาก themeManager
-                .font(.system(size: 16)) // ใช้ฟอนต์ที่ต้องการ
+                .foregroundColor(textColor)
+                .font(.system(size: 16))
                 .padding(.vertical, 10)
                 .padding(.horizontal, 5)
                 .overlay(
@@ -125,13 +136,12 @@ struct CustomSecureField: View {
                 )
                 .placeholder(when: text.isEmpty) {
                     Text(placeholder)
-                        .foregroundColor(textColor) // ใช้สี textColor สำหรับ placeholder
+                        .foregroundColor(textColor)
                 }
         }
         .padding(.bottom, 15)
     }
 }
-
 
 // Extension to make placeholder work
 extension View {
@@ -150,4 +160,3 @@ struct RegisterView_Previews: PreviewProvider {
         RegisterView()
     }
 }
-

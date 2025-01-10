@@ -12,7 +12,7 @@ struct BeActiveApp: App {
     @StateObject var manager = HealthManager()
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            RegisterView()
                 .environmentObject(manager) // Make sure this is correctly applied
         }
     }

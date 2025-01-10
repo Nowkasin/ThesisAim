@@ -27,7 +27,7 @@ class ThemeManager: ObservableObject {
     private func updateTheme() {
         let hour = Calendar.current.component(.hour, from: Date())
         
-        if hour >= 18 || hour < 6 {
+        if hour >= 1 || hour < 6 {
             withAnimation(.easeInOut(duration: 1)) {
                 self.backgroundColor = Color(red: 0.1, green: 0.1, blue: 0.1)
                 self.textColor = .white

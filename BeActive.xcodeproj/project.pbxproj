@@ -3,14 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		8E0563592CD9D1D1009EB84A /* VoucherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0563582CD9D1D1009EB84A /* VoucherView.swift */; };
 		8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E05635A2CD9D270009EB84A /* MatesView.swift */; };
-		8E13FDEC2D2B93EE00F2D875 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E13FDEB2D2B93EE00F2D875 /* ThemeManager.swift */; };
 		8E2850052CCE437100059D4E /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2850042CCE437100059D4E /* ChartView.swift */; };
+		8E5E7FCB2D30E4C000917EE0 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5E7FCA2D30E4C000917EE0 /* Register.swift */; };
 		8E81C2642CCF594F00F940AE /* notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E81C2632CCF594F00F940AE /* notification.swift */; };
 		8E83E6BF2CD894550089DC31 /* WaterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E83E6BE2CD894550089DC31 /* WaterView.swift */; };
 		8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */; };
@@ -46,8 +46,8 @@
 /* Begin PBXFileReference section */
 		8E0563582CD9D1D1009EB84A /* VoucherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoucherView.swift; sourceTree = "<group>"; };
 		8E05635A2CD9D270009EB84A /* MatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatesView.swift; sourceTree = "<group>"; };
-		8E13FDEB2D2B93EE00F2D875 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		8E2850042CCE437100059D4E /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		8E5E7FCA2D30E4C000917EE0 /* Register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Register.swift; sourceTree = "<group>"; };
 		8E81C2632CCF594F00F940AE /* notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = notification.swift; sourceTree = "<group>"; };
 		8E83E6BE2CD894550089DC31 /* WaterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterView.swift; sourceTree = "<group>"; };
 		8E8FFA172C06D72400E0A56E /* BeActive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeActive.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,11 +61,15 @@
 		8E8FFA352C06D72600E0A56E /* BeActiveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveUITests.swift; sourceTree = "<group>"; };
 		8E8FFA372C06D72600E0A56E /* BeActiveUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8E8FFA462C06D90200E0A56E /* BeActiTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiTabView.swift; sourceTree = "<group>"; };
-		8E8FFA482C06DA6E00E0A56E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		8E8FFA482C06DA6E00E0A56E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; usesTabs = 0; wrapsLines = 1; };
 		8E8FFA4C2C06DD6000E0A56E /* ActivityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCard.swift; sourceTree = "<group>"; };
 		8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthManager.swift; sourceTree = "<group>"; };
 		8E8FFA502C06E8F500E0A56E /* BeActive.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BeActive.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8E5E7FC92D30E34800917EE0 /* Control */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Control; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8E8FFA142C06D72400E0A56E /* Frameworks */ = {
@@ -125,11 +129,12 @@
 				8E83E6BE2CD894550089DC31 /* WaterView.swift */,
 				8E2850042CCE437100059D4E /* ChartView.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
-				8E13FDEB2D2B93EE00F2D875 /* ThemeManager.swift */,
 				8E05635A2CD9D270009EB84A /* MatesView.swift */,
+				8E5E7FCA2D30E4C000917EE0 /* Register.swift */,
 				8E0563582CD9D1D1009EB84A /* VoucherView.swift */,
 				8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */,
 				8E81C2632CCF594F00F940AE /* notification.swift */,
+				8E5E7FC92D30E34800917EE0 /* Control */,
 			);
 			path = BeActive;
 			sourceTree = "<group>";
@@ -173,6 +178,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8E5E7FC92D30E34800917EE0 /* Control */,
 			);
 			name = BeActive;
 			productName = BeActive;
@@ -293,6 +301,7 @@
 				8E8FFA4F2C06E5A400E0A56E /* HealthManager.swift in Sources */,
 				8E8FFA492C06DA6E00E0A56E /* HomeView.swift in Sources */,
 				8E2850052CCE437100059D4E /* ChartView.swift in Sources */,
+				8E5E7FCB2D30E4C000917EE0 /* Register.swift in Sources */,
 				8E83E6BF2CD894550089DC31 /* WaterView.swift in Sources */,
 				8E0563592CD9D1D1009EB84A /* VoucherView.swift in Sources */,
 				8E81C2642CCF594F00F940AE /* notification.swift in Sources */,
@@ -300,7 +309,6 @@
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,
 				8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */,
 				8E8FFA4D2C06DD6000E0A56E /* ActivityCard.swift in Sources */,
-				8E13FDEC2D2B93EE00F2D875 /* ThemeManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

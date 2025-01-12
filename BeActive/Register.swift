@@ -13,7 +13,11 @@ struct RegisterView: View {
     @State private var lastName = ""
     @State private var phoneNumber = ""
     @State private var password = ""
+    @State private var errorMessage = ""
+    @State private var isPasswordVisible = false
     @StateObject var themeManager = ThemeManager()
+
+    private let passwordValidator = PasswordValidator()
 
     // เพิ่ม FocusState เพื่อควบคุมการ focus ของแต่ละช่องกรอกข้อมูล
     @FocusState private var focusedField: Field?
@@ -55,8 +59,46 @@ struct RegisterView: View {
                         .keyboardType(.phonePad)
                         .focused($focusedField, equals: .phoneNumber)
 
-                    CustomSecureField(placeholder: "Password", textColor: themeManager.textColor, text: $password)
+                    VStack {
+                        HStack {
+                            if isPasswordVisible {
+                                TextField("Password", text: $password)
+                                    .foregroundColor(themeManager.textColor)
+                                    .font(.system(size: 16))
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 5)
+                            } else {
+                                SecureField("Password", text: $password)
+                                    .foregroundColor(themeManager.textColor)
+                                    .font(.system(size: 16))
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 5)
+                            }
+
+                            Button(action: {
+                                isPasswordVisible.toggle()
+                            }) {
+                                Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .overlay(
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(Color.gray.opacity(0.5)),
+                            alignment: .bottom
+                        )
                         .focused($focusedField, equals: .password)
+                        .onChange(of: password) { newValue in
+                            validatePassword(newValue)
+                        }
+                    }
+                }
+
+                if !errorMessage.isEmpty {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .font(.caption)
                 }
 
                 // Button
@@ -80,10 +122,24 @@ struct RegisterView: View {
 
     func registerUser() {
         guard !email.isEmpty, !firstName.isEmpty, !lastName.isEmpty, !phoneNumber.isEmpty, !password.isEmpty else {
-            print("Please fill all fields.")
+            errorMessage = "Please fill all fields."
             return
         }
-        print("User registered with email: \(email)")
+
+        if passwordValidator.validatePassword(password) {
+            print("User registered with email: \(email)")
+            errorMessage = ""
+        } else {
+            errorMessage = passwordValidator.errorMessage
+        }
+    }
+
+    private func validatePassword(_ password: String) {
+        if !passwordValidator.validatePassword(password) {
+            errorMessage = passwordValidator.errorMessage
+        } else {
+            errorMessage = ""
+        }
     }
 }
 

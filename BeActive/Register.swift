@@ -59,40 +59,11 @@ struct RegisterView: View {
                         .keyboardType(.phonePad)
                         .focused($focusedField, equals: .phoneNumber)
 
-                    VStack {
-                        HStack {
-                            if isPasswordVisible {
-                                TextField("Password", text: $password)
-                                    .foregroundColor(themeManager.textColor)
-                                    .font(.system(size: 16))
-                                    .padding(.vertical, 10)
-                                    .padding(.horizontal, 5)
-                            } else {
-                                SecureField("Password", text: $password)
-                                    .foregroundColor(themeManager.textColor)
-                                    .font(.system(size: 16))
-                                    .padding(.vertical, 10)
-                                    .padding(.horizontal, 5)
-                            }
-
-                            Button(action: {
-                                isPasswordVisible.toggle()
-                            }) {
-                                Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                        .overlay(
-                            Rectangle()
-                                .frame(height: 1)
-                                .foregroundColor(Color.gray.opacity(0.5)),
-                            alignment: .bottom
-                        )
+                    CustomPasswordField(placeholder: "Password", textColor: themeManager.textColor, text: $password, isPasswordVisible: $isPasswordVisible)
                         .focused($focusedField, equals: .password)
                         .onChange(of: password) { newValue in
                             validatePassword(newValue)
                         }
-                    }
                 }
 
                 if !errorMessage.isEmpty {
@@ -164,36 +135,54 @@ struct CustomTextField: View {
                 )
                 .placeholder(when: text.isEmpty) {
                     Text(placeholder)
-                        .foregroundColor(textColor)
+                        .foregroundColor(textColor.opacity(0.6))
                 }
         }
         .padding(.bottom, 15)
     }
 }
 
-// Custom SecureField Component
-struct CustomSecureField: View {
+// Custom PasswordField Component
+struct CustomPasswordField: View {
     var placeholder: String
     var textColor: Color
     @Binding var text: String
+    @Binding var isPasswordVisible: Bool
 
     var body: some View {
         VStack {
-            SecureField(placeholder, text: $text)
-                .foregroundColor(textColor)
-                .font(.system(size: 16))
-                .padding(.vertical, 10)
-                .padding(.horizontal, 5)
-                .overlay(
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color.gray.opacity(0.5)),
-                    alignment: .bottom
-                )
-                .placeholder(when: text.isEmpty) {
-                    Text(placeholder)
+            HStack {
+                if isPasswordVisible {
+                    TextField(placeholder, text: $text)
                         .foregroundColor(textColor)
+                        .font(.system(size: 16))
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 5)
+                } else {
+                    SecureField(placeholder, text: $text)
+                        .foregroundColor(textColor)
+                        .font(.system(size: 16))
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 5)
                 }
+
+                Button(action: {
+                    isPasswordVisible.toggle()
+                }) {
+                    Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
+                        .foregroundColor(.gray)
+                }
+            }
+            .overlay(
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(Color.gray.opacity(0.5)),
+                alignment: .bottom
+            )
+            .placeholder(when: text.isEmpty) {
+                Text(placeholder)
+                    .foregroundColor(textColor.opacity(0.6))
+            }
         }
         .padding(.bottom, 15)
     }

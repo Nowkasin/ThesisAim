@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		8E0563592CD9D1D1009EB84A /* VoucherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0563582CD9D1D1009EB84A /* VoucherView.swift */; };
 		8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E05635A2CD9D270009EB84A /* MatesView.swift */; };
+		8E085E412D374D9300D7C29E /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E085E402D374D9300D7C29E /* Login.swift */; };
 		8E2850052CCE437100059D4E /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2850042CCE437100059D4E /* ChartView.swift */; };
 		8E5E7FCB2D30E4C000917EE0 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5E7FCA2D30E4C000917EE0 /* Register.swift */; };
-		8E81C2642CCF594F00F940AE /* notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E81C2632CCF594F00F940AE /* notification.swift */; };
 		8E83E6BF2CD894550089DC31 /* WaterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E83E6BE2CD894550089DC31 /* WaterView.swift */; };
 		8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */; };
 		8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1C2C06D72400E0A56E /* ContentView.swift */; };
@@ -46,9 +46,9 @@
 /* Begin PBXFileReference section */
 		8E0563582CD9D1D1009EB84A /* VoucherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoucherView.swift; sourceTree = "<group>"; };
 		8E05635A2CD9D270009EB84A /* MatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatesView.swift; sourceTree = "<group>"; };
+		8E085E402D374D9300D7C29E /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
 		8E2850042CCE437100059D4E /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		8E5E7FCA2D30E4C000917EE0 /* Register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Register.swift; sourceTree = "<group>"; };
-		8E81C2632CCF594F00F940AE /* notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = notification.swift; sourceTree = "<group>"; };
 		8E83E6BE2CD894550089DC31 /* WaterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterView.swift; sourceTree = "<group>"; };
 		8E8FFA172C06D72400E0A56E /* BeActive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeActive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveApp.swift; sourceTree = "<group>"; };
@@ -126,6 +126,7 @@
 				8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */,
 				8E8FFA202C06D72600E0A56E /* Preview Content */,
 				8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */,
+				8E085E402D374D9300D7C29E /* Login.swift */,
 				8E83E6BE2CD894550089DC31 /* WaterView.swift */,
 				8E2850042CCE437100059D4E /* ChartView.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
@@ -133,7 +134,6 @@
 				8E5E7FCA2D30E4C000917EE0 /* Register.swift */,
 				8E0563582CD9D1D1009EB84A /* VoucherView.swift */,
 				8E8FFA4E2C06E5A400E0A56E /* HealthManager.swift */,
-				8E81C2632CCF594F00F940AE /* notification.swift */,
 				8E5E7FC92D30E34800917EE0 /* Control */,
 			);
 			path = BeActive;
@@ -301,10 +301,10 @@
 				8E8FFA4F2C06E5A400E0A56E /* HealthManager.swift in Sources */,
 				8E8FFA492C06DA6E00E0A56E /* HomeView.swift in Sources */,
 				8E2850052CCE437100059D4E /* ChartView.swift in Sources */,
+				8E085E412D374D9300D7C29E /* Login.swift in Sources */,
 				8E5E7FCB2D30E4C000917EE0 /* Register.swift in Sources */,
 				8E83E6BF2CD894550089DC31 /* WaterView.swift in Sources */,
 				8E0563592CD9D1D1009EB84A /* VoucherView.swift in Sources */,
-				8E81C2642CCF594F00F940AE /* notification.swift in Sources */,
 				8E8FFA472C06D90200E0A56E /* BeActiTabView.swift in Sources */,
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,
 				8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */,

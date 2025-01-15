@@ -12,8 +12,9 @@ struct BeActiveApp: App {
     @StateObject var manager = HealthManager()
     var body: some Scene {
         WindowGroup {
-            RegisterView()
+            Login()
                 .environmentObject(manager) // Make sure this is correctly applied
+                .environmentObject(ThemeManager())
         }
     }
 }

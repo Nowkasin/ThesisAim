@@ -4,10 +4,11 @@
 //
 //  Created by Kasin Thappawan on 10/1/2568 BE.
 //
-
 import SwiftUI
 
 struct RegisterView: View {
+    @EnvironmentObject var themeManager: ThemeManager // ใช้ ThemeManager จาก EnvironmentObject
+    
     @State private var email = ""
     @State private var firstName = ""
     @State private var lastName = ""
@@ -15,11 +16,8 @@ struct RegisterView: View {
     @State private var password = ""
     @State private var errorMessage = ""
     @State private var isPasswordVisible = false
-    @StateObject var themeManager = ThemeManager()
-
     private let passwordValidator = PasswordValidator()
 
-    // เพิ่ม FocusState เพื่อควบคุมการ focus ของแต่ละช่องกรอกข้อมูล
     @FocusState private var focusedField: Field?
 
     enum Field {
@@ -32,19 +30,16 @@ struct RegisterView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-                // Title
                 Text("Register")
                     .padding(.top, 30)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(Color(red: 135/255, green: 206/255, blue: 235/255))
                     .padding(.bottom, 20)
 
-                // Form Fields
                 Group {
                     CustomTextField(placeholder: "E-mail Address", textColor: themeManager.textColor, text: $email)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
-                        .disableAutocorrection(true)
                         .focused($focusedField, equals: .email)
 
                     CustomTextField(placeholder: "First Name", textColor: themeManager.textColor, text: $firstName)
@@ -72,7 +67,6 @@ struct RegisterView: View {
                         .font(.caption)
                 }
 
-                // Button
                 Button(action: {
                     registerUser()
                 }) {
@@ -85,7 +79,7 @@ struct RegisterView: View {
                 }
                 .padding(.top, 30)
 
-                Spacer() // ระยะห่างด้านล่าง
+                Spacer()
             }
             .padding(.horizontal, 30)
         }
@@ -118,6 +112,7 @@ struct RegisterView: View {
 struct CustomTextField: View {
     var placeholder: String
     var textColor: Color
+    var backgroundColor: Color = Color(.systemGray6) // เพิ่มตัวเลือกสำหรับสีพื้นหลัง
     @Binding var text: String
 
     var body: some View {
@@ -125,27 +120,20 @@ struct CustomTextField: View {
             TextField(placeholder, text: $text)
                 .foregroundColor(textColor)
                 .font(.system(size: 16))
-                .padding(.vertical, 10)
-                .padding(.horizontal, 5)
-                .overlay(
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color.gray.opacity(0.5)),
-                    alignment: .bottom
-                )
-                .placeholder(when: text.isEmpty) {
-                    Text(placeholder)
-                        .foregroundColor(textColor.opacity(0.6))
-                }
+                .padding()
+                .background(backgroundColor) // ใช้สีพื้นหลังที่กำหนด
+                .cornerRadius(8) // เพิ่มมุมโค้งมน
         }
         .padding(.bottom, 15)
     }
 }
 
+
 // Custom PasswordField Component
 struct CustomPasswordField: View {
     var placeholder: String
     var textColor: Color
+    var backgroundColor: Color = Color(.systemGray6) // เพิ่มสีพื้นหลัง
     @Binding var text: String
     @Binding var isPasswordVisible: Bool
 
@@ -156,14 +144,12 @@ struct CustomPasswordField: View {
                     TextField(placeholder, text: $text)
                         .foregroundColor(textColor)
                         .font(.system(size: 16))
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 5)
+                        .padding()
                 } else {
                     SecureField(placeholder, text: $text)
                         .foregroundColor(textColor)
                         .font(.system(size: 16))
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 5)
+                        .padding()
                 }
 
                 Button(action: {
@@ -173,20 +159,13 @@ struct CustomPasswordField: View {
                         .foregroundColor(.gray)
                 }
             }
-            .overlay(
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color.gray.opacity(0.5)),
-                alignment: .bottom
-            )
-            .placeholder(when: text.isEmpty) {
-                Text(placeholder)
-                    .foregroundColor(textColor.opacity(0.6))
-            }
+            .background(backgroundColor) // ใช้สีพื้นหลังที่กำหนด
+            .cornerRadius(8) // เพิ่มมุมโค้งมน
         }
         .padding(.bottom, 15)
     }
 }
+
 
 // Extension to make placeholder work
 extension View {
@@ -203,5 +182,7 @@ extension View {
 struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
         RegisterView()
+            .environmentObject(ThemeManager()) // Pass the ThemeManager environment object to the view
     }
 }
+

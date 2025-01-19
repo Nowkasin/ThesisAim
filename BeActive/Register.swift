@@ -51,7 +51,7 @@ struct RegisterView: View {
                         .focused($focusedField, equals: .lastName)
 
                     CustomTextField(placeholder: "Phone number", textColor: themeManager.textColor, text: $phoneNumber)
-                        .keyboardType(.phonePad)
+                        .keyboardType(.numberPad)
                         .focused($focusedField, equals: .phoneNumber)
 
                     CustomPasswordField(placeholder: "Password", textColor: themeManager.textColor, text: $password, isPasswordVisible: $isPasswordVisible)

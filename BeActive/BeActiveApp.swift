@@ -13,7 +13,7 @@ struct BeActiveApp: App {
     var body: some Scene {
         WindowGroup {
             Login()
-                .environmentObject(manager) // Make sure this is correctly applied
+                .environmentObject(HealthManager())// Make sure this is correctly applied
                 .environmentObject(ThemeManager())
         }
     }

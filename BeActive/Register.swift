@@ -37,24 +37,24 @@ struct RegisterView: View {
                     .padding(.bottom, 20)
 
                 Group {
-                    CustomTextField(placeholder: "E-mail Address", textColor: themeManager.textColor, text: $email)
+                    CustomTextField(placeholder: "E-mail Address", text: $email)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         .focused($focusedField, equals: .email)
 
-                    CustomTextField(placeholder: "First Name", textColor: themeManager.textColor, text: $firstName)
+                    CustomTextField(placeholder: "First Name", text: $firstName)
                         .autocapitalization(.words)
                         .focused($focusedField, equals: .firstName)
 
-                    CustomTextField(placeholder: "Last Name", textColor: themeManager.textColor, text: $lastName)
+                    CustomTextField(placeholder: "Last Name", text: $lastName)
                         .autocapitalization(.words)
                         .focused($focusedField, equals: .lastName)
 
-                    CustomTextField(placeholder: "Phone number", textColor: themeManager.textColor, text: $phoneNumber)
+                    CustomTextField(placeholder: "Phone number", text: $phoneNumber)
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .phoneNumber)
 
-                    CustomPasswordField(placeholder: "Password", textColor: themeManager.textColor, text: $password, isPasswordVisible: $isPasswordVisible)
+                    CustomPasswordField(placeholder: "Password", text: $password, isPasswordVisible: $isPasswordVisible)
                         .focused($focusedField, equals: .password)
                         .onChange(of: password) { newValue in
                             validatePassword(newValue)
@@ -111,14 +111,12 @@ struct RegisterView: View {
 // Custom TextField Component
 struct CustomTextField: View {
     var placeholder: String
-    var textColor: Color
     var backgroundColor: Color = Color(.systemGray6) // เพิ่มตัวเลือกสำหรับสีพื้นหลัง
     @Binding var text: String
 
     var body: some View {
         VStack {
             TextField(placeholder, text: $text)
-                .foregroundColor(textColor)
                 .font(.system(size: 16))
                 .padding()
                 .background(backgroundColor) // ใช้สีพื้นหลังที่กำหนด
@@ -132,7 +130,6 @@ struct CustomTextField: View {
 // Custom PasswordField Component
 struct CustomPasswordField: View {
     var placeholder: String
-    var textColor: Color
     var backgroundColor: Color = Color(.systemGray6) // เพิ่มสีพื้นหลัง
     @Binding var text: String
     @Binding var isPasswordVisible: Bool
@@ -142,12 +139,10 @@ struct CustomPasswordField: View {
             HStack {
                 if isPasswordVisible {
                     TextField(placeholder, text: $text)
-                        .foregroundColor(textColor)
                         .font(.system(size: 16))
                         .padding()
                 } else {
                     SecureField(placeholder, text: $text)
-                        .foregroundColor(textColor)
                         .font(.system(size: 16))
                         .padding()
                 }
@@ -183,6 +178,7 @@ struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
         RegisterView()
             .environmentObject(ThemeManager()) // Pass the ThemeManager environment object to the view
+//            .environmentObject(HealthManager())
     }
 }
 

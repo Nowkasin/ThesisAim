@@ -43,18 +43,7 @@ struct ChartView: View {
                 .frame(height: 300)
                 .padding()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) { // ปุ่ม Back ที่มุมซ้ายบน
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss() // กลับไปยังหน้า Home
-                    }) {
-                        HStack {
-                            Image(systemName: "chevron.left") // ไอคอนลูกศรย้อนกลับ
-                            Text("Home")
-                        }
-                    }
-                }
-            }
+           
             .onAppear {
                 fetchHealthData() // ดึงข้อมูลเมื่อหน้าแสดงผล
             }

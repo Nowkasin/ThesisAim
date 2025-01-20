@@ -1,9 +1,10 @@
 //
-//  ActivityCard.swift
+//  Activity.swift
 //  BeActive
 //
-//  Created by Kasin Thappawan on 29/5/2567 BE.
+//  Created by Kasin Thappawan on 19/11/2567 BE.
 //
+
 
 import SwiftUI
 
@@ -20,7 +21,7 @@ struct ActivityCard: View {
     let activity: Activity
     
     var body: some View {
-        NavigationLink(destination: ChartView(activity: activity)) {
+        NavigationLink(destination: ChartView()) {
             ZStack {
                 Color(uiColor: .systemGray6)
                     .cornerRadius(15)
@@ -54,7 +55,6 @@ struct ActivityCard: View {
         .buttonStyle(PlainButtonStyle()) // Removes the default link styling
     }
 }
-
 
 struct ActivityCard_Previews: PreviewProvider {
     static var previews: some View {

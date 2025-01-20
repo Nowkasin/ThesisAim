@@ -8,13 +8,12 @@
 import Foundation
 import HealthKit
 import Combine
-
 // Extension for date handling
 extension Date {
     static var startOfDay: Date {
         Calendar.current.startOfDay(for: Date())
     }
-
+    
     static var startOfWeek: Date {
         let calendar = Calendar.current
         var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
@@ -40,13 +39,13 @@ extension Double {
 // HealthManager class
 class HealthManager: ObservableObject {
     let healthStore = HKHealthStore()
+    var alertsManager: AlertsManager?
     private var timer: AnyCancellable?
     private var startTime: Date?
     private var alertStartTime: Date?
     
     // Properties for handling alerts
-    @Published var alertMessage: String = ""
-    @Published var showAlert: Bool = false
+    
     private var alertActive: Bool = false
     
     // Properties for tracking score and steps
@@ -59,6 +58,7 @@ class HealthManager: ObservableObject {
         "todayCalories": Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: "0"),
         "todayHeartRate": Activity(id: 2, title: "Today Heart Rate", subtitle: "Goal 60-100 BPM", image: "heart.fill", tintColor: .red, amount: "0 BPM"),
         "dayDistance": Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: "0")
+        
     ]
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ไม่ได้รับข้อมูลมาจาก health
     @Published var mockActivities: [String: Activity] = [
@@ -74,7 +74,9 @@ class HealthManager: ObservableObject {
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
-        let healthTypes: Set = [steps, calories, heartRate, distance]
+        let water = HKQuantityType(.dietaryWater)
+        let healthTypes: Set = [steps, calories, heartRate, distance, water]
+        self.alertsManager = AlertsManager()
         
         Task {
             do {
@@ -88,22 +90,39 @@ class HealthManager: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.publish(every: 30, on: .main, in: .common) // Change to 30 seconds
+        timer = Timer.publish(every: 2, on: .main, in: .common) // Change to 30 seconds
             .autoconnect()
             .sink { [weak self] _ in
                 self?.fetchTodaySteps()
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
+                self?.alertsManager?.triggerWaterAlert()
             }
     }
     func startObservingHealthData() {
+        // Define health data types
         let steps = HKQuantityType(.stepCount)
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
+<<<<<<< HEAD
         let healthTypes = [steps, calories, heartRate, distance]
 
+=======
+        let water = HKQuantityType(.dietaryWater)
+        
+        // Create a dictionary to map health types to corresponding fetch functions
+        let healthDataMap: [HKQuantityType: () -> Void] = [
+            steps: { [weak self] in self?.fetchTodaySteps() },
+            calories: { [weak self] in self?.fetchTodayCalories() },
+            heartRate: { [weak self] in self?.fetchTodayHeartRate() },
+            distance: { [weak self] in self?.fetchTodayDistance() }
+        ]
+        
+        let healthTypes = [steps, calories, heartRate, distance, water]
+        
+>>>>>>> cc1ba21a1b094d52bcd14b8f3b301097e4308826
         for type in healthTypes {
             // Use HKObserverQuery to detect changes in data from Apple Watch
             let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
@@ -113,23 +132,21 @@ class HealthManager: ObservableObject {
                     print("Error observing \(type.identifier): \(error.localizedDescription)")
                     return
                 }
+<<<<<<< HEAD
 
                 // Call a function to fetch data from Apple Watch
+=======
+                
+                // Fetch the corresponding data based on the health data type
+>>>>>>> cc1ba21a1b094d52bcd14b8f3b301097e4308826
                 DispatchQueue.main.async {
-                    switch type {
-                    case steps:
-                        self?.fetchTodaySteps()
-                    case calories:
-                        self?.fetchTodayCalories()
-                    case heartRate:
-                        self?.fetchTodayHeartRate()
-                    case distance:
-                        self?.fetchTodayDistance()
-                    default:
-                        break
-                    }
+                    healthDataMap[type]?() // Call the associated fetch function
                 }
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> cc1ba21a1b094d52bcd14b8f3b301097e4308826
                 completionHandler() // Inform HealthKit that the work is done
             })
             healthStore.execute(query)
@@ -174,7 +191,6 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-
     
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
@@ -217,7 +233,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             guard let samples = samples as? [HKQuantitySample], let latestSample = samples.first else {
                 print("No heart rate samples found.")
                 DispatchQueue.main.async {
@@ -225,7 +241,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
             
             // Define heart rate ranges
@@ -234,48 +250,39 @@ class HealthManager: ObservableObject {
             let walkingHeartRateRange = 86.0...120.0 // Adjust based on gender
             
             print("Current Heart Rate: \(heartRate)")
-
+            
             DispatchQueue.main.async {
                 var state: String = "Unknown"
                 
                 // Determine the state based on heart rate range
                 if restingHeartRateRange.contains(heartRate) {
                     state = "Resting"
-                } else if walkingHeartRateRange.contains(heartRate) {
-                    state = "Walking"
-                } else if sleepHeartRateRange.contains(heartRate){
-                    state = "Sleep"
-                }
-                else {
-                    self?.startTime = nil
-                    print("Heart rate out of target range. Resetting timer.")
-                }
-                
-                print("Current State: \(state)")
-                
-                if walkingHeartRateRange.contains(heartRate) || restingHeartRateRange.contains(heartRate) {
+                    // Start timer for Resting state
                     if self?.startTime == nil && self?.alertActive == false {
-                        // Start timer when heart rate is in range and no alert is active
                         self?.startTime = Date()
                         print("Started timing: \(self?.startTime ?? Date())")
                     }
                     
                     let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
-                    print("Elapsed Time in target range: \(elapsedTime) seconds")
+                    print("Elapsed Time in resting range: \(elapsedTime) seconds")
                     
-                    if elapsedTime >= 300 && self?.alertActive == false { // 5 minutes
-                        self?.triggerMoveAlert()
-                        // Wait for the user to dismiss the alert before resetting startTime
+                    if elapsedTime >= 3600 && self?.alertActive == false { // 5 minutes
+                        self?.alertsManager?.triggerMoveAlert()
                     }
+                } else {
+                    // Reset timer and do not trigger notification for non-resting states
+                    self?.startTime = nil
+                    print("Heart rate not in resting range. Timer reset and no alert triggered.")
                 }
-
+                
+                print("Current State: \(state)")
+                
                 let activity = Activity(id: 2, title: "Today Heart Rate (\(state))", subtitle: "Goal 60-120 BPM", image: "heart.fill", tintColor: .red, amount: heartRate.formattedString())
                 self?.activities["todayHeartRate"] = activity
             }
         }
         healthStore.execute(query)
     }
-
     
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
@@ -298,8 +305,8 @@ class HealthManager: ObservableObject {
             }
             
             let distanceInMeters = quantity.doubleValue(for: .meter())
-            let distanceInKm = distanceInMeters / 1000
-            let activity = Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: distanceInKm.formattedString())
+            let distanceInKilometers = distanceInMeters / 1000.0
+            let activity = Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: distanceInKilometers.formattedString())
             
             DispatchQueue.main.async {
                 self?.activities["dayDistance"] = activity
@@ -308,7 +315,15 @@ class HealthManager: ObservableObject {
         healthStore.execute(query)
     }
     
+    func handleAlertDismiss() {
+        DispatchQueue.main.async {
+            self.alertActive = false // Alert is no longer active
+            self.startTime = nil // Reset the timer now that the alert is dismissed
+            print("Alert dismissed, resetting timer.")
+        }
+    }
     
+<<<<<<< HEAD
     private func triggerMoveAlert() {
            DispatchQueue.main.async {
                print("Triggering alert")
@@ -327,6 +342,8 @@ class HealthManager: ObservableObject {
            }
        }
     
+=======
+>>>>>>> cc1ba21a1b094d52bcd14b8f3b301097e4308826
     func requestAuthorization() {
         // ตรวจสอบว่า HealthKit สามารถใช้งานได้
         guard HKHealthStore.isHealthDataAvailable() else {
@@ -339,7 +356,11 @@ class HealthManager: ObservableObject {
         
         let typesToShare: Set = [heartRateType, stepCountType]
         let typesToRead: Set = [heartRateType, stepCountType]
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> cc1ba21a1b094d52bcd14b8f3b301097e4308826
         healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
             if success {
                 print("Permission granted")

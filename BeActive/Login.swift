@@ -9,53 +9,54 @@ import SwiftUI
 
 struct Login: View {
     @EnvironmentObject var themeManager: ThemeManager
-    @State private var email: String = "" // เก็บอีเมล
-    @State private var password: String = "" // เก็บรหัสผ่าน
-    @State private var isPasswordVisible: Bool = false // เก็บสถานะการแสดงรหัสผ่าน
-    @State private var isLoggedIn: Bool = false // สถานะการล็อกอิน
-    
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var isPasswordVisible: Bool = false
+    @State private var isLoggedIn: Bool = false
+
     var body: some View {
         NavigationStack {
             ZStack {
                 if isLoggedIn {
                     HomeView()
-                        .transition(.move(edge: .trailing)) // การเคลื่อนไหวจากด้านขวา
-                        .animation(.easeInOut(duration: 0.5), value: isLoggedIn) // เพิ่ม Animation
+                        .transition(.move(edge: .trailing))
+                        .animation(.easeInOut(duration: 0.5), value: isLoggedIn)
                 } else {
                     VStack {
                         Spacer().frame(height: 50)
-                        
-                        Text("Log In")
+
+                        // ใช้ฟังก์ชัน t() สำหรับการแปล
+                        Text(t("log_in", in: "login_screen"))
                             .padding(.top, 30)
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(Color(red: 135/255, green: 206/255, blue: 235/255))
                             .padding(.bottom, 20)
-                        
+
                         VStack(alignment: .leading, spacing: 15) {
-                            TextField("E-mail Address", text: $email)
+                            TextField(t("e_mail", in: "login_screen"), text: $email)
                                 .padding()
                                 .background(Color(.systemGray6))
                                 .cornerRadius(8)
                                 .autocapitalization(.none)
                                 .keyboardType(.emailAddress)
-                            
+
                             ZStack {
                                 if isPasswordVisible {
-                                    TextField("Password", text: $password) // แสดงรหัสผ่าน
+                                    TextField(t("password", in: "login_screen"), text: $password)
                                         .padding()
                                         .background(Color(.systemGray6))
                                         .cornerRadius(8)
                                 } else {
-                                    SecureField("Password", text: $password) // ซ่อนรหัสผ่าน
+                                    SecureField(t("password", in: "login_screen"), text: $password)
                                         .padding()
                                         .background(Color(.systemGray6))
                                         .cornerRadius(8)
                                 }
-                                
+
                                 HStack {
                                     Spacer()
                                     Button(action: {
-                                        isPasswordVisible.toggle() // เปลี่ยนสถานะการแสดงรหัสผ่าน
+                                        isPasswordVisible.toggle()
                                     }) {
                                         Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
                                             .foregroundColor(.gray)
@@ -65,28 +66,27 @@ struct Login: View {
                             }
                         }
                         .padding(.horizontal, 20)
-                        
+
                         HStack {
                             Spacer()
-                            Text("No account yet?")
+                            Text(t("no_account_yet", in: "login_screen"))
                                 .foregroundColor(.gray)
                             NavigationLink(destination: RegisterView()) {
-                                Text("Register")
+                                Text(t("register", in: "login_screen"))
                                     .foregroundColor(themeManager.textColor)
                             }
                         }
                         .padding(.top, 10)
                         .padding(.horizontal, 20)
-                        
+
                         Spacer()
-                        
+
                         Button(action: {
-                            // ตรวจสอบการล็อกอิน (สามารถเพิ่ม validation ได้)
                             withAnimation {
                                 isLoggedIn = true
                             }
                         }) {
-                            Text("Log In")
+                            Text(t("log_in", in: "login_screen"))
                                 .font(.system(size: 18, weight: .medium))
                                 .frame(maxWidth: .infinity, minHeight: 50)
                                 .background(Color(red: 90/255, green: 200/255, blue: 250/255))

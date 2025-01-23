@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @EnvironmentObject var themeManager: ThemeManager // ใช้ ThemeManager จาก EnvironmentObject
+    @EnvironmentObject var themeManager: ThemeManager
     
     @State private var email = ""
     @State private var firstName = ""
@@ -25,36 +25,44 @@ struct RegisterView: View {
     }
 
     var body: some View {
+        
         ZStack {
             themeManager.backgroundColor
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-                Text("Register")
+                Text(t("register", in: "register_screen"))
+                 // ใช้ฟังก์ชัน t() สำหรับข้อความ
                     .padding(.top, 30)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(Color(red: 135/255, green: 206/255, blue: 235/255))
                     .padding(.bottom, 20)
 
                 Group {
-                    CustomTextField(placeholder: "E-mail Address", text: $email)
+                    CustomTextField(placeholder:
+                                        (t("e_mail", in: "register_screen")), text: $email) // ใช้ t() แปล
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         .focused($focusedField, equals: .email)
 
-                    CustomTextField(placeholder: "First Name", text: $firstName)
+                    CustomTextField(placeholder:
+                                        (t("first_name", in: "register_screen"))
+                                        , text: $firstName) // ใช้ t() แปล
                         .autocapitalization(.words)
                         .focused($focusedField, equals: .firstName)
 
-                    CustomTextField(placeholder: "Last Name", text: $lastName)
+                    CustomTextField(placeholder:
+                                        (t("last_name", in: "register_screen")), text: $lastName) // ใช้ t() แปล
                         .autocapitalization(.words)
                         .focused($focusedField, equals: .lastName)
 
-                    CustomTextField(placeholder: "Phone number", text: $phoneNumber)
+                    CustomTextField(placeholder:
+                                        (t("phone_number", in: "register_screen")), text: $phoneNumber) // ใช้ t() แปล
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .phoneNumber)
 
-                    CustomPasswordField(placeholder: "Password", text: $password, isPasswordVisible: $isPasswordVisible)
+                    CustomPasswordField(placeholder:
+                                            (t("password", in: "register_screen")), text: $password, isPasswordVisible: $isPasswordVisible) // ใช้ t() แปล
                         .focused($focusedField, equals: .password)
                         .onChange(of: password) { newValue in
                             validatePassword(newValue)
@@ -70,7 +78,7 @@ struct RegisterView: View {
                 Button(action: {
                     registerUser()
                 }) {
-                    Text("Sign Up")
+                    Text(t("sign_up", in: "register_screen")) // ใช้ t() แปล
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity, minHeight: 50)
                         .background(Color(red: 90/255, green: 200/255, blue: 250/255))
@@ -87,7 +95,7 @@ struct RegisterView: View {
 
     func registerUser() {
         guard !email.isEmpty, !firstName.isEmpty, !lastName.isEmpty, !phoneNumber.isEmpty, !password.isEmpty else {
-            errorMessage = "Please fill all fields."
+            errorMessage = (t("fill_all_fields", in: "register_screen")) // ใช้ t() แปล
             return
         }
 
@@ -107,6 +115,7 @@ struct RegisterView: View {
         }
     }
 }
+
 
 // Custom TextField Component
 struct CustomTextField: View {

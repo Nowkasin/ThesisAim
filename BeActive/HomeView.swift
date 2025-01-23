@@ -49,18 +49,18 @@ struct HomeView: View {
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
-                            Text("Reminders")
+                            Text(t("Reminders", in: "home_screen"))
                                 .font(.headline)
                                 .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal)
                                 .padding(.bottom, 5)
                             
                             VStack(spacing: 15) {
-                                ReminderSection(title: "Water to Drink", color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
+                                ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
                                     .navigate(to: WaterView())
-                                ReminderSection(title: "Voucher Shop", color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
+                                ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
                                     .navigate(to: VoucherView())
-                                ReminderSection(title: "Mates Shop", color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
+                                ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
                                     .navigate(to: MatesView())
                             }
                             .padding(.horizontal)
@@ -79,11 +79,11 @@ struct HomeView: View {
                         }
                         .alert(isPresented: $showAlert) {
                             Alert(
-                                title: Text("Time to Move!"),
+                                title: Text(t("Time to Move!", in: "home_screen")),
                                 message: Text(alertMessage),
-                                dismissButton: .default(Text("OK")) {
-                                    manager.handleAlertDismiss()
-                                }
+                                dismissButton: .default(Text(t("OK", in: "home_screen"))) {
+                                                                    manager.handleAlertDismiss()
+                                                                }
                             )
                         }
                     }
@@ -139,7 +139,7 @@ struct HomeView: View {
     
     func triggerNotification(message: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Time to Move!"
+        content.title = (t("Time to Move!", in: "home_screen"))
         content.body = message
         content.sound = .default
         

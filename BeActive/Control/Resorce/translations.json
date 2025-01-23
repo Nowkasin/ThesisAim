@@ -1,0 +1,62 @@
+{
+    "en" : {
+            "login_screen": {
+                "log_in": "Log In",
+                "e_mail": "E-mail Address",
+                "password": "Password",
+                "no_account_yet": "No account yet?",
+                "register": "Register"
+            },
+            "register_screen": {
+                "register": "Register",
+                "e_mail": "e_mail",
+                "first_name": "First Name",
+                "last_name": "Last Name",
+                "phone_number": "Phone Number",
+                "password": "Password",
+                "sign_up": "Sign Up",
+                "fill_all_fields": "Please fill all fields."
+            },
+            "home_screen": {
+                "Reminders": "Reminders",
+                "Water to Drink": "Water to Drink",
+                "Voucher Shop": "Voucher Shop",
+                "Mates Shop": "Mates Shop",
+                "Time to Move!" : "Time to Move!",
+                "OK":"OK",
+                "Notification permission error:" : "Notification permission error:",
+                "Notification permission granted:": "Notification permission granted:",
+                "Error triggering notification:": "Error triggering notification:"
+            }
+        },
+        "th": {
+            "login_screen": {
+                "log_in": "เข้าสู่ระบบ",
+                "e_mail": "ที่อยู่อีเมล",
+                "password": "รหัสผ่าน",
+                "no_account_yet": "ยังไม่มีบัญชีใช่หรือไม่?",
+                "register": "สมัครสมาชิก"
+            },
+            "register_screen": {
+                "register": "สมัครสมาชิก",
+                "e_mail": "อีเมล",
+                "first_name": "ชื่อจริง",
+                "last_name": "นามสกุล",
+                "phone_number": "เบอร์โทรศัพท์",
+                "password": "รหัสผ่าน",
+                "sign_up": "สมัคร",
+                "fill_all_fields": "กรุณากรอกข้อมูลให้ครบถ้วน"
+            },
+            "home_screen": {
+                "Reminders": "แจ้งเตือน",
+                "Water to Drink": "การดื่มน้ำ",
+                "Voucher Shop": "บัตรกำนัล",
+                "Mates Shop": "ร้านค้า",
+                "Time to Move!" : "ได้เวลาเดินแล้ว!",
+                "OK":"ตกลง",
+                "Notification permission error:" : "ข้อผิดพลาดการอนุญาตการแจ้งเตือน:",
+                "Notification permission granted:": "ได้รับอนุญาติให้แจ้งเตือน:",
+                "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:"
+            }
+        }
+}

@@ -36,11 +36,21 @@ struct HomeView: View {
                                     .onAppear {
                                         startWelcomeTimer()
                                     }
-                                
                                 Text(getFormattedDate())
                                     .font(.system(size: 16))
                                     .foregroundColor(getDayColor())
                                     .padding(.horizontal)
+                                
+                                    .overlay(
+                                        HStack {
+                                            Spacer() // ดันเนื้อหาไปทางซ้าย
+                                            Image(systemName: "line.3.horizontal")
+                                                    .font(.system(size: geometry.size.width * 0.06, weight: .bold))
+                                                    .foregroundColor(themeManager.textColor)
+                                                    .padding(.trailing, -1000) // ระยะห่างจากขอบขวา
+                                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                        }
+                                        )
                             }
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
@@ -185,7 +195,7 @@ struct TodayActivitiesView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Today Activities")
+                Text (t( "Today Activities", in: "home_screen"))
                     .font(.headline)
                     .foregroundColor(textColor)
                 Spacer() // ดันไอคอนไปด้านขวา

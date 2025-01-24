@@ -54,18 +54,72 @@ class HealthManager: ObservableObject {
     
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health
     @Published var activities: [String: Activity] = [
-        "todaySteps": Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: "0"),
-        "todayCalories": Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: "0"),
-        "todayHeartRate": Activity(id: 2, title: "Today Heart Rate", subtitle: "Goal 60-100 BPM", image: "heart.fill", tintColor: .red, amount: "0 BPM"),
-        "dayDistance": Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: "0")
+        "todaySteps": Activity(
+            id: 0,
+            title: t("Today Steps", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
+            image: "figure.walk",
+            tintColor: .green,
+            amount: "0"
+        ),
+        "todayCalories": Activity(
+            id: 1,title: t("Today Calories", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
+            image: "flame", tintColor: .red, amount: "0"
+        ),
         
+        "todayHeartRate": Activity(
+            id: 2,
+            title: t("Today Heart Rate", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
+            image: "heart.fill",
+            tintColor: .red,
+            amount: "0 BPM"
+        ),
+
+        "dayDistance": Activity(
+            id: 3,
+            title: t("Today's Distance", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
+            image: "figure.walk.circle",
+            tintColor: .blue,
+            amount: "0"
+        )
     ]
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ไม่ได้รับข้อมูลมาจาก health
     @Published var mockActivities: [String: Activity] = [
-        "todaySteps": Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: "0"),
-        "todayCalories": Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: "0"),
-        "todayHeartRate": Activity(id: 2, title: "Today Heart Rate", subtitle: "Goal 60-100 BPM", image: "heart.fill", tintColor: .red, amount: "0 BPM"),
-        "dayDistance": Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: "0"),
+        "todaySteps": Activity(
+            id: 0,
+            title: t("Today Steps", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
+            image: "figure.walk",
+            tintColor: .green,
+            amount: "0"
+        ),
+        "todayCalories": Activity(
+            id: 1,title: t("Today Calories", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
+            image: "flame", tintColor: .red, amount: "0"
+        ),
+        
+        "todayHeartRate": Activity(
+            id: 2,
+            title: t("Today Heart Rate", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
+            image: "heart.fill",
+            tintColor: .red,
+            amount: "0 BPM"
+        ),
+
+        "dayDistance": Activity(
+            id: 3,
+            title: t("Today's Distance", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
+            image: "figure.walk.circle",
+            tintColor: .blue,
+            amount: "0"
+        )
+
     ]
     
     init() {

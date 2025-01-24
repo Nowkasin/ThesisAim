@@ -19,13 +19,14 @@ struct ChartView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Text("Chart for \(activity.title)") // แสดงชื่อกิจกรรมที่เลือก
+                Text("\(activity.title)") // แสดงชื่อกิจกรรมที่เลือก
                     .font(.largeTitle)
                     .padding()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Subtitle: \(activity.subtitle)")
-                    Text("Amount: \(activity.amount)")
+                    Text(" \(activity.subtitle)")
+                    Text("\(t("Amount", in: "Chart_screen")): \(activity.amount)")
+
                 }
                 .padding()
 

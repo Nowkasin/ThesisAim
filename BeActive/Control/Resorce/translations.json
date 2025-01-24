@@ -26,7 +26,18 @@
                 "OK":"OK",
                 "Notification permission error:" : "Notification permission error:",
                 "Notification permission granted:": "Notification permission granted:",
-                "Error triggering notification:": "Error triggering notification:"
+                "Error triggering notification:": "Error triggering notification:",
+                "Today Activities": "Today Activities"
+            },
+            "HealthMate_screen": {
+                "Today Steps": "Today Steps",
+                "Today Calories": "Today Calories",
+                "Today Heart Rate": "Today Heart Rate",
+                "Today's Distance": "Today's Distance",
+                "Goal": "Goal"
+            },
+            "Chart_screen":{
+                "Amount": "Amount"
             }
         },
         "th": {
@@ -56,7 +67,18 @@
                 "OK":"ตกลง",
                 "Notification permission error:" : "ข้อผิดพลาดการอนุญาตการแจ้งเตือน:",
                 "Notification permission granted:": "ได้รับอนุญาติให้แจ้งเตือน:",
-                "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:"
+                "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
+                "Today Activities": "เป้าหมายวันนี้"
+            },
+            "HealthMate_screen": {
+                "Today Steps": "การเดินวันนี้",
+                "Today Calories": "แคลอรี่วันนี้",
+                "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
+                "Today's Distance": "ระยะทางการเดินวันนี้",
+                "Goal": "เป้าหมายวันนี้"
+            },
+            "Chart_screen":{
+                "Amount": "ผลรวม"
             }
         }
 }

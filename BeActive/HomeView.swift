@@ -1,10 +1,3 @@
-//
-//  HomeView.swift
-//  BeActive
-//
-//  Created by Kasin Thappawan on 29/5/2567 BE.
-//
-
 import SwiftUI
 import UserNotifications
 
@@ -27,31 +20,32 @@ struct HomeView: View {
                             .edgesIgnoringSafeArea(.all)
                         
                         VStack(alignment: .leading) {
-                            VStack(alignment: .leading) {
-                                Text("Hey \(welcomeArray[currentIndex])")
-                                    .padding(.top, 10)
+                            HStack {
+                                Text("\(welcomeArray[currentIndex])")
                                     .font(.system(size: geometry.size.width * 0.08, weight: .bold))
                                     .foregroundColor(themeManager.textColor)
-                                    .padding(.horizontal)
                                     .onAppear {
                                         startWelcomeTimer()
                                     }
-                                Text(getFormattedDate())
-                                    .font(.system(size: 16))
-                                    .foregroundColor(getDayColor())
-                                    .padding(.horizontal)
                                 
-                                    .overlay(
-                                        HStack {
-                                            Spacer() // ดันเนื้อหาไปทางซ้าย
-                                            Image(systemName: "line.3.horizontal")
-                                                    .font(.system(size: geometry.size.width * 0.06, weight: .bold))
-                                                    .foregroundColor(themeManager.textColor)
-                                                    .padding(.trailing, -1000) // ระยะห่างจากขอบขวา
-                                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                        }
-                                        )
+                                Spacer() // ดันไอคอนไปด้านขวา
+                                
+                                Button(action: {
+                                    // การทำงานของเมนู
+                                    print("Menu tapped")
+                                }) {
+                                    Image(systemName: "line.3.horizontal")
+                                        .font(.title2)
+                                        .foregroundColor(themeManager.textColor)
+                                }
                             }
+                            .padding(.horizontal)
+                            .padding(.top, 10)
+                            
+                            Text(getFormattedDate())
+                                .font(.system(size: 16))
+                                .foregroundColor(getDayColor())
+                                .padding(.horizontal)
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
@@ -92,8 +86,8 @@ struct HomeView: View {
                                 title: Text(t("Time to Move!", in: "home_screen")),
                                 message: Text(alertMessage),
                                 dismissButton: .default(Text(t("OK", in: "home_screen"))) {
-                                                                    manager.handleAlertDismiss()
-                                                                }
+                                    manager.handleAlertDismiss()
+                                }
                             )
                         }
                     }
@@ -164,8 +158,6 @@ struct HomeView: View {
     }
 }
 
-
-
 struct ReminderSection: View {
     var title: String
     var color: Color
@@ -195,25 +187,25 @@ struct TodayActivitiesView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text (t( "Today Activities", in: "home_screen"))
+                Text(t("Today Activities", in: "home_screen"))
                     .font(.headline)
                     .foregroundColor(textColor)
-                Spacer() // ดันไอคอนไปด้านขวา
+                Spacer()
                 HStack {
-                    Image(systemName: "star.circle") // ไอคอนรูปเหรียญ
+                    Image(systemName: "star.circle")
                         .resizable()
-                        .frame(width: 20, height: 20) // กำหนดขนาดไอคอน
-                        .foregroundColor(.yellow) // สีไอคอน
-                    Text("\(manager.stepScore)") // คะแนน
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(.yellow)
+                    Text("\(manager.stepScore)")
                         .font(.headline)
-                        .padding(8) // เพิ่มระยะห่างรอบข้อความ
-                        .background(Color.gray) // พื้นหลังสีเทา
-                        .foregroundColor(.white) // ตัวเลขสีขาว
-                        .cornerRadius(10) // มุมโค้งมนให้กับพื้นหลัง
+                        .padding(8)
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                 }
             }
             .padding(.horizontal)
-            .padding(.bottom, 5) // เพิ่มระยะห่างด้านล่าง HStack
+            .padding(.bottom, 5)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 1) {
                     ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
@@ -226,7 +218,6 @@ struct TodayActivitiesView: View {
         }
     }
 }
-
 
 struct ReminderCard: View {
     var color: Color

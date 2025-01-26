@@ -1,3 +1,6 @@
+
+
+
 import SwiftUI
 import UserNotifications
 
@@ -10,6 +13,7 @@ struct HomeView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var selectedTab = "Home"
+    @State private var isShowingSettings = false // ตัวแปรควบคุมการแสดงผล Settings
     
     var body: some View {
         NavigationView {
@@ -21,7 +25,7 @@ struct HomeView: View {
                         
                         VStack(alignment: .leading) {
                             HStack {
-                                Text("\(welcomeArray[currentIndex])")
+                                Text("Hey \(welcomeArray[currentIndex])")
                                     .font(.system(size: geometry.size.width * 0.08, weight: .bold))
                                     .foregroundColor(themeManager.textColor)
                                     .onAppear {
@@ -31,13 +35,15 @@ struct HomeView: View {
                                 Spacer() // ดันไอคอนไปด้านขวา
                                 
                                 Button(action: {
-                                    // การทำงานของเมนู
-                                    print("Menu tapped")
+                                    withAnimation(.easeInOut(duration: 1)) { // ใช้ easeInOut และกำหนดระยะเวลา 0.5 วินาที
+                                        isShowingSettings.toggle()
+                                    }
                                 }) {
                                     Image(systemName: "line.3.horizontal")
                                         .font(.title2)
                                         .foregroundColor(themeManager.textColor)
                                 }
+
                             }
                             .padding(.horizontal)
                             .padding(.top, 10)
@@ -89,6 +95,25 @@ struct HomeView: View {
                                     manager.handleAlertDismiss()
                                 }
                             )
+                        }
+                        
+                        // Settings Panel
+                        if isShowingSettings {
+                            ZStack(alignment: .trailing) { // ใช้ ZStack และจัดตำแหน่งให้อยู่ด้านขวา
+                                Color.black.opacity(0.4) // เพิ่มพื้นหลังโปร่งแสง
+                                    .edgesIgnoringSafeArea(.all)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            isShowingSettings = false
+                                        }
+                                    }
+                                
+                                SettingsView(isShowing: $isShowingSettings)
+                                    .frame(width: geometry.size.width * 0.5) // แสดงครึ่งหน้าจอ
+                                    .background(Color.white)
+                                    .transition(.move(edge: .trailing)) // เลื่อนจากด้านขวา
+                                    .zIndex(1)
+                            }
                         }
                     }
                     .tabItem {
@@ -157,6 +182,7 @@ struct HomeView: View {
         }
     }
 }
+
 
 struct ReminderSection: View {
     var title: String

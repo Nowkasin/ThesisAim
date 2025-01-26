@@ -38,6 +38,10 @@
             },
             "Chart_screen":{
                 "Amount": "Amount"
+            },
+            "Setting_screen":{
+                "Settings": "Settings",
+                "Language": "Language"
             }
         },
         "th": {
@@ -79,6 +83,10 @@
             },
             "Chart_screen":{
                 "Amount": "ผลรวม"
+            },
+            "Setting_screen":{
+                "Settings": "การตั้งค่า",
+                "Language": "ภาษา"
             }
         }
 }

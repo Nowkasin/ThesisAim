@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		195DA41F2D47C18E008B3FDF /* ExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 195DA41E2D47C18E008B3FDF /* ExerciseView.swift */; };
 		8E0563592CD9D1D1009EB84A /* VoucherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0563582CD9D1D1009EB84A /* VoucherView.swift */; };
 		8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E05635A2CD9D270009EB84A /* MatesView.swift */; };
 		8E085E412D374D9300D7C29E /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E085E402D374D9300D7C29E /* Login.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		195DA41E2D47C18E008B3FDF /* ExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseView.swift; sourceTree = "<group>"; };
 		8E0563582CD9D1D1009EB84A /* VoucherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoucherView.swift; sourceTree = "<group>"; };
 		8E05635A2CD9D270009EB84A /* MatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatesView.swift; sourceTree = "<group>"; };
 		8E085E402D374D9300D7C29E /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				8E83E6BE2CD894550089DC31 /* WaterView.swift */,
 				8E2850042CCE437100059D4E /* ChartView.swift */,
 				8E8FFA482C06DA6E00E0A56E /* HomeView.swift */,
+				195DA41E2D47C18E008B3FDF /* ExerciseView.swift */,
 				8E05635A2CD9D270009EB84A /* MatesView.swift */,
 				8E5E7FCA2D30E4C000917EE0 /* Register.swift */,
 				8E0563582CD9D1D1009EB84A /* VoucherView.swift */,
@@ -308,6 +311,7 @@
 				8E8FFA472C06D90200E0A56E /* BeActiTabView.swift in Sources */,
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,
 				8E05635B2CD9D270009EB84A /* MatesView.swift in Sources */,
+				195DA41F2D47C18E008B3FDF /* ExerciseView.swift in Sources */,
 				8E8FFA4D2C06DD6000E0A56E /* ActivityCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

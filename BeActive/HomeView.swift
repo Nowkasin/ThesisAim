@@ -1,13 +1,10 @@
-
-
-
 import SwiftUI
 import UserNotifications
 
 struct HomeView: View {
     @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว
     @EnvironmentObject var manager: HealthManager
-    let welcomeArray = ["Hello", "Bienvenido", "Bienvenue"]
+    let welcomeArray = ["Hello", "Bienvenido", "Wassup"]
     @State private var currentIndex = 0
     @State private var welcomeTimer: Timer?
     @State private var showAlert = false
@@ -65,14 +62,28 @@ struct HomeView: View {
                                 .padding(.horizontal)
                                 .padding(.bottom, 5)
                             
-                            VStack(spacing: 15) {
-                                ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
-                                    .navigate(to: WaterView())
-                                ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
-                                    .navigate(to: VoucherView())
-                                ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
-                                    .navigate(to: MatesView())
+                            ScrollView {
+                                VStack(spacing: 15) {
+                                    // แปลภาษาให้ด้วย
+                                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .yellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
+                                        .navigate(to: MatesView()) // <-- แก้เป็น TaskView or Something
+                                    
+                                    // แปลภาษาให้ด้วย
+                                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .purple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)
+                                        .navigate(to: ExerciseView())
+                                    
+                                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
+                                        .navigate(to: WaterView())
+
+                                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
+                                        .navigate(to: VoucherView())
+
+                                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
+                                        .navigate(to: MatesView())
+                                }
+                                .padding()
                             }
+
                             .padding(.horizontal)
                             Spacer()
                         }

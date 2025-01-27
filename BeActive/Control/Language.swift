@@ -5,12 +5,12 @@
 //  Created by Kasin Thappawan on 23/1/2568 BE.
 //
 
-import Foundation
+import SwiftUI
 
-class Language {
+class Language: ObservableObject {
     static let shared = Language() // Singleton instance
 
-    private(set) var currentLanguage: String = "th" // Default language
+    @Published private(set) var currentLanguage: String = "th" // Default language
     private var translations: [String: [String: [String: String]]] = [:]
 
     init() {
@@ -27,12 +27,14 @@ class Language {
         }
     }
 
+
     func setLanguage(_ language: String) {
         guard translations[language] != nil else {
             print("Language \(language) is not available.")
             return
         }
         currentLanguage = language
+        objectWillChange.send() // Notify SwiftUI to refresh UI
     }
 
     func translate(_ key: String, in screen: String) -> String {

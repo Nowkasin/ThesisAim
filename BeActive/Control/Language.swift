@@ -7,79 +7,41 @@
 
 import SwiftUI
 
-struct UILang: View {
-    @Binding var isShowing: Bool // ใช้ Binding เพื่อควบคุมการแสดงผล
-    @ObservedObject var language = Language.shared // เชื่อมต่อกับ Singleton
+class Language: ObservableObject {
+    static let shared = Language() // Singleton instance
 
-    var body: some View {
-        ZStack {
-            Color.white
-                .edgesIgnoringSafeArea(.vertical)
-                .shadow(radius: 5)
-            
-            VStack {
-                HStack {
-                    Text(t("Select Language", in: "Language_screen"))
-                        .font(.system(size: 16))
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 1)) {
-                            isShowing = false // ปิดหน้า UILang
-                        }
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.title)
-                            .foregroundColor(.black)
-                    }
-                }
-                .padding()
-                
-                Spacer()
-                
-                // ปุ่มเปลี่ยนเป็นภาษาไทย
-                Button(action: {
-                    language.setLanguage("th")
-                    isShowing = false // ปิดหน้าภาษาเมื่อเลือก
-                }) {
-                    Text("ภาษาไทย")
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(language.currentLanguage == "th" ? Color.blue : Color.gray)
-                        .cornerRadius(10)
-                }
-                .padding()
-                
-                // ปุ่มเปลี่ยนเป็นภาษาอังกฤษ
-                Button(action: {
-                    language.setLanguage("en")
-                    isShowing = false // ปิดหน้าภาษาเมื่อเลือก
-                }) {
-                    Text("English")
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(language.currentLanguage == "en" ? Color.blue : Color.gray)
-                        .cornerRadius(10)
-                }
-                .padding()
-                
-                Spacer()
-            }
-            .frame(maxWidth: .infinity)
-            .opacity(isShowing ? 1 : 0) // ใช้ opacity เพื่อการแอนิเมชัน
-            .offset(y: isShowing ? 0 : UIScreen.main.bounds.height) // ใช้ offset เพื่อเลื่อนจากด้านล่าง
-            .animation(.easeInOut(duration: 1), value: isShowing) // แอนิเมชันเมื่อ isShowing เปลี่ยน
+    @Published private(set) var currentLanguage: String = "en" // Default language
+    private var translations: [String: [String: [String: String]]] = [:]
+
+    init() {
+        loadTranslations()
+    }
+
+    func loadTranslations() {
+        if let url = Bundle.main.url(forResource: "translations", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: [String: String]]] {
+            translations = json
+        } else {
+            print("Failed to load translations.json")
         }
+    }
+
+
+    func setLanguage(_ language: String) {
+        guard translations[language] != nil else {
+            print("Language \(language) is not available.")
+            return
+        }
+        currentLanguage = language
+        objectWillChange.send() // Notify SwiftUI to refresh UI
+    }
+    func translate(_ key: String, in screen: String) -> String {
+        return translations[currentLanguage]?[screen]?[key] ?? key
     }
 }
 
-#Preview {
-    @Previewable @State var isShowingLanguageView = true
-    return UILang(isShowing: $isShowingLanguageView)
+// Global translation function
+func t(_ key: String, in screen: String) -> String {
+    return Language.shared.translate(key, in: screen)
 }

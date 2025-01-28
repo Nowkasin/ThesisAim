@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct Activity: Identifiable {
-    var id: Int
-    var titleKey: String
-    var image: String
-    var tintColor: Color
-    var amount: String
+struct Activity {
+    let id: Int
+    let title: String
+    let subtitle: String
+    let image: String
+    let tintColor: Color
+    let amount: String
 }
-
 
 struct ActivityCard: View {
     let activity: Activity
@@ -28,11 +28,12 @@ struct ActivityCard: View {
                 VStack(spacing: 20) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 5) {
-                            // ใช้ t() เพื่อแปล titleKey และ subtitleKey
-                            Text(t(activity.titleKey, in: "Chart_screen"))  // แปล title
+                            Text(activity.title)
                                 .font(.system(size: 14))
                                 .foregroundColor(.primary)
-                            
+                            Text(activity.subtitle)
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
                         }
                         
                         Spacer()
@@ -50,13 +51,13 @@ struct ActivityCard: View {
             }
             .padding()
         }
-        .buttonStyle(PlainButtonStyle()) // ลบสไตล์ลิงก์เริ่มต้น
+        .buttonStyle(PlainButtonStyle()) // Removes the default link styling
     }
 }
+
 
 struct ActivityCard_Previews: PreviewProvider {
     static var previews: some View {
-        ActivityCard(activity: Activity(id: 0, titleKey: "daily_steps", image: "figure.walk", tintColor: .green, amount: "6,234"))
+        ActivityCard(activity: Activity(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
     }
 }
-

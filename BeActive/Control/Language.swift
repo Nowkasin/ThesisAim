@@ -10,7 +10,7 @@ import SwiftUI
 class Language: ObservableObject {
     static let shared = Language() // Singleton instance
 
-    @Published private(set) var currentLanguage: String = "en" // Default language
+    @Published private(set) var currentLanguage: String = "th" // Default language
     private var translations: [String: [String: [String: String]]] = [:]
 
     init() {
@@ -36,6 +36,7 @@ class Language: ObservableObject {
         currentLanguage = language
         objectWillChange.send() // Notify SwiftUI to refresh UI
     }
+
     func translate(_ key: String, in screen: String) -> String {
         return translations[currentLanguage]?[screen]?[key] ?? key
     }

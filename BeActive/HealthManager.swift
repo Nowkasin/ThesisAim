@@ -56,20 +56,22 @@ class HealthManager: ObservableObject {
     @Published var activities: [String: Activity] = [
         "todaySteps": Activity(
             id: 0,
-            titleKey: t("Today Steps", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-            
+            title: t("Today Steps", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
             image: "figure.walk",
             tintColor: .green,
             amount: "0"
         ),
         "todayCalories": Activity(
-            id: 1,titleKey: t("Today Calories", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            id: 1,title: t("Today Calories", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
             image: "flame", tintColor: .red, amount: "0"
         ),
         
         "todayHeartRate": Activity(
             id: 2,
-            titleKey: t("Today Heart Rate", in: "Chart_screen"),
+            title: t("Today Heart Rate", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
             image: "heart.fill",
             tintColor: .red,
             amount: "0 BPM"
@@ -77,7 +79,8 @@ class HealthManager: ObservableObject {
 
         "dayDistance": Activity(
             id: 3,
-            titleKey: t("Today's Distance", in: "Chart_screen"),
+            title: t("Today's Distance", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
             image: "figure.walk.circle",
             tintColor: .blue,
             amount: "0"
@@ -87,19 +90,22 @@ class HealthManager: ObservableObject {
     @Published var mockActivities: [String: Activity] = [
         "todaySteps": Activity(
             id: 0,
-            titleKey: t("Today Steps", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            title: t("Today Steps", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
             image: "figure.walk",
             tintColor: .green,
             amount: "0"
         ),
         "todayCalories": Activity(
-            id: 1,titleKey: t("Today Calories", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            id: 1,title: t("Today Calories", in: "HealthMate_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
             image: "flame", tintColor: .red, amount: "0"
         ),
         
         "todayHeartRate": Activity(
             id: 2,
-            titleKey: t("Today Heart Rate", in: "Chart_screen"),
+            title: t("Today Heart Rate", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
             image: "heart.fill",
             tintColor: .red,
             amount: "0 BPM"
@@ -107,7 +113,8 @@ class HealthManager: ObservableObject {
 
         "dayDistance": Activity(
             id: 3,
-            titleKey: t("Today's Distance", in: "Chart_screen"),
+            title: t("Today's Distance", in: "HealthMate_screen"),
+            subtitle: "\(t("Goal", in: "HealthMate_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
             image: "figure.walk.circle",
             tintColor: .blue,
             amount: "0"
@@ -207,7 +214,7 @@ class HealthManager: ObservableObject {
             }
             //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
             let stepCount = quantity.doubleValue(for: .count())
-            let activity = Activity(id: 0, titleKey: t("Today Steps", in: "Chart_screen"), image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
+            let activity = Activity(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: stepCount.formattedString())
             //อัปเดตข้อมูลใหม่ไปยังหน้า ui
             DispatchQueue.main.async {
                 self?.activities["todaySteps"] = activity
@@ -245,7 +252,7 @@ class HealthManager: ObservableObject {
             }
             
             let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
-            let activity = Activity(id: 1, titleKey: t("Today Calories", in: "Chart_screen"), image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
+            let activity = Activity(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: caloriesBurned.formattedString())
             
             DispatchQueue.main.async {
                 self?.activities["todayCalories"] = activity
@@ -309,7 +316,7 @@ class HealthManager: ObservableObject {
                 
                 print("Current State: \(state)")
                 
-                let activity = Activity(id: 2, titleKey: t("Today Heart Rate (\(state))", in: "Chart_screen") ,  image: "heart.fill", tintColor: .red, amount: heartRate.formattedString())
+                let activity = Activity(id: 2, title: "Today Heart Rate (\(state))", subtitle: "Goal 60-120 BPM", image: "heart.fill", tintColor: .red, amount: heartRate.formattedString())
                 self?.activities["todayHeartRate"] = activity
             }
         }
@@ -338,7 +345,7 @@ class HealthManager: ObservableObject {
             
             let distanceInMeters = quantity.doubleValue(for: .meter())
             let distanceInKilometers = distanceInMeters / 1000.0
-            let activity = Activity(id: 3, titleKey: t("Today's Distance", in: "Chart_screen"),  image: "figure.walk.circle", tintColor: .blue, amount: distanceInKilometers.formattedString())
+            let activity = Activity(id: 3, title: "Today's Distance", subtitle: "Goal 5 km", image: "figure.walk.circle", tintColor: .blue, amount: distanceInKilometers.formattedString())
             
             DispatchQueue.main.async {
                 self?.activities["dayDistance"] = activity

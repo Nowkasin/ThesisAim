@@ -29,15 +29,17 @@
                 "Error triggering notification:": "Error triggering notification:",
                 "Today Activities": "Today Activities"
             },
-            "Chart_screen": {
-                  "Today Steps": "Today Steps",
-                  "Today Calories": "Today Calories",
-                  "Today Heart Rate": "Today Heart Rate",
-                  "Today's Distance": "Today's Distance",
-                  "Amount": "Amount",
-                  "Goal": "Goal"
-                },
-            "Setting_screen": {
+            "HealthMate_screen": {
+                "Today Steps": "Today Steps",
+                "Today Calories": "Today Calories",
+                "Today Heart Rate": "Today Heart Rate",
+                "Today's Distance": "Today's Distance",
+                "Goal": "Goal"
+            },
+            "Chart_screen":{
+                "Amount": "Amount"
+            },
+            "Setting_screen":{
                 "Settings": "Settings",
                 "Language": "Language"
             }
@@ -72,15 +74,17 @@
                 "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
                 "Today Activities": "เป้าหมายวันนี้"
             },
-            "Chart_screen": {
-                  "Today Steps": "การเดินวันนี้",
-                  "Today Calories": "แคลอรี่วันนี้",
-                  "Today Heart Rate": "อัตรสการเต้นหัวใจ",
-                  "Today's Distance": "จำนวนการก้าวเดิน",
-                  "Amount": "รวม",
-                  "Goal": "เป้าหมายวันนี้"
-                },
-            "Setting_screen": {
+            "HealthMate_screen": {
+                "Today Steps": "การเดินวันนี้",
+                "Today Calories": "แคลอรี่วันนี้",
+                "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
+                "Today's Distance": "ระยะทางการเดินวันนี้",
+                "Goal": "เป้าหมายวันนี้"
+            },
+            "Chart_screen":{
+                "Amount": "ผลรวม"
+            },
+            "Setting_screen":{
                 "Settings": "การตั้งค่า",
                 "Language": "ภาษา"
             }

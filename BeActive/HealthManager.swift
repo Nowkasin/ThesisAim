@@ -8,6 +8,7 @@
 import Foundation
 import HealthKit
 import Combine
+import SwiftUI
 // Extension for date handling
 extension Date {
     static var startOfDay: Date {
@@ -50,6 +51,7 @@ class HealthManager: ObservableObject {
     
     // Properties for tracking score and steps
     @Published var stepScore: Int = 0
+    @AppStorage("waterScore") var waterScore: Int = 0
     private var previousStepCount: Double = 0
     
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health

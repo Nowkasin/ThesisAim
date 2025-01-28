@@ -233,7 +233,7 @@ struct TodayActivitiesView: View {
                         .resizable()
                         .frame(width: 20, height: 20)
                         .foregroundColor(.yellow)
-                    Text("\(manager.stepScore)")
+                    Text("\(manager.stepScore+manager.waterScore)")
                         .font(.headline)
                         .padding(8)
                         .background(Color.gray)

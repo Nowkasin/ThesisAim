@@ -180,7 +180,9 @@ struct WaterView: View {
     @AppStorage("waterIntake") private var waterIntake = 0 // Persist water intake
     @AppStorage("scheduleData") private var scheduleData: Data? // Persist schedule as Data
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String? // Persist last opened date
-    
+
+    @EnvironmentObject var healthManager: HealthManager // Use HealthManager to update water score
+
     private let totalWaterIntake = 2100 // Total daily goal
     @State private var schedule: [ScheduleItem] = [
         ScheduleItem(time: "09:30", amount: 500, completed: false),
@@ -190,12 +192,12 @@ struct WaterView: View {
         ScheduleItem(time: "17:30", amount: 100, completed: false),
     ]
     @State private var showCongratulations = false // State for popup visibility
-    
+
     init() {
         checkForNewDay()
         loadSchedule()
     }
-    
+
     var body: some View {
         NavigationView {
             VStack {
@@ -204,7 +206,7 @@ struct WaterView: View {
                     Text("Water to Drink")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.blue)
-                    
+
                     Text("Don't forget to drink water!")
                         .font(.system(size: 18))
                         .foregroundColor(.gray)
@@ -212,27 +214,27 @@ struct WaterView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical)
-                
+
                 Spacer()
-                
+
                 // Water Level Section
                 ZStack {
                     Circle()
                         .stroke(lineWidth: 10)
                         .foregroundColor(.blue.opacity(0.3))
-                    
+
                     Circle()
                         .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
                         .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
                         .foregroundColor(.blue)
                         .rotationEffect(.degrees(-90))
                         .animation(.easeInOut, value: waterIntake)
-                    
+
                     VStack {
                         Text("\(waterIntake) / \(totalWaterIntake)")
                             .font(.system(size: 18))
                             .fontWeight(.semibold)
-                        
+
                         Image(systemName: "drop.circle.fill")
                             .resizable()
                             .frame(width: 40, height: 40)
@@ -240,9 +242,9 @@ struct WaterView: View {
                     }
                 }
                 .frame(width: 200, height: 200)
-                
+
                 Spacer()
-                
+
                 // Water Schedule Section
                 VStack(alignment: .leading) {
                     ForEach(schedule) { item in
@@ -252,20 +254,15 @@ struct WaterView: View {
                             Text(item.time)
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(.black)
-                            
+
                             Spacer()
-                            
+
                             Text("\(item.amount) ml")
                                 .foregroundColor(.gray)
                                 .font(.system(size: 16))
-                            
+
                             Button(action: {
                                 toggleCompletion(for: item)
-                                
-                                // Check if all checkmarks are selected
-                                if schedule.filter({ $0.completed }).count == schedule.count {
-                                    showCongratulations = true
-                                }
                             }) {
                                 Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
                                     .resizable()
@@ -277,9 +274,9 @@ struct WaterView: View {
                     }
                 }
                 .padding()
-                
+
                 Spacer()
-                
+
                 // Simulate New Day Button
                 Button(action: simulateNewDay) {
                     Text("Simulate New Day")
@@ -302,7 +299,7 @@ struct WaterView: View {
             .navigationBarHidden(true)
         }
     }
-    
+
     private func toggleCompletion(for item: ScheduleItem) {
         if let index = schedule.firstIndex(where: { $0.id == item.id }) {
             if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
@@ -313,9 +310,15 @@ struct WaterView: View {
                 waterIntake -= schedule[index].amount
             }
             saveSchedule()
+
+            // Check if all checkmarks are selected
+            if schedule.allSatisfy({ $0.completed }) {
+                showCongratulations = true
+                healthManager.waterScore += 10 // Increase water score by 10 in HealthManager
+            }
         }
     }
-    
+
     private func saveSchedule() {
         do {
             let encodedSchedule = try JSONEncoder().encode(schedule)
@@ -324,7 +327,7 @@ struct WaterView: View {
             print("Failed to save schedule: \(error)")
         }
     }
-    
+
     private func loadSchedule() {
         guard let savedData = scheduleData else { return }
         do {
@@ -334,30 +337,31 @@ struct WaterView: View {
             print("Failed to load schedule: \(error)")
         }
     }
-    
+
     private func checkForNewDay() {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let today = formatter.string(from: Date())
-        
+
         if lastOpenedDate != today {
-            // Reset the water intake and schedule
             waterIntake = 0
             schedule = schedule.map { ScheduleItem(time: $0.time, amount: $0.amount, completed: false) }
             saveSchedule()
             lastOpenedDate = today
         }
     }
-    
+
     private func simulateNewDay() {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         lastOpenedDate = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
+        healthManager.waterScore = 0
+        print("Water score reset to 0 for the new day.")
         checkForNewDay()
-        print("Simulated new day. Last opened date set to: \(lastOpenedDate ?? "N/A")")
     }
 }
 
 #Preview {
     WaterView()
+        .environmentObject(HealthManager()) // Pass HealthManager as environment object
 }

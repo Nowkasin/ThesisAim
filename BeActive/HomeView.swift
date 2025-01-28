@@ -195,7 +195,7 @@ struct ReminderSection: View {
                 icon
                     .foregroundColor(color)
                     .font(.system(size: 20))
-                Text(title)
+                Text(t(title, in: "Chart_screen"))
                     .font(.subheadline)
                     .foregroundColor(textColor)
             }
@@ -235,7 +235,7 @@ struct TodayActivitiesView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 1) {
                     ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                        ActivityCard(activity: item.value)
+                        ActivityCard(activity: item.value)  // ไม่ต้องแปลที่นี่แล้ว
                             .frame(width: 200, height: 180)
                     }
                 }

@@ -19,13 +19,18 @@ struct ChartView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Text("\(activity.title)") // แสดงชื่อกิจกรรมที่เลือก
+                Text("\(t(activity.title, in: "Chart_screen"))")
+
                     .font(.largeTitle)
                     .padding()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(" \(activity.subtitle)")
-                    Text("\(t("Amount", in: "Chart_screen")): \(activity.amount)")
+                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("\(t(activity.subtitleKey, in: "Chart_screen")): \(t("Goal", in: "Chart_screen"))")
+                        Text("\(t("Amount", in: "Chart_screen")): \(activity.amount)")
+                    }
+
 
                 }
                 .padding()
@@ -94,5 +99,5 @@ struct ChartView: View {
 }
 
 #Preview {
-    ChartView(activity: Activity(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
+    ChartView(activity: Activity(id: 0, title: "Daily Steps", subtitleKey: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
 }

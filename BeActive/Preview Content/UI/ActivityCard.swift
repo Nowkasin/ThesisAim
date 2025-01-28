@@ -10,7 +10,7 @@ import SwiftUI
 struct Activity {
     let id: Int
     let title: String
-    let subtitle: String
+    var subtitleKey: String
     let image: String
     let tintColor: Color
     let amount: String
@@ -18,6 +18,11 @@ struct Activity {
 
 struct ActivityCard: View {
     let activity: Activity
+    
+    // ตัวอย่างฟังก์ชัน `t` สำหรับการแปล
+    func t(_ key: String, in table: String = "Localizable") -> String {
+        NSLocalizedString(key, tableName: table, comment: "")
+    }
     
     var body: some View {
         NavigationLink(destination: ChartView(activity: activity)) {
@@ -28,10 +33,11 @@ struct ActivityCard: View {
                 VStack(spacing: 20) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text(activity.title)
+                            // ใช้ฟังก์ชัน `t` ในส่วน title และ subtitle
+                            Text(t(activity.title, in: "Chart_screen"))
                                 .font(.system(size: 14))
                                 .foregroundColor(.primary)
-                            Text(activity.subtitle)
+                            Text(t(activity.subtitleKey, in: "Chart_screen"))
                                 .font(.system(size: 12))
                                 .foregroundColor(.gray)
                         }
@@ -55,9 +61,8 @@ struct ActivityCard: View {
     }
 }
 
-
 struct ActivityCard_Previews: PreviewProvider {
     static var previews: some View {
-        ActivityCard(activity: Activity(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
+        ActivityCard(activity: Activity(id: 0, title: "Daily_Steps", subtitleKey: "Goal_10K", image: "figure.walk", tintColor: .green, amount: "6,234"))
     }
 }

@@ -17,96 +17,87 @@ struct Exercise: Identifiable {
 }
 
 struct ExerciseView: View {
+    @StateObject var themeManager = ThemeManager() // ใช้ ThemeManager
     @State private var exercises: [Exercise] = [
-        Exercise(title: "Back Exercise", duration: "10 Minutes", videoURL: "https://youtu.be/4BYVwq2wv0Q?si=wfvsQSPgxiIz4Ldj", isFavorite: false),
-        Exercise(title: "Neck Exercise", duration: "5 Minutes", videoURL: "https://www.example.com/neck-exercise", isFavorite: false),
-        Exercise(title: "Arm Exercise", duration: "7 Minutes", videoURL: "https://www.example.com/arm-exercise", isFavorite: false),
-        Exercise(title: "Shoulder Exercise", duration: "5 Minutes", videoURL: "https://www.example.com/shoulder-exercise", isFavorite: false)
+        Exercise(title: t("Back Exercise", in: "Ex_screen"), duration: "10 " + t("Minutes", in: "Ex_screen"), videoURL: "https://youtu.be/4BYVwq2wv0Q?si=wfvsQSPgxiIz4Ldj", isFavorite: false),
+        Exercise(title: t("Neck Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/neck-exercise", isFavorite: false),
+        Exercise(title: t("Arm Exercise", in: "Ex_screen"), duration: "7 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/arm-exercise", isFavorite: false),
+        Exercise(title: t("Shoulder Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/shoulder-exercise", isFavorite: false)
     ]
-
+    
     @State private var selectedURL: IdentifiableURL?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Exercise")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(Color.purple)
-                    .padding(.horizontal)
-
-                Text("Recommended for you")
-                    .font(.headline)
-                    .foregroundColor(Color.blue)
-                    .padding(.horizontal)
-                    .padding(.top, -20)
-                    .padding(.bottom, 10)
-
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
-                    ForEach($exercises) { $exercise in
-                        ExerciseCard(exercise: $exercise, selectedURL: $selectedURL)
+        ZStack {
+            themeManager.backgroundColor
+                .edgesIgnoringSafeArea(.all)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text(t("Exercise", in: "Ex_screen"))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(themeManager.textColor)
+                        .padding(.horizontal)
+                    
+                    Text(t("Recommended for you", in: "Ex_screen"))
+                        .font(.headline)
+                        .foregroundColor(themeManager.textColor)
+                        .padding(.horizontal)
+                        .padding(.top, -20)
+                        .padding(.bottom, 10)
+                    
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
+                        ForEach($exercises) { $exercise in
+                            ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+                        }
                     }
-                }
-                .padding(.horizontal)
-
-                Text("Article & Tip")
-                    .font(.headline)
-                    .foregroundColor(Color.blue)
                     .padding(.horizontal)
-
-                VStack(spacing: 15) {
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 100)
-                        .onTapGesture {
-                            print("Go to Articles")
-                        }
-
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 100)
-                        .onTapGesture {
-                            print("Go to Tips")
-                        }
                     
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 100)
-                        .onTapGesture {
-                            print("Go to Tips")
-                        }
+                    Text(t("Article & Tip", in: "Ex_screen"))
+                        .font(.headline)
+                        .foregroundColor(themeManager.textColor)
+                        .padding(.horizontal)
                     
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 100)
-                        .onTapGesture {
-                            print("Go to Tips")
+                    VStack(spacing: 15) {
+                        ForEach(0..<4) { _ in
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(themeManager.textColor.opacity(0.2))
+                                .frame(height: 100)
+                                .onTapGesture {
+                                    print("Go to Tips")
+                                }
                         }
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+                .padding(.bottom, 20)
             }
-            .padding(.bottom, 20)
-        }
-        .sheet(item: $selectedURL) { identifiableURL in
-            SafariView(url: identifiableURL.url)
+            .background(themeManager.backgroundColor)
+            .sheet(item: $selectedURL) { identifiableURL in
+                SafariView(url: identifiableURL.url)
+            }
         }
     }
 }
 
+       
+
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
     @Binding var selectedURL: IdentifiableURL?
+    var themeManager: ThemeManager
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color.gray.opacity(0.3))
+                .fill(themeManager.textColor.opacity(0.2))
 
             VStack {
                 HStack {
                     Spacer()
                     Image(systemName: exercise.isFavorite ? "star.fill" : "star")
-                        .foregroundColor(exercise.isFavorite ? Color.indigo : Color.white)
+                        .foregroundColor(exercise.isFavorite ? Color.yellow : themeManager.textColor)
                         .padding()
                         .onTapGesture {
                             exercise.isFavorite.toggle()
@@ -116,21 +107,21 @@ struct ExerciseCard: View {
                 Spacer()
 
                 RoundedRectangle(cornerRadius: 0)
-                    .fill(Color.black.opacity(0.8))
+                    .fill(themeManager.textColor.opacity(0.8))
                     .frame(height: 50)
 
                 HStack {
                     VStack(alignment: .leading) {
                         Text(exercise.title)
                             .font(.headline)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(themeManager.textColor)
                         Text(exercise.duration)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.backgroundColor)
                     }
                     Spacer()
 
                     Image(systemName: "play.circle.fill")
-                        .foregroundColor(Color.purple)
+                        .foregroundColor(themeManager.textColor)
                         .font(.title)
                 }
                 .padding(.horizontal)
@@ -169,4 +160,3 @@ struct ExerciseView_Previews: PreviewProvider {
         ExerciseView()
     }
 }
-

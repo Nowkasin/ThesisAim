@@ -47,6 +47,16 @@
                 "Amount": "Amount",
                 "Goal": "Goal"
             },
+            "Ex_screen": {
+                "Back Exercise": "Back Exercise",
+                "Neck Exercise": "Neck Exercise",
+                "Arm Exercise": "Arm Exercise",
+                "Shoulder Exercise": "Shoulder Exercise",
+                "Exercise": "Exercise",
+                "Article & Tip": "Article & Tip",
+                "Recommended for you": "Recommended for you",
+                "Minutes": "Minutes"
+            },
             "Setting_screen":{
                 "Settings": "Settings",
                 "Language": "Language"
@@ -107,6 +117,16 @@
                 "Today's Distance": "ระยะทางการเดินวันนี้",
                 "Amount": "ผลรวม",
                 "Goal": "เป้าหมายวันนี้"
+            },
+            "Ex_screen": {
+                "Back Exercise": "การออกกำลังกายหลัง",
+                "Neck Exercise": "การออกกำลังกายคอ",
+                "Arm Exercise": "Arm Exercise",
+                "Shoulder Exercise": "การออกกำลังกายแขน",
+                "Exercise": "การออกกำลังกาย",
+                "Article & Tip": "เคล็ดลับ",
+                "Recommended for you": "แนะนำสำหรับคุณ",
+                "Minutes": "นาที"
             },
             "Setting_screen": {
                 "Settings": "การตั้งค่า",

@@ -37,12 +37,12 @@ struct ExerciseView: View {
                     Text(t("Exercise", in: "Ex_screen"))
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .foregroundColor(themeManager.textColor)
+                        .foregroundColor(Color.purple)
                         .padding(.horizontal)
                     
                     Text(t("Recommended for you", in: "Ex_screen"))
                         .font(.headline)
-                        .foregroundColor(themeManager.textColor)
+                        .foregroundColor(Color.blue)
                         .padding(.horizontal)
                         .padding(.top, -20)
                         .padding(.bottom, 10)
@@ -56,7 +56,7 @@ struct ExerciseView: View {
                     
                     Text(t("Article & Tip", in: "Ex_screen"))
                         .font(.headline)
-                        .foregroundColor(themeManager.textColor)
+                        .foregroundColor(Color.blue)
                         .padding(.horizontal)
                     
                     VStack(spacing: 15) {

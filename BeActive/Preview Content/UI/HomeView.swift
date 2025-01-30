@@ -163,12 +163,21 @@ struct HomeView: View {
             }
         }
     }
-    
+    //แก้ไขเวลา
     func getFormattedDate() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "th_TH")
-        dateFormatter.dateFormat = "EEEE - dd/MM/yyyy"
-        return dateFormatter.string(from: Date())
+        dateFormatter.locale = Locale(identifier: Language.shared.currentLanguage == "th" ? "th_TH" : "en_US") // เปลี่ยน locale ตามภาษา
+        dateFormatter.dateFormat = "EEEE" // เอาเฉพาะชื่อวันก่อน
+        let dayName = dateFormatter.string(from: Date()) // ได้ค่าเป็น "Monday" หรือ "วันจันทร์"
+
+        // ใช้ t() เพื่อแปลชื่อวัน
+        let translatedDayName = t(dayName, in: "Date")
+
+        // ฟอร์แมตวันที่
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        let dateString = dateFormatter.string(from: Date())
+
+        return "\(translatedDayName) - \(dateString)"
     }
     
     func getDayColor() -> Color {

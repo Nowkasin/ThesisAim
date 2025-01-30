@@ -177,6 +177,7 @@ struct ScheduleItem: Codable, Identifiable {
 }
 
 struct WaterView: View {
+    @StateObject var themeManager = ThemeManager()  // Use @StateObject to initialize ThemeManager
     @AppStorage("waterIntake") private var waterIntake = 0 // Persist water intake
     @AppStorage("scheduleData") private var scheduleData: Data? // Persist schedule as Data
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String? // Persist last opened date
@@ -203,13 +204,13 @@ struct WaterView: View {
             VStack {
                 // Header Section
                 VStack(spacing: 8) {
-                    Text("Water to Drink")
+                    Text(t("Water to Drink", in: "Water_screen"))
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.blue)
 
-                    Text("Don't forget to drink water!")
+                    Text(t("Don't forget to drink water!", in: "Water_screen"))
                         .font(.system(size: 18))
-                        .foregroundColor(.gray)
+                        .foregroundColor(themeManager.textColor)
                 }
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -226,7 +227,7 @@ struct WaterView: View {
                     Circle()
                         .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
                         .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                        .foregroundColor(.blue)
+                        .foregroundColor(themeManager.textColor)
                         .rotationEffect(.degrees(-90))
                         .animation(.easeInOut, value: waterIntake)
 
@@ -234,6 +235,7 @@ struct WaterView: View {
                         Text("\(waterIntake) / \(totalWaterIntake)")
                             .font(.system(size: 18))
                             .fontWeight(.semibold)
+                            .foregroundColor(themeManager.textColor)
 
                         Image(systemName: "drop.circle.fill")
                             .resizable()
@@ -253,12 +255,12 @@ struct WaterView: View {
                                 .foregroundColor(.blue)
                             Text(item.time)
                                 .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(themeManager.textColor)
 
                             Spacer()
 
-                            Text("\(item.amount) ml")
-                                .foregroundColor(.gray)
+                            Text("\(item.amount) \(t("mi", in: "Water_screen"))")
+                                .foregroundColor(themeManager.textColor.opacity(0.7))
                                 .font(.system(size: 16))
 
                             Button(action: {
@@ -267,7 +269,7 @@ struct WaterView: View {
                                 Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
                                     .resizable()
                                     .frame(width: 24, height: 24)
-                                    .foregroundColor(item.completed ? .green : .gray)
+                                    .foregroundColor(item.completed ? .green : themeManager.textColor.opacity(0.7))
                             }
                         }
                         .padding(.vertical, 5)
@@ -282,17 +284,19 @@ struct WaterView: View {
                     Text("Simulate New Day")
                         .font(.headline)
                         .padding()
-                        .background(Color.blue)
+                        .background(.blue)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
                 .padding()
+
             }
             .padding()
+            .background(themeManager.backgroundColor) // Apply the background color from ThemeManager
             .alert(isPresented: $showCongratulations) {
                 Alert(
-                    title: Text("Congratulations!"),
-                    message: Text("You have completed your daily water schedule!"),
+                    title: Text(t("Congratulations!", in: "Water_screen")),
+                    message: Text(t("You have completed your daily water schedule!", in: "Water_screen")),
                     dismissButton: .default(Text("OK"))
                 )
             }

@@ -9,7 +9,7 @@
             },
             "register_screen": {
                 "register": "Register",
-                "e_mail": "e_mail",
+                "e_mail": "Email",
                 "first_name": "First Name",
                 "last_name": "Last Name",
                 "phone_number": "Phone Number",
@@ -19,6 +19,8 @@
             },
             "home_screen": {
                 "Reminders": "Reminders",
+                "Task to Complete": "Task to Complete",
+                "Exercise": "Exercise",
                 "Water to Drink": "Water to Drink",
                 "Voucher Shop": "Voucher Shop",
                 "Mates Shop": "Mates Shop",
@@ -28,16 +30,22 @@
                 "Notification permission granted:": "Notification permission granted:",
                 "Error triggering notification:": "Error triggering notification:",
                 "Today Activities": "Today Activities"
+                
             },
-            "HealthMate_screen": {
+            "Water_screen": {
+                "Water to Drink": "Water to Drink",
+                "Don't forget to drink water!": "Don't forget to drink water!",
+                "Congratulations!": "Congratulations!",
+                "You have completed your daily water schedule!": "You have completed your daily water schedule!",
+                "ml": "ml"
+            },
+            "Chart_screen": {
                 "Today Steps": "Today Steps",
                 "Today Calories": "Today Calories",
                 "Today Heart Rate": "Today Heart Rate",
                 "Today's Distance": "Today's Distance",
+                "Amount": "Amount",
                 "Goal": "Goal"
-            },
-            "Chart_screen":{
-                "Amount": "Amount"
             },
             "Setting_screen":{
                 "Settings": "Settings",
@@ -64,6 +72,8 @@
             },
             "home_screen": {
                 "Reminders": "แจ้งเตือน",
+                "Task to Complete": "สิ่งที่ต้องทำให้สำเร็จ",
+                "Exercise": "ออกกำลังกาย",
                 "Water to Drink": "การดื่มน้ำ",
                 "Voucher Shop": "บัตรกำนัล",
                 "Mates Shop": "ร้านค้า",
@@ -74,17 +84,31 @@
                 "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
                 "Today Activities": "เป้าหมายวันนี้"
             },
-            "HealthMate_screen": {
+                "Date": {
+                    "Monday": "วันจันทร์",
+                    "Tuesday": "วันอังคาร",
+                    "Wednesday": "วันพุธ",
+                    "Thursday": "วันพฤหัสบดี",
+                    "Friday": "วันศุกร์",
+                    "Saturday": "วันเสาร์",
+                    "Sunday": "วันอาทิตย์"
+                },
+                "Water_screen": {
+                    "Water to Drink": "น้ำที่ต้องดื่ม",
+                    "Don't forget to drink water!": "อย่าลืมดื่มน้ำ!",
+                    "Congratulations!": "ขอแสดงความยินดี!",
+                    "You have completed your daily water schedule!": "คุณได้ทำตามแผนการดื่มน้ำในแต่ละวันสำเร็จ!",
+                    "ml": "มิลลิลิตร"
+                },
+            "Chart_screen": {
                 "Today Steps": "การเดินวันนี้",
                 "Today Calories": "แคลอรี่วันนี้",
                 "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
                 "Today's Distance": "ระยะทางการเดินวันนี้",
+                "Amount": "ผลรวม",
                 "Goal": "เป้าหมายวันนี้"
             },
-            "Chart_screen":{
-                "Amount": "ผลรวม"
-            },
-            "Setting_screen":{
+            "Setting_screen": {
                 "Settings": "การตั้งค่า",
                 "Language": "ภาษา"
             }

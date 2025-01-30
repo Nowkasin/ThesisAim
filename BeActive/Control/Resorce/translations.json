@@ -28,8 +28,9 @@
                 "Notification permission granted:": "Notification permission granted:",
                 "Error triggering notification:": "Error triggering notification:",
                 "Today Activities": "Today Activities"
+                
             },
-            "Chart_screen":{
+            "Chart_screen": {
                 "Today Steps": "Today Steps",
                 "Today Calories": "Today Calories",
                 "Today Heart Rate": "Today Heart Rate",
@@ -72,8 +73,16 @@
                 "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
                 "Today Activities": "เป้าหมายวันนี้"
             },
-            
-            "Chart_screen":{
+                "Date": {
+                    "Monday": "วันจันทร์",
+                    "Tuesday": "วันอังคาร",
+                    "Wednesday": "วันพุธ",
+                    "Thursday": "วันพฤหัสบดี",
+                    "Friday": "วันศุกร์",
+                    "Saturday": "วันเสาร์",
+                    "Sunday": "วันอาทิตย์"
+                },
+            "Chart_screen": {
                 "Today Steps": "การเดินวันนี้",
                 "Today Calories": "แคลอรี่วันนี้",
                 "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
@@ -81,7 +90,7 @@
                 "Amount": "ผลรวม",
                 "Goal": "เป้าหมายวันนี้"
             },
-            "Setting_screen":{
+            "Setting_screen": {
                 "Settings": "การตั้งค่า",
                 "Language": "ภาษา"
             }

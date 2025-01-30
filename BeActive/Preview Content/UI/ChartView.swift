@@ -10,59 +10,59 @@ import HealthKit
 import Charts
 
 struct ChartView: View {
+    @StateObject var themeManager = ThemeManager()
     @Environment(\.presentationMode) var presentationMode
-    let activity: Activity // รับข้อมูล Activity จาก ActivityCard
+    @ObservedObject var language = Language.shared
     
-    @State private var stepsData: [Double] = [] // ตัวแปรสำหรับเก็บข้อมูลจำนวนขั้นตอน
+    let activity: Activity
+    @State private var stepsData: [Double] = []
     private let healthStore = HKHealthStore()
-
+    
     var body: some View {
         NavigationView {
-            VStack {
-                Text("\(t(activity.title, in: "Chart_screen"))")
-
-                    .font(.largeTitle)
-                    .padding()
-
-                VStack(alignment: .leading, spacing: 10) {
+            ZStack {
+                themeManager.backgroundColor // พื้นหลังเต็มหน้าจอ
+                    .edgesIgnoringSafeArea(.all)
+                
+                VStack {
+                    Text(t(activity.titleKey, in: "Chart_screen"))
+                        .font(.largeTitle)
+                        .padding()
+                        .foregroundColor(themeManager.textColor) // ใช้สีข้อความจาก ThemeManager
+                    Text("\(t(activity.subtitleKey, in: "Chart_screen")) \(activity.goalValue)")
+                        .font(.system(size: 14))
+                        .foregroundColor(themeManager.textColor)
                     
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("\(t(activity.subtitleKey, in: "Chart_screen")): \(t("Goal", in: "Chart_screen"))")
+                    VStack(alignment: .leading, spacing: 5) {
                         Text("\(t("Amount", in: "Chart_screen")): \(activity.amount)")
+                            .foregroundColor(themeManager.textColor)
                     }
-
-
-                }
-                .padding()
-
-                // แสดงกราฟที่เกี่ยวข้องกับ activity
-                // กรณีนี้จะใช้ข้อมูลจำนวนขั้นตอน
-                Chart {
-                    ForEach(0..<stepsData.count, id: \.self) { index in
-                        BarMark(
-                            x: .value("Day", index + 1),
-                            y: .value("Steps", stepsData[index])
-                        )
-                        .foregroundStyle(.blue)
+                    .padding()
+                    
+                    Chart {
+                        ForEach(0..<stepsData.count, id: \.self) { index in
+                            BarMark(
+                                x: .value("Day", index + 1),
+                                y: .value("Steps", stepsData[index])
+                            )
+                            .foregroundStyle(.blue)
+                        }
                     }
+                    .frame(height: 300)
+                    .padding()
                 }
-                .frame(height: 300)
-                .padding()
-            }
-           
-            .onAppear {
-                fetchHealthData() // ดึงข้อมูลเมื่อหน้าแสดงผล
+                .onAppear {
+                    fetchHealthData()
+                }
             }
         }
     }
-    
-    // ฟังก์ชันเพื่อดึงข้อมูลจาก HealthKit
+
     private func fetchHealthData() {
         guard let stepsType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
             return
         }
         
-        // กำหนดเวลาเริ่มต้นและสิ้นสุด (ตัวอย่างนี้ใช้ 7 วันย้อนหลัง)
         let calendar = Calendar.current
         let now = Date()
         guard let startDate = calendar.date(byAdding: .day, value: -7, to: now) else {
@@ -72,10 +72,10 @@ struct ChartView: View {
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictEndDate)
         
         let query = HKStatisticsCollectionQuery(quantityType: stepsType,
-                                                 quantitySamplePredicate: predicate,
-                                                 options: .cumulativeSum,
-                                                 anchorDate: now,
-                                                 intervalComponents: DateComponents(day: 1)) // ข้อมูลรายวัน
+                                                quantitySamplePredicate: predicate,
+                                                options: .cumulativeSum,
+                                                anchorDate: now,
+                                                intervalComponents: DateComponents(day: 1))
         
         query.initialResultsHandler = { query, results, error in
             guard let statsCollection = results else {
@@ -90,7 +90,7 @@ struct ChartView: View {
             }
             
             DispatchQueue.main.async {
-                self.stepsData = stepsPerDay // กำหนดข้อมูลลงในตัวแปร
+                self.stepsData = stepsPerDay
             }
         }
         
@@ -99,5 +99,5 @@ struct ChartView: View {
 }
 
 #Preview {
-    ChartView(activity: Activity(id: 0, title: "Daily Steps", subtitleKey: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
+    ChartView(activity: Activity(id: 0, titleKey: "Daily Steps", subtitleKey: "", image: "figure.walk", tintColor: .green, amount: "6,234", goalValue: ""))
 }

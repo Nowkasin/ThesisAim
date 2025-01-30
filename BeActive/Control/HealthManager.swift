@@ -54,74 +54,51 @@ class HealthManager: ObservableObject {
     
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health
     @Published var activities: [String: Activity] = [
-        "todaySteps": Activity(
-            id: 0,
-            title: t("Today Steps", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
-            image: "figure.walk",
-            tintColor: .green,
-            amount: "0"
-        ),
+            "todaySteps": Activity(
+                id: 0,
+                titleKey: t("Today Steps", in: "Chart_screen"),
+                subtitleKey: t("Goal", in: "Chart_screen"), // ✅ แปลคำว่า Goal เท่านั้น
+                image: "figure.walk",
+                tintColor: .green,
+                amount: "0",
+                goalValue: "10,000" // ✅ ใส่ค่าของ Goal ไว้ที่นี่
+            ),
+            "todayCalories": Activity(
+                id: 1,
+                titleKey: t("Today Calories", in: "Chart_screen"),
+                subtitleKey: t("Goal", in: "Chart_screen"),
+                image: "flame",
+                tintColor: .orange,
+                amount: "0",
+                goalValue: "900"
+            ),
+            "todayHeartRate": Activity(
+                id: 2,
+                titleKey: t("Today Heart Rate", in: "Chart_screen"),
+                subtitleKey: t("Goal", in: "Chart_screen"),
+                image: "heart.fill",
+                tintColor: .red,
+                amount: "0 BPM",
+                goalValue: "60-100 BPM"
+            ),
+            "dayDistance": Activity(
+                id: 3,
+                titleKey: t("Today's Distance", in: "Chart_screen"),
+                subtitleKey: t("Goal", in: "Chart_screen"),
+                image: "figure.walk.circle",
+                tintColor: .blue,
+                amount: "0",
+                goalValue: "5 km"
+            )
 
-        "todayCalories": Activity(
-            id: 1,title: t("Today Calories", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
-            image: "flame", tintColor: .red, amount: "0"
-        ),
-        
-        "todayHeartRate": Activity(
-            id: 2,
-            title: t("Today Heart Rate", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
-            image: "heart.fill",
-            tintColor: .red,
-            amount: "0 BPM"
-        ),
-
-        "dayDistance": Activity(
-            id: 3,
-            title: t("Today's Distance", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
-            image: "figure.walk.circle",
-            tintColor: .blue,
-            amount: "0"
-        )
+        ]
+    var mockActivities: [String: Activity] = [
+        "todaySteps": Activity(id: 0, titleKey: "Today Steps", subtitleKey: t("Goal", in: "Chart_screen"), image: "figure.walk", tintColor: .green, amount: "0", goalValue: "10,000"),
+        "todayCalories": Activity(id: 1, titleKey: "Today Calories", subtitleKey: t("Goal", in: "Chart_screen"), image: "flame", tintColor: .orange, amount: "0", goalValue: "900"),
+        "todayHeartRate": Activity(id: 2, titleKey: "Today Heart Rate", subtitleKey: t("Goal", in: "Chart_screen"), image: "heart.fill", tintColor: .red, amount: "0", goalValue: "60-100 BPM"),
+        "dayDistance": Activity(id: 3, titleKey: "Today's Distance", subtitleKey: t("Goal", in: "Chart_screen"), image: "figure.walk.circle", tintColor: .blue, amount: "0", goalValue: "5 km")
     ]
-    // เป็นส่วนการแสดงข้อมูลในกรณีที่ไม่ได้รับข้อมูลมาจาก health
-    @Published var mockActivities: [String: Activity] = [
-        "todaySteps": Activity(
-            id: 0,
-            title: t("Today Steps", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 10,000", // แปลคำว่า Goal และรวมกับตัวเลข
-            image: "figure.walk",
-            tintColor: .green,
-            amount: "0"
-        ),
-        "todayCalories": Activity(
-            id: 1,title: t("Today Calories", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 900", // แปลคำว่า Goal และรวมกับตัวเลข
-            image: "flame", tintColor: .red, amount: "0"
-        ),
-        
-        "todayHeartRate": Activity(
-            id: 2,
-            title: t("Today Heart Rate", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 60-100 BPM", // ใช้การแปลและประกอบข้อความ
-            image: "heart.fill",
-            tintColor: .red,
-            amount: "0 BPM"
-        ),
 
-        "dayDistance": Activity(
-            id: 3,
-            title: t("Today's Distance", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 5 km", // ใช้การแปลและประกอบข้อความ
-            image: "figure.walk.circle",
-            tintColor: .blue,
-            amount: "0"
-        )
-
-    ]
     
     init() {
         startTimer()//เริ่มนับเวลาในแต่ละฟังก์ชั่น
@@ -196,16 +173,16 @@ class HealthManager: ObservableObject {
     
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
-        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())//เริ่มจับการเคลื่อนไหวเมื่อถึงเที่ยงคืนวันต่อไป และจะรีเซ็ตค่าเมื่อสิ้นสุดวันนั้น
-        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in//สร้างเพื่อนับจำนวนก้าวที่เกิดขึ้นในช่วงเวลานั้น
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
             if let error = error {
                 print("Error fetching today's step data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
-                }//ตรวจสอบข้อผิดพลาด
+                }
                 return
             }
-            //ตรวจสอบว่ามีข้อมูลจำนวนก้าวหรือไม่ ถ้าไม่มีให้แสดงข้อมูลแบบจำลองแทน
+
             guard let quantity = result?.sumQuantity() else {
                 print("No step data available for today.")
                 DispatchQueue.main.async {
@@ -213,33 +190,27 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            //นำข้อมูลจำนวนก้าวไปแสดงในหน้า ui
+
             let stepCount = quantity.doubleValue(for: .count())
+            let goalValue = "10,000" // ✅ เปลี่ยนค่าคงที่เป็นตัวแปร
+
             let activity = Activity(
                 id: 0,
-                title: t("Today Steps", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปลข้อความ title
-                subtitleKey: "\(t("Goal", in: "Chart_screen")) 10,000", // ใช้ฟังก์ชัน t() สำหรับการแปล Goal
+                titleKey: t("Today Steps", in: "Chart_screen"),
+                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)", // ✅ ใช้ goalValue
                 image: "figure.walk",
                 tintColor: .green,
-                amount: stepCount.formattedString() // ค่าที่ฟอร์แมตมาแล้ว
+                amount: stepCount.formattedString(),
+                goalValue: goalValue // ✅ เก็บค่า goalValue
             )
 
-            //อัปเดตข้อมูลใหม่ไปยังหน้า ui
             DispatchQueue.main.async {
                 self?.activities["todaySteps"] = activity
-                
-                // Update step score with new rule: 100 steps = 1 point
-                let newPoints = Int(stepCount / 100) - Int(self?.previousStepCount ?? 0) / 100
-                if newPoints > 0 {
-                    self?.stepScore += newPoints
-                }
-                
-                self?.previousStepCount = stepCount
             }
         }
         healthStore.execute(query)
     }
-    
+
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -251,7 +222,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             guard let quantity = result?.sumQuantity() else {
                 print("No calories data available for today.")
                 DispatchQueue.main.async {
@@ -259,25 +230,27 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
+            let goalValue = "900"
+
             let activity = Activity(
                 id: 1,
-                title: t("Today Calories", in: "Chart_screen"), // ใช้ฟังก์ชัน t() สำหรับการแปล
-                subtitleKey: "\(t("Goal", in: "Chart_screen")) 900", // แปลคำว่า Goal และรวมกับตัวเลข
+                titleKey: t("Today Calories", in: "Chart_screen"),
+                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
                 image: "flame",
                 tintColor: .red,
-                amount: caloriesBurned.formattedString()
+                amount: caloriesBurned.formattedString(),
+                goalValue: goalValue
             )
 
-            
             DispatchQueue.main.async {
                 self?.activities["todayCalories"] = activity
             }
         }
         healthStore.execute(query)
     }
-    
+
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -289,7 +262,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             guard let samples = samples as? [HKQuantitySample], let latestSample = samples.first else {
                 print("No heart rate samples found.")
                 DispatchQueue.main.async {
@@ -297,49 +270,19 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            
-            // Define heart rate ranges
-            let sleepHeartRateRange = 40.0...64.0
-            let restingHeartRateRange = 65.0...85.0 // Adjust based on gender
-            let walkingHeartRateRange = 86.0...120.0 // Adjust based on gender
-            
-            print("Current Heart Rate: \(heartRate)")
-            
+            let goalValue = "60-100 BPM"
+
             DispatchQueue.main.async {
-                var state: String = "Unknown"
-                
-                // Determine the state based on heart rate range
-                if restingHeartRateRange.contains(heartRate) {
-                    state = "Resting"
-                    // Start timer for Resting state
-                    if self?.startTime == nil && self?.alertActive == false {
-                        self?.startTime = Date()
-                        print("Started timing: \(self?.startTime ?? Date())")
-                    }
-                    
-                    let elapsedTime = Date().timeIntervalSince(self?.startTime ?? Date())
-                    print("Elapsed Time in resting range: \(elapsedTime) seconds")
-                    
-                    if elapsedTime >= 3600 && self?.alertActive == false { // 5 minutes
-                        self?.alertsManager?.triggerMoveAlert()
-                    }
-                } else {
-                    // Reset timer and do not trigger notification for non-resting states
-                    self?.startTime = nil
-                    print("Heart rate not in resting range. Timer reset and no alert triggered.")
-                }
-                
-                print("Current State: \(state)")
-                
                 let activity = Activity(
                     id: 2,
-                    title: "\(t("Today Heart Rate", in: "Chart_screen")) (\(state))",
-                    subtitleKey: "\(t("Goal", in: "Chart_screen")) 60-120 BPM",
+                    titleKey: t("Today Heart Rate", in: "Chart_screen"),
+                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
                     image: "heart.fill",
                     tintColor: .red,
-                    amount: heartRate.formattedString()
+                    amount: heartRate.formattedString(),
+                    goalValue: goalValue
                 )
 
                 self?.activities["todayHeartRate"] = activity
@@ -347,7 +290,6 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-    
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -359,7 +301,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             guard let quantity = result?.sumQuantity() else {
                 print("No distance data available for today.")
                 DispatchQueue.main.async {
@@ -367,16 +309,19 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-            
+
             let distanceInMeters = quantity.doubleValue(for: .meter())
             let distanceInKilometers = distanceInMeters / 1000.0
+            let goalValue = "5 km"
+
             let activity = Activity(
                 id: 3,
-                title: t("Today's Distance", in: "Chart_screen"),
-                subtitleKey: "\(t("Goal", in: "Chart_screen")) 5 km",
+                titleKey: t("Today's Distance", in: "Chart_screen"),
+                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
                 image: "figure.walk.circle",
                 tintColor: .blue,
-                amount: distanceInKilometers.formattedString()
+                amount: distanceInKilometers.formattedString(),
+                goalValue: goalValue
             )
 
             DispatchQueue.main.async {
@@ -384,8 +329,7 @@ class HealthManager: ObservableObject {
             }
         }
         healthStore.execute(query)
-    }
-    
+    }    
     func handleAlertDismiss() {
         DispatchQueue.main.async {
             self.alertActive = false // Alert is no longer active

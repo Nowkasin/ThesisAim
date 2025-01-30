@@ -8,20 +8,22 @@
 import SwiftUI
 
 struct UILang: View {
+    @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว // เพิ่มการเข้าถึง themeManager
     @Binding var isShowing: Bool // ใช้ Binding เพื่อควบคุมการแสดงผล
     @ObservedObject var language = Language.shared // เชื่อมต่อกับ Singleton
-
+    
     var body: some View {
         ZStack {
-            Color.white
+            themeManager.backgroundColor // ใช้ backgroundColor จาก themeManager
                 .edgesIgnoringSafeArea(.vertical)
                 .shadow(radius: 5)
             
             VStack {
                 HStack {
                     Text(t("Select Language", in: "Language_screen"))
-                        .font(.system(size: 16))
+                        .font(.system(size: 20))
                         .fontWeight(.bold)
+                        .foregroundColor(themeManager.textColor)
                     
                     Spacer()
                     
@@ -46,7 +48,7 @@ struct UILang: View {
                 }) {
                     Text("ภาษาไทย")
                         .font(.body)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor) // ใช้ textColor จาก themeManager
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(language.currentLanguage == "th" ? Color.blue : Color.gray)
@@ -61,7 +63,7 @@ struct UILang: View {
                 }) {
                     Text("English")
                         .font(.body)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor) // ใช้ textColor จาก themeManager
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(language.currentLanguage == "en" ? Color.blue : Color.gray)

@@ -14,15 +14,17 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            Color.white
-                .shadow(radius: 5)
-                .edgesIgnoringSafeArea(.vertical)
+            themeManager.backgroundColor
+                .edgesIgnoringSafeArea(.all)
             
             VStack {
+                // Title และปุ่มปิด
                 HStack {
                     Text(t("Settings", in: "Setting_screen"))
                         .font(.title)
                         .fontWeight(.bold)
+                        .foregroundColor(themeManager.textColor)
+                    
                     Spacer()
                     
                     Button(action: {
@@ -37,8 +39,7 @@ struct SettingsView: View {
                 }
                 .padding()
                 
-                Spacer()
-                
+                // ปุ่มเปลี่ยนภาษา อยู่ใต้หัวข้อ Settings
                 Button(action: {
                     withAnimation {
                         showLanguageView = true // เปิดหน้า UILang
@@ -48,11 +49,9 @@ struct SettingsView: View {
                         .font(.body)
                         .foregroundColor(themeManager.textColor)
                         .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(10)
+                        .frame(maxWidth: .infinity, alignment: .leading) // ชิดซ้าย
+                        .padding(.horizontal)
                 }
-                .padding()
-                
                 Spacer()
             }
             .frame(maxWidth: .infinity)

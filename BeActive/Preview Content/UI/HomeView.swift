@@ -155,10 +155,20 @@ struct HomeView: View {
     
     func getFormattedDate() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "th_TH")
-        dateFormatter.dateFormat = "EEEE - dd/MM/yyyy"
-        return dateFormatter.string(from: Date())
+        dateFormatter.locale = Locale(identifier: Language.shared.currentLanguage == "th" ? "th_TH" : "en_US") // เปลี่ยน locale ตามภาษา
+        dateFormatter.dateFormat = "EEEE" // เอาเฉพาะชื่อวันก่อน
+        let dayName = dateFormatter.string(from: Date()) // ได้ค่าเป็น "Monday" หรือ "วันจันทร์"
+
+        // ใช้ t() เพื่อแปลชื่อวัน
+        let translatedDayName = t(dayName, in: "Date")
+
+        // ฟอร์แมตวันที่
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        let dateString = dateFormatter.string(from: Date())
+
+        return "\(translatedDayName) - \(dateString)"
     }
+
     
     func getDayColor() -> Color {
         let colors: [Color] = [.red, .yellow, .pink, .green, .orange, .blue, .purple]
@@ -233,7 +243,7 @@ struct TodayActivitiesView: View {
             .padding(.horizontal)
             .padding(.bottom, 5)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 1) {
+                HStack(spacing: 10) {
                     ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
                         ActivityCard(activity: item.value)
                             .frame(width: 200, height: 180)

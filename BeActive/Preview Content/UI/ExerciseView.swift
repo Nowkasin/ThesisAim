@@ -26,62 +26,74 @@ struct ExerciseView: View {
     ]
     
     @State private var selectedURL: IdentifiableURL?
-
+    
     var body: some View {
-        ZStack {
-            themeManager.backgroundColor
-                .edgesIgnoringSafeArea(.all)
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text(t("Exercise", in: "Ex_screen"))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(themeManager.textColor)
-                        .padding(.horizontal)
-                    
-                    Text(t("Recommended for you", in: "Ex_screen"))
-                        .font(.headline)
-                        .foregroundColor(themeManager.textColor)
-                        .padding(.horizontal)
-                        .padding(.top, -20)
-                        .padding(.bottom, 10)
-                    
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
-                        ForEach($exercises) { $exercise in
-                            ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+        NavigationView {
+            ZStack {
+                themeManager.backgroundColor // ใช้สีพื้นหลังจาก themeManager
+                    .edgesIgnoringSafeArea(.all)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text(t("Exercise", in: "Ex_screen"))
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.horizontal)
+                        
+                        Text(t("Recommended for you", in: "Ex_screen"))
+                            .font(.headline)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.horizontal)
+                            .padding(.top, -20)
+                            .padding(.bottom, 10)
+                        
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
+                            ForEach($exercises) { $exercise in
+                                ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+                            }
                         }
-                    }
-                    .padding(.horizontal)
-                    
-                    Text(t("Article & Tip", in: "Ex_screen"))
-                        .font(.headline)
-                        .foregroundColor(themeManager.textColor)
                         .padding(.horizontal)
-                    
-                    VStack(spacing: 15) {
-                        ForEach(0..<4) { _ in
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(themeManager.textColor.opacity(0.2))
-                                .frame(height: 100)
-                                .onTapGesture {
-                                    print("Go to Tips")
-                                }
+                        
+                        Text(t("Article & Tip", in: "Ex_screen"))
+                            .font(.headline)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.horizontal)
+                        
+                        VStack(spacing: 15) {
+                            ForEach(0..<4) { _ in
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(themeManager.textColor.opacity(0.2))
+                                    .frame(height: 100)
+                                    .onTapGesture {
+                                        print("Go to Tips")
+                                    }
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .padding(.bottom, 20)
+                .background(themeManager.backgroundColor) // ใช้สีพื้นหลังจาก themeManager
+                .sheet(item: $selectedURL) { identifiableURL in
+                    SafariView(url: identifiableURL.url)
+                }
             }
-            .background(themeManager.backgroundColor)
-            .sheet(item: $selectedURL) { identifiableURL in
-                SafariView(url: identifiableURL.url)
+            .navigationBarHidden(false) // แสดง Navigation Bar
+            .onAppear {
+                // ปรับแต่ง NavigationBar appearance
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithOpaqueBackground()
+                appearance.backgroundColor = UIColor(themeManager.backgroundColor) // สีพื้นหลังของ Navigation Bar
+                appearance.titleTextAttributes = [.foregroundColor: themeManager.textColor] // สีของ title ใน Navigation Bar
+                
+                UINavigationBar.appearance().standardAppearance = appearance
+                UINavigationBar.appearance().compactAppearance = appearance
+                UINavigationBar.appearance().scrollEdgeAppearance = appearance
             }
         }
     }
 }
-
-       
 
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
@@ -160,3 +172,4 @@ struct ExerciseView_Previews: PreviewProvider {
         ExerciseView()
     }
 }
+

@@ -6,10 +6,17 @@
 //
 
 import SwiftUI
+import Firebase
+
 
 @main
 struct BeActiveApp: App {
     @StateObject var manager = HealthManager()
+    
+    init() {
+        FirebaseApp.configure() // Initialize Firebase
+    }
+    
     var body: some Scene {
         WindowGroup {
             Login()

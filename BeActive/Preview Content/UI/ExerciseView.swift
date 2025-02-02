@@ -18,6 +18,7 @@ struct Exercise: Identifiable {
 
 struct ExerciseView: View {
     @StateObject var themeManager = ThemeManager() // ใช้ ThemeManager
+    @Environment(\.presentationMode) var presentationMode
     @State private var exercises: [Exercise] = [
         Exercise(title: t("Back Exercise", in: "Ex_screen"), duration: "10 " + t("Minutes", in: "Ex_screen"), videoURL: "https://youtu.be/4BYVwq2wv0Q?si=wfvsQSPgxiIz4Ldj", isFavorite: false),
         Exercise(title: t("Neck Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/neck-exercise", isFavorite: false),
@@ -28,72 +29,79 @@ struct ExerciseView: View {
     @State private var selectedURL: IdentifiableURL?
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                themeManager.backgroundColor // ใช้สีพื้นหลังจาก themeManager
-                    .edgesIgnoringSafeArea(.all)
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text(t("Exercise", in: "Ex_screen"))
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color.purple)
-                            .padding(.horizontal)
-                        
-                        Text(t("Recommended for you", in: "Ex_screen"))
-                            .font(.headline)
-                            .foregroundColor(Color.blue)
-                            .padding(.horizontal)
-                            .padding(.top, -20)
-                            .padding(.bottom, 10)
-                        
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
-                            ForEach($exercises) { $exercise in
-                                ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+        ZStack {
+            themeManager.backgroundColor
+                .edgesIgnoringSafeArea(.all)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack {
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss() // ปิดหน้าจอเมื่อกด
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                    .font(.title)
+                                    .foregroundColor(.blue) // ใช้สีน้ำเงิน
+                                Text(t("Back", in: "Ex_screen"))
+                                    .foregroundColor(.blue) // ใช้สีน้ำเงิน
+                                    .fontWeight(.semibold)
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.leading)
                         
-                        Text(t("Article & Tip", in: "Ex_screen"))
-                            .font(.headline)
-                            .foregroundColor(Color.blue)
-                            .padding(.horizontal)
-                        
-                        VStack(spacing: 15) {
-                            ForEach(0..<4) { _ in
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(themeManager.textColor.opacity(0.2))
-                                    .frame(height: 100)
-                                    .onTapGesture {
-                                        print("Go to Tips")
-                                    }
-                            }
-                        }
-                        .padding(.horizontal)
+                        Spacer()
                     }
-                    .padding(.bottom, 20)
+
+                    Text(t("Exercise", in: "Ex_screen"))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.purple)
+                        .padding(.horizontal)
+                    
+                    Text(t("Recommended for you", in: "Ex_screen"))
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                        .padding(.horizontal)
+                        .padding(.top, -20)
+                        .padding(.bottom, 10)
+                    
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
+                        ForEach($exercises) { $exercise in
+                            ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    Text(t("Article & Tip", in: "Ex_screen"))
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                        .padding(.horizontal)
+                    
+                    VStack(spacing: 15) {
+                        ForEach(0..<4) { _ in
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(themeManager.textColor.opacity(0.2))
+                                .frame(height: 100)
+                                .onTapGesture {
+                                    print("Go to Tips")
+                                }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
-                .background(themeManager.backgroundColor) // ใช้สีพื้นหลังจาก themeManager
-                .sheet(item: $selectedURL) { identifiableURL in
-                    SafariView(url: identifiableURL.url)
-                }
+                .padding(.bottom, 20)
             }
-            .navigationBarHidden(false) // แสดง Navigation Bar
-            .onAppear {
-                // ปรับแต่ง NavigationBar appearance
-                let appearance = UINavigationBarAppearance()
-                appearance.configureWithOpaqueBackground()
-                appearance.backgroundColor = UIColor(themeManager.backgroundColor) // สีพื้นหลังของ Navigation Bar
-                appearance.titleTextAttributes = [.foregroundColor: themeManager.textColor] // สีของ title ใน Navigation Bar
-                
-                UINavigationBar.appearance().standardAppearance = appearance
-                UINavigationBar.appearance().compactAppearance = appearance
-                UINavigationBar.appearance().scrollEdgeAppearance = appearance
+            .background(themeManager.backgroundColor)
+            .sheet(item: $selectedURL) { identifiableURL in
+                SafariView(url: identifiableURL.url)
             }
         }
+        .navigationBarHidden(true) // ซ่อน navigation bar
     }
 }
+
+
 
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
@@ -109,7 +117,7 @@ struct ExerciseCard: View {
                 HStack {
                     Spacer()
                     Image(systemName: exercise.isFavorite ? "star.fill" : "star")
-                        .foregroundColor(exercise.isFavorite ? Color.yellow : themeManager.textColor)
+                        .foregroundColor(exercise.isFavorite ? Color.yellow : Color.purple)
                         .padding()
                         .onTapGesture {
                             exercise.isFavorite.toggle()
@@ -126,7 +134,7 @@ struct ExerciseCard: View {
                     VStack(alignment: .leading) {
                         Text(exercise.title)
                             .font(.headline)
-                            .foregroundColor(themeManager.textColor)
+                            .foregroundColor(.purple)
                         Text(exercise.duration)
                             .foregroundColor(themeManager.backgroundColor)
                     }

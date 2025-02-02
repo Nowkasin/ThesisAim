@@ -66,7 +66,7 @@ struct HomeView: View {
                                 VStack(spacing: 15) {
                                     // แปลภาษาให้ด้วย
                                     ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .yellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
-                                        .navigate(to: MatesView()) // <-- แก้เป็น TaskView or Something
+                                        .navigate(to: TaskView())
                                     
                                     // แปลภาษาให้ด้วย
                                     ReminderSection(title: t("Exercise", in: "home_screen"), color: .purple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)

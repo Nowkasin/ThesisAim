@@ -180,4 +180,3 @@ struct ExerciseView_Previews: PreviewProvider {
         ExerciseView()
     }
 }
-

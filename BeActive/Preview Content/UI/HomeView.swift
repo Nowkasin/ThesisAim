@@ -1,5 +1,11 @@
+//
+//  HomeView.swift
+//  BeActive
+//
+//  Created by Kasin Thappawan on 29/5/2567 BE.
+//
+
 import SwiftUI
-import UserNotifications
 
 struct HomeView: View {
     @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว
@@ -12,10 +18,20 @@ struct HomeView: View {
     @State private var selectedTab = "Home"
     @State private var isShowingSettings = false // ตัวแปรควบคุมการแสดงผล Settings
     
+    init() {
+        // กำหนดสีพื้นหลังของ TabBar
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = UIColor(red: 0.7, green: 0.9, blue: 1.0, alpha: 1.0)
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+    
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
                 TabView(selection: $selectedTab) {
+                    
                     ZStack {
                         themeManager.backgroundColor
                             .edgesIgnoringSafeArea(.all)
@@ -133,6 +149,13 @@ struct HomeView: View {
                     }
                     .tag("Home")
                     
+                    ProfileView()
+                        .tabItem{
+                            Image(systemName: "person.crop.circle")
+                            Text("profile")
+                        }
+                        .tag( "Profile")
+                    
                     ContentView()
                         .tabItem {
                             Image(systemName: "person")
@@ -140,11 +163,12 @@ struct HomeView: View {
                         }
                         .tag("Content")
                 }
+                .background(Color(red: 0.7, green: 0.9, blue: 1.0))
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)
         }
     }
-    
+
     func startWelcomeTimer() {
         welcomeTimer?.invalidate()
         welcomeTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in

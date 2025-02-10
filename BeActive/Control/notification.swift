@@ -7,10 +7,14 @@
 
 import Foundation
 import UserNotifications
+import AudioToolbox
+
 
 class AlertsManager {
     var isWaterAlertActive = false
     var isAlertActive = false
+    var isHeartRateAlertActive = false
+    var soundID: SystemSoundID = 1005 // ✅ เก็บ SoundID เพื่อนำไปหยุด   
 
     func triggerWaterAlert() {
             print("Attempting to trigger water alert...")
@@ -39,11 +43,11 @@ class AlertsManager {
         }
 
         private func scheduleNextWaterAlertAfterDelay() {
-            print("Starting 10 minute delay for water reminder")
+            print("Starting 30 minutes delay for water reminder")
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1800) { // 1800 seconds = 30 minutes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1800) { // 1800 seconds = 30 minutes ลองทดสอบเป็น 10 วิได้
                 self.isWaterAlertActive = false
-                print("10 minutes passed, isWaterAlertActive set to false")
+                print("30 minutes passed, isWaterAlertActive set to false")
                 self.triggerWaterAlert() // Restart the alert
             }
         }
@@ -52,7 +56,7 @@ class AlertsManager {
             if !isAlertActive { // ตรวจสอบว่ามีการแจ้งเตือนอยู่หรือไม่
                 let content = UNMutableNotificationContent()
                 content.title = "เดินได้แล้ว!"
-                content.body = "คุณนั่งนานเกิน 5 นาที ลุกขึ้นเดินได้แล้ว!"
+                content.body = "คุณนั่งนานเกิน 1 ชั่วโมง ลุกขึ้นเดินได้แล้ว!"
                 content.sound = .default
 
                 // กำหนดให้แจ้งเตือนซ้ำทุก 5 นาที
@@ -72,7 +76,7 @@ class AlertsManager {
                     }
                 }
             } else {
-                print("Alert is already active, waiting for 5 minutes.")
+                print("Alert is already active, waiting for 1 hour.")
             }
         }
 
@@ -88,4 +92,72 @@ class AlertsManager {
                 self.triggerMoveAlert()  // เริ่มการแจ้งเตือนใหม่
             }
         }
+
+
+    func triggerHeartRateAlert() {
+        print("🚨 Attempting to trigger heart rate alert...")
+
+        if isHeartRateAlertActive {
+            print("⚠️ Heart rate alert is already active, skipping new alert.")
+            return
+        }
+
+        isHeartRateAlertActive = true
+
+        let content = UNMutableNotificationContent()
+        content.title = "🚨 อัตราการเต้นของหัวใจสูง!"
+        content.body = "หัวใจของคุณเต้นเร็วเกินไปโดยไม่มีการเคลื่อนไหว โปรดพักหรือตรวจสอบสุขภาพของคุณ"
+        
+        // ✅ ใช้เสียงแจ้งเตือนที่ดังขึ้น แม้ในโหมดเงียบ
+        content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
+        content.badge = NSNumber(value: 1)
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(identifier: "heartRateAlert_\(UUID().uuidString)", content: content, trigger: trigger)
+
+        // ✅ ตรวจสอบว่าไม่มีแจ้งเตือนซ้ำ
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let existingRequests = requests.filter { $0.identifier.contains("heartRateAlert") }
+
+            if existingRequests.isEmpty {
+                UNUserNotificationCenter.current().add(request) { error in
+                    if let error = error {
+                        print("❌ Error triggering heart rate alert: \(error.localizedDescription)")
+                    } else {
+                        print("✅ Heart rate alert scheduled successfully")
+                        self.playSystemAlarm() // ✅ เล่นเสียงทันทีเมื่อแจ้งเตือนขึ้น
+                    }
+                }
+            } else {
+                print("⚠️ A similar heart rate alert is already pending, skipping duplicate.")
+            }
+        }
+
+        scheduleNextHeartRateAlertAfterDelay()
+    }
+
+    // ✅ ฟังก์ชันเล่นเสียง 1005 (Alarm)
+    func playSystemAlarm() {
+        print("🔊 Playing System Sound 1005 (Alarm)")
+        AudioServicesPlaySystemSound(soundID) // 🚨 เล่นเสียงแจ้งเตือนทันที
+    }
+
+    // ✅ ฟังก์ชันหยุดเสียงเมื่อแจ้งเตือนหยุด
+    func stopSystemAlarm() {
+        print("🔇 Stopping System Sound 1005 (Alarm)")
+        AudioServicesDisposeSystemSoundID(soundID) // 🛑 หยุดเสียง
+    }
+
+    // ✅ หยุดเสียงเมื่อแจ้งเตือนหมดเวลา (90 วินาที)
+    private func scheduleNextHeartRateAlertAfterDelay() {
+        print("⏳ Starting 90-second cooldown for heart rate alert")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 90) {
+            self.isHeartRateAlertActive = false
+            print("✅ 90 seconds passed, isHeartRateAlertActive set to false")
+
+            self.stopSystemAlarm() // 🛑 หยุดเสียงเมื่อครบเวลา
+        }
+    }
+
 }

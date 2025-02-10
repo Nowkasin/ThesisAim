@@ -254,43 +254,73 @@ class HealthManager: ObservableObject {
 
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
+        let stepCountType = HKQuantityType(.stepCount)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
-        let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { [weak self] _, samples, error in
+
+        let heartRateQuery = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { [weak self] _, samples, error in
             if let error = error {
-                print("Error fetching today's HeartRate data: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self?.activities["todayHeartRate"] = self?.mockActivities["todayHeartRate"]
-                }
+                print("❌ Error fetching today's HeartRate data: \(error.localizedDescription)")
                 return
             }
 
             guard let samples = samples as? [HKQuantitySample], let latestSample = samples.first else {
-                print("No heart rate samples found.")
-                DispatchQueue.main.async {
-                    self?.activities["todayHeartRate"] = self?.mockActivities["todayHeartRate"]
-                }
+                print("⚠️ No heart rate samples found.")
                 return
             }
 
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            let goalValue = "60-100 BPM"
+            print("📊 Fetched Heart Rate: \(heartRate) BPM")
 
-            DispatchQueue.main.async {
-                let activity = Activity(
-                    id: 2,
-                    titleKey: t("Today Heart Rate", in: "Chart_screen"),
-                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
-                    image: "heart.fill",
-                    tintColor: .red,
-                    amount: heartRate.formattedString(),
-                    goalValue: goalValue
-                )
+            // ดึงจำนวนก้าวเดิน
+            let stepQuery = HKStatisticsQuery(quantityType: stepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, error in
+                if let error = error {
+                    print("❌ Error fetching today's step data: \(error.localizedDescription)")
+                    return
+                }
 
-                self?.activities["todayHeartRate"] = activity
+                let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                print("🚶‍♂️ Fetched Step Count: \(stepCount) steps")
+
+                // 🔥 เรียกฟังก์ชันตรวจสอบการแจ้งเตือน
+                let (alertColor, alertSubtitle) = self?.evaluateHeartRateWarning(heartRate: heartRate, stepCount: stepCount) ?? (.green, "\(t("Goal", in: "Chart_screen")): 60-100 BPM")
+
+                DispatchQueue.main.async {
+                    let activity = Activity(
+                        id: 2,
+                        titleKey: t("Today Heart Rate", in: "Chart_screen"),
+                        subtitleKey: alertSubtitle,
+                        image: "heart.fill",
+                        tintColor: Color(alertColor),
+                        amount: heartRate.formattedString(),
+                        goalValue: "60-100 BPM"
+                    )
+
+                    self?.activities["todayHeartRate"] = activity
+                }
             }
+            self?.healthStore.execute(stepQuery)
         }
-        healthStore.execute(query)
+        healthStore.execute(heartRateQuery)
     }
+    // ✅ ฟังก์ชันตรวจสอบ Heart Rate
+    private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) -> (UIColor, String) {
+        let goalValue = "60-100 BPM"
+        let isHeartRateHigh = heartRate >= 90  // ✅ กำหนดช่วงอัตราการเต้นของหัวใจ
+        let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount) // ✅ ตรวจสอบว่าก้าวเดินไม่เพิ่มขึ้น
+        if isHeartRateHigh && isNotMoving {
+            print("🚨 Triggering Heart Rate Alert!")
+            AlertsManager().triggerHeartRateAlert() // ✅ แจ้งเตือน
+            return (.red, "\(t("Warning: High Heart Rate", in: "Chart_screen"))!")
+        } else {
+            print("✅ Heart Rate is normal.")
+        }
+
+        // ✅ อัปเดต previousStepCount เป็นค่าล่าสุด
+        previousStepCount = stepCount
+
+        return (.green, "\(t("Goal", in: "Chart_screen")): \(goalValue)")
+    }
+
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())

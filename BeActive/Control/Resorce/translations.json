@@ -1,136 +1,136 @@
 {
     "en" : {
-            "login_screen": {
-                "log_in": "Log In",
-                "e_mail": "E-mail Address",
-                "password": "Password",
-                "no_account_yet": "No account yet?",
-                "register": "Register"
-            },
-            "register_screen": {
-                "register": "Register",
-                "e_mail": "Email",
-                "first_name": "First Name",
-                "last_name": "Last Name",
-                "phone_number": "Phone Number",
-                "password": "Password",
-                "sign_up": "Sign Up",
-                "fill_all_fields": "Please fill all fields."
-            },
-            "home_screen": {
-                "Reminders": "Reminders",
-                "Task to Complete": "Task to Complete",
-                "Exercise": "Exercise",
-                "Water to Drink": "Water to Drink",
-                "Voucher Shop": "Voucher Shop",
-                "Mates Shop": "Mates Shop",
-                "Time to Move!" : "Time to Move!",
-                "OK":"OK",
-                "Notification permission error:" : "Notification permission error:",
-                "Notification permission granted:": "Notification permission granted:",
-                "Error triggering notification:": "Error triggering notification:",
-                "Today Activities": "Today Activities"
-                
-            },
-            "Water_screen": {
-                "Water to Drink": "Water to Drink",
-                "Don't forget to drink water!": "Don't forget to drink water!",
-                "Congratulations!": "Congratulations!",
-                "You have completed your daily water schedule!": "You have completed your daily water schedule!",
-                "ml": "ml"
-            },
-            "Chart_screen": {
-                "Today Steps": "Today Steps",
-                "Today Calories": "Today Calories",
-                "Today Heart Rate": "Today Heart Rate",
-                "Today's Distance": "Today's Distance",
-                "Amount": "Amount",
-                "Goal": "Goal"
-            },
-            "Ex_screen": {
-                "Back Exercise": "Back Exercise",
-                "Neck Exercise": "Neck Exercise",
-                "Arm Exercise": "Arm Exercise",
-                "Shoulder Exercise": "Shoulder Exercise",
-                "Exercise": "Exercise",
-                "Article & Tip": "Article & Tip",
-                "Recommended for you": "Recommended for you",
-                "Minutes": "Minutes"
-            },
-            "Setting_screen":{
-                "Settings": "Settings",
-                "Language": "Language"
-            }
+        "login_screen": {
+            "log_in": "Log In",
+            "e_mail": "E-mail Address",
+            "password": "Password",
+            "no_account_yet": "No account yet?",
+            "register": "Register"
         },
-        "th": {
-            "login_screen": {
-                "log_in": "เข้าสู่ระบบ",
-                "e_mail": "ที่อยู่อีเมล",
-                "password": "รหัสผ่าน",
-                "no_account_yet": "ยังไม่มีบัญชีใช่หรือไม่?",
-                "register": "สมัครสมาชิก"
-            },
-            "register_screen": {
-                "register": "สมัครสมาชิก",
-                "e_mail": "อีเมล",
-                "first_name": "ชื่อจริง",
-                "last_name": "นามสกุล",
-                "phone_number": "เบอร์โทรศัพท์",
-                "password": "รหัสผ่าน",
-                "sign_up": "สมัคร",
-                "fill_all_fields": "กรุณากรอกข้อมูลให้ครบถ้วน"
-            },
-            "home_screen": {
-                "Reminders": "แจ้งเตือน",
-                "Task to Complete": "สิ่งที่ต้องทำให้สำเร็จ",
-                "Exercise": "ออกกำลังกาย",
-                "Water to Drink": "การดื่มน้ำ",
-                "Voucher Shop": "บัตรกำนัล",
-                "Mates Shop": "ร้านค้า",
-                "Time to Move!" : "ได้เวลาเดินแล้ว!",
-                "OK":"ตกลง",
-                "Notification permission error:" : "ข้อผิดพลาดการอนุญาตการแจ้งเตือน:",
-                "Notification permission granted:": "ได้รับอนุญาติให้แจ้งเตือน:",
-                "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
-                "Today Activities": "เป้าหมายวันนี้"
-            },
-                "Date": {
-                    "Monday": "วันจันทร์",
-                    "Tuesday": "วันอังคาร",
-                    "Wednesday": "วันพุธ",
-                    "Thursday": "วันพฤหัสบดี",
-                    "Friday": "วันศุกร์",
-                    "Saturday": "วันเสาร์",
-                    "Sunday": "วันอาทิตย์"
-                },
-                "Water_screen": {
-                    "Water to Drink": "น้ำที่ต้องดื่ม",
-                    "Don't forget to drink water!": "อย่าลืมดื่มน้ำ!",
-                    "Congratulations!": "ขอแสดงความยินดี!",
-                    "You have completed your daily water schedule!": "คุณได้ทำตามแผนการดื่มน้ำในแต่ละวันสำเร็จ!",
-                    "ml": "มิลลิลิตร"
-                },
-            "Chart_screen": {
-                "Today Steps": "การเดินวันนี้",
-                "Today Calories": "แคลอรี่วันนี้",
-                "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
-                "Today's Distance": "ระยะทางการเดินวันนี้",
-                "Amount": "ผลรวม",
-                "Goal": "เป้าหมายวันนี้"
-            },
-            "Ex_screen": {
-                "Back Exercise": "ออกกำลังกายหลัง",
-                "Neck Exercise": "ออกกำลังกายคอ",
-                "Arm Exercise": "ออกกำลังกายแขน",
-                "Shoulder Exercise": "ออกกำลังกายไหล่",
-                "Exercise": "การออกกำลังกาย",
-                "Article & Tip": "เคล็ดลับ",
-                "Recommended for you": "แนะนำสำหรับคุณ",
-                "Minutes": "นาที"
-            },
-            "Setting_screen": {
-                "Settings": "การตั้งค่า",
-                "Language": "ภาษา"
-            }
+        "register_screen": {
+            "register": "Register",
+            "e_mail": "Email",
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "phone_number": "Phone Number",
+            "password": "Password",
+            "sign_up": "Sign Up",
+            "fill_all_fields": "Please fill all fields."
+        },
+        "home_screen": {
+            "Reminders": "Reminders",
+            "Task to Complete": "Task to Complete",
+            "Exercise": "Exercise",
+            "Water to Drink": "Water to Drink",
+            "Voucher Shop": "Voucher Shop",
+            "Mates Shop": "Mates Shop",
+            "Time to Move!" : "Time to Move!",
+            "OK":"OK",
+            "Notification permission error:" : "Notification permission error:",
+            "Notification permission granted:": "Notification permission granted:",
+            "Error triggering notification:": "Error triggering notification:",
+            "Today Activities": "Today Activities"
+            
+        },
+        "Water_screen": {
+            "Water to Drink": "Water to Drink",
+            "Don't forget to drink water!": "Don't forget to drink water!",
+            "Congratulations!": "Congratulations!",
+            "You have completed your daily water schedule!": "You have completed your daily water schedule!",
+            "ml": "ml"
+        },
+        "Chart_screen": {
+            "Today Steps": "Today Steps",
+            "Today Calories": "Today Calories",
+            "Today Heart Rate": "Today Heart Rate",
+            "Today's Distance": "Today's Distance",
+            "Amount": "Amount",
+            "Goal": "Goal"
+        },
+        "Ex_screen": {
+            "Back Exercise": "Back Exercise",
+            "Neck Exercise": "Neck Exercise",
+            "Arm Exercise": "Arm Exercise",
+            "Shoulder Exercise": "Shoulder Exercise",
+            "Exercise": "Exercise",
+            "Article & Tip": "Article & Tip",
+            "Recommended for you": "Recommended for you",
+            "Minutes": "Minutes"
+        },
+        "Setting_screen":{
+            "Settings": "Settings",
+            "Language": "Language"
         }
+    },
+    "th": {
+        "login_screen": {
+            "log_in": "เข้าสู่ระบบ",
+            "e_mail": "ที่อยู่อีเมล",
+            "password": "รหัสผ่าน",
+            "no_account_yet": "ยังไม่มีบัญชีใช่หรือไม่?",
+            "register": "สมัครสมาชิก"
+        },
+        "register_screen": {
+            "register": "สมัครสมาชิก",
+            "e_mail": "อีเมล",
+            "first_name": "ชื่อจริง",
+            "last_name": "นามสกุล",
+            "phone_number": "เบอร์โทรศัพท์",
+            "password": "รหัสผ่าน",
+            "sign_up": "สมัคร",
+            "fill_all_fields": "กรุณากรอกข้อมูลให้ครบถ้วน"
+        },
+        "home_screen": {
+            "Reminders": "แจ้งเตือน",
+            "Task to Complete": "สิ่งที่ต้องทำให้สำเร็จ",
+            "Exercise": "ออกกำลังกาย",
+            "Water to Drink": "การดื่มน้ำ",
+            "Voucher Shop": "บัตรกำนัล",
+            "Mates Shop": "ร้านค้า",
+            "Time to Move!" : "ได้เวลาเดินแล้ว!",
+            "OK":"ตกลง",
+            "Notification permission error:" : "ข้อผิดพลาดการอนุญาตการแจ้งเตือน:",
+            "Notification permission granted:": "ได้รับอนุญาติให้แจ้งเตือน:",
+            "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
+            "Today Activities": "เป้าหมายวันนี้"
+        },
+        "Date": {
+            "Monday": "วันจันทร์",
+            "Tuesday": "วันอังคาร",
+            "Wednesday": "วันพุธ",
+            "Thursday": "วันพฤหัสบดี",
+            "Friday": "วันศุกร์",
+            "Saturday": "วันเสาร์",
+            "Sunday": "วันอาทิตย์"
+        },
+        "Water_screen": {
+            "Water to Drink": "น้ำที่ต้องดื่ม",
+            "Don't forget to drink water!": "อย่าลืมดื่มน้ำ!",
+            "Congratulations!": "ขอแสดงความยินดี!",
+            "You have completed your daily water schedule!": "คุณได้ทำตามแผนการดื่มน้ำในแต่ละวันสำเร็จ!",
+            "ml": "มิลลิลิตร"
+        },
+        "Chart_screen": {
+            "Today Steps": "การเดินวันนี้",
+            "Today Calories": "แคลอรี่วันนี้",
+            "Today Heart Rate": "อัตราการเต้นหัวใจวันนี้",
+            "Today's Distance": "ระยะทางการเดินวันนี้",
+            "Amount": "ผลรวม",
+            "Goal": "เป้าหมาย"
+        },
+        "Ex_screen": {
+            "Back Exercise": "ออกกำลังกายหลัง",
+            "Neck Exercise": "ออกกำลังกายคอ",
+            "Arm Exercise": "ออกกำลังกายแขน",
+            "Shoulder Exercise": "ออกกำลังกายไหล่",
+            "Exercise": "การออกกำลังกาย",
+            "Article & Tip": "เคล็ดลับ",
+            "Recommended for you": "แนะนำสำหรับคุณ",
+            "Minutes": "นาที"
+        },
+        "Setting_screen": {
+            "Settings": "การตั้งค่า",
+            "Language": "ภาษา"
+        }
+    }
 }

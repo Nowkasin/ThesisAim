@@ -282,7 +282,7 @@ class HealthManager: ObservableObject {
                 print("🚶‍♂️ Fetched Step Count: \(stepCount) steps")
 
                 // 🔥 เรียกฟังก์ชันตรวจสอบการแจ้งเตือน
-                let (alertColor, alertSubtitle) = self?.evaluateHeartRateWarning(heartRate: heartRate, stepCount: stepCount) ?? (.green, "\(t("Goal", in: "Chart_screen")): 60-100 BPM")
+                let (alertColor, alertSubtitle) = self?.evaluateHeartRateWarning(heartRate: heartRate, stepCount: stepCount) ?? (.red, "\(t("Goal", in: "Chart_screen")): 60-100 BPM")
 
                 DispatchQueue.main.async {
                     let activity = Activity(

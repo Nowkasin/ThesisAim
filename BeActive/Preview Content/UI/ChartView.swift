@@ -29,7 +29,7 @@ struct ChartView: View {
                         .font(.largeTitle)
                         .padding()
                         .foregroundColor(themeManager.textColor) // ใช้สีข้อความจาก ThemeManager
-                    Text("\(t(activity.subtitleKey, in: "Chart_screen")) \(activity.goalValue)")
+                    Text("\(t(activity.subtitleKey, in: "Chart_screen")) ")
                         .font(.system(size: 14))
                         .foregroundColor(themeManager.textColor)
                     

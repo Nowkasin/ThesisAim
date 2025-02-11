@@ -36,7 +36,7 @@ struct ActivityCard: View {
                                 .foregroundColor(.primary)
                             
                             // ✅ ใช้ค่า Goal ที่กำหนดจาก Activity
-                            Text("\(t(activity.subtitleKey, in: "Chart_screen")) \(activity.goalValue)")
+                            Text("\(t(activity.subtitleKey, in: "Chart_screen"))")
                                 .font(.system(size: 14))
                                 .foregroundColor(.black)
                         }

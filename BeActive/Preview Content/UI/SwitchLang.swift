@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct SwitchLang: View {
     @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว // เพิ่มการเข้าถึง themeManager
     @Binding var isShowing: Bool // ใช้ Binding เพื่อควบคุมการแสดงผล

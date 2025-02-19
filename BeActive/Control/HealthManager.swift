@@ -175,19 +175,20 @@ class HealthManager: ObservableObject {
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+
         let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
             if let error = error {
-                print("Error fetching today's step data: \(error.localizedDescription)")
+                print("❌ Error fetching today's step data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                    self?.setMockStepActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
 
             guard let quantity = result?.sumQuantity() else {
-                print("No step data available for today.")
+                print("⚠️ No step data available for today.")
                 DispatchQueue.main.async {
-                    self?.activities["todaySteps"] = self?.mockActivities["todaySteps"]
+                    self?.setMockStepActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
@@ -195,39 +196,63 @@ class HealthManager: ObservableObject {
             let stepCount = quantity.doubleValue(for: .count())
             let goalValue = "10,000" // ✅ เปลี่ยนค่าคงที่เป็นตัวแปร
 
-            let activity = Activity(
-                id: 0,
-                titleKey: t("Today Steps", in: "Chart_screen"),
-                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)", // ✅ ใช้ goalValue
-                image: "figure.walk",
-                tintColor: .green,
-                amount: stepCount.formattedString(),
-                goalValue: goalValue // ✅ เก็บค่า goalValue
-            )
-
             DispatchQueue.main.async {
+                let translatedTitle = t("Today Steps", in: "Chart_screen")
+                print("🌎 Translated Title: \(translatedTitle)")
+
+                let activity = Activity(
+                    id: 0,
+                    titleKey: translatedTitle,  // ✅ ใช้ค่าที่แปลแล้ว
+                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
+                    image: "figure.walk",
+                    tintColor: .green,
+                    amount: stepCount.formattedString(),
+                    goalValue: goalValue
+                )
+
                 self?.activities["todaySteps"] = activity
+                print("🔄 Updated Activity: \(activity.titleKey)")
             }
         }
         healthStore.execute(query)
     }
 
+    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
+    private func setMockStepActivity() {
+        print("⚠️ Using Mock Data for Steps")
+
+        let mockActivity = Activity(
+            id: 0,
+            titleKey: t("Today Steps", in: "Chart_screen"),
+            subtitleKey: "\(t("Goal", in: "Chart_screen")): 10,000",
+            image: "figure.walk",
+            tintColor: .gray,
+            amount: "0", // ✅ แสดงว่าไม่มีข้อมูลจริง
+            goalValue: "10,000"
+        )
+
+        self.activities["todaySteps"] = mockActivity
+        print("✅ Set Mock Data for Steps Activity")
+    }
+
+
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+
         let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
             if let error = error {
-                print("Error fetching today's Calories data: \(error.localizedDescription)")
+                print("❌ Error fetching today's Calories data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                    self?.setMockCaloriesActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
 
             guard let quantity = result?.sumQuantity() else {
-                print("No calories data available for today.")
+                print("⚠️ No calories data available for today.")
                 DispatchQueue.main.async {
-                    self?.activities["todayCalories"] = self?.mockActivities["todayCalories"]
+                    self?.setMockCaloriesActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
@@ -235,43 +260,90 @@ class HealthManager: ObservableObject {
             let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
             let goalValue = "900"
 
-            let activity = Activity(
-                id: 1,
-                titleKey: t("Today Calories", in: "Chart_screen"),
-                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
-                image: "flame",
-                tintColor: .red,
-                amount: caloriesBurned.formattedString(),
-                goalValue: goalValue
-            )
-
             DispatchQueue.main.async {
+                let translatedTitle = t("Today Calories", in: "Chart_screen")
+                print("🌎 Translated Title: \(translatedTitle)")
+
+                let activity = Activity(
+                    id: 1,
+                    titleKey: translatedTitle,  // ✅ ใช้ค่าที่แปลแล้ว
+                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
+                    image: "flame",
+                    tintColor: .red,
+                    amount: caloriesBurned.formattedString(),
+                    goalValue: goalValue
+                )
+
                 self?.activities["todayCalories"] = activity
+                print("🔄 Updated Activity: \(activity.titleKey)")
             }
         }
         healthStore.execute(query)
     }
 
+    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
+    private func setMockCaloriesActivity() {
+        print("⚠️ Using Mock Data for Calories")
+
+        let mockActivity = Activity(
+            id: 1,
+            titleKey: t("Today Calories", in: "Chart_screen"),
+            subtitleKey: "\(t("Goal", in: "Chart_screen")): 900",
+            image: "flame",
+            tintColor: .gray,
+            amount: "--", // ✅ แสดงว่าไม่มีข้อมูลจริง
+            goalValue: "900"
+        )
+
+        self.activities["todayCalories"] = mockActivity
+        print("✅ Set Mock Data for Calories Activity")
+    }
+
+
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
-        let stepCountType = HKQuantityType(.stepCount)
+        let stepCountType = HKQuantityType(.stepCount) // ✅ ตรวจสอบการเคลื่อนไหว
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
 
-        let heartRateQuery = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { [weak self] _, samples, error in
+        let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { [weak self] _, samples, error in
             if let error = error {
                 print("❌ Error fetching today's HeartRate data: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self?.setMockHeartRateActivity() // ✅ ใช้ Mock Data แทน
+                }
                 return
             }
 
             guard let samples = samples as? [HKQuantitySample], let latestSample = samples.first else {
                 print("⚠️ No heart rate samples found.")
+                DispatchQueue.main.async {
+                    self?.setMockHeartRateActivity() // ✅ ใช้ Mock Data แทน
+                }
                 return
             }
 
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            print("📊 Fetched Heart Rate: \(heartRate) BPM")
+            let goalValue = "60-100 BPM"
 
-            // ดึงจำนวนก้าวเดิน
+            DispatchQueue.main.async {
+                let translatedTitle = t("Today Heart Rate", in: "Chart_screen")
+                print("🌎 Translated Title: \(translatedTitle)")
+
+                let activity = Activity(
+                    id: 2,
+                    titleKey: translatedTitle,
+                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
+                    image: "heart.fill",
+                    tintColor: .red,
+                    amount: heartRate.formattedString(),
+                    goalValue: goalValue
+                )
+
+                self?.activities["todayHeartRate"] = activity
+                print("🔄 Updated Activity: \(activity.titleKey)")
+            }
+
+            // ✅ ดึงจำนวนก้าวเดินก่อนเรียก `evaluateHeartRateWarning()`
             let stepQuery = HKStatisticsQuery(quantityType: stepCountType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, error in
                 if let error = error {
                     print("❌ Error fetching today's step data: \(error.localizedDescription)")
@@ -281,62 +353,71 @@ class HealthManager: ObservableObject {
                 let stepCount = result?.sumQuantity()?.doubleValue(for: .count()) ?? 0
                 print("🚶‍♂️ Fetched Step Count: \(stepCount) steps")
 
-                // 🔥 เรียกฟังก์ชันตรวจสอบการแจ้งเตือน
-                let (alertColor, alertSubtitle) = self?.evaluateHeartRateWarning(heartRate: heartRate, stepCount: stepCount) ?? (.red, "\(t("Goal", in: "Chart_screen")): 60-100 BPM")
-
-                DispatchQueue.main.async {
-                    let activity = Activity(
-                        id: 2,
-                        titleKey: t("Today Heart Rate", in: "Chart_screen"),
-                        subtitleKey: alertSubtitle,
-                        image: "heart.fill",
-                        tintColor: Color(alertColor),
-                        amount: heartRate.formattedString(),
-                        goalValue: "60-100 BPM"
-                    )
-
-                    self?.activities["todayHeartRate"] = activity
-                }
+                // ✅ เรียกใช้ฟังก์ชันตรวจสอบการแจ้งเตือน
+                self?.evaluateHeartRateWarning(heartRate: heartRate, stepCount: stepCount)
             }
             self?.healthStore.execute(stepQuery)
         }
-        healthStore.execute(heartRateQuery)
+        healthStore.execute(query)
     }
+
+    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
+    private func setMockHeartRateActivity() {
+        print("⚠️ Using Mock Data for Heart Rate")
+
+        let mockActivity = Activity(
+            id: 2,
+            titleKey: t("Today Heart Rate", in: "Chart_screen"),
+            subtitleKey: "\(t("Goal", in: "Chart_screen")): 60-100 BPM",
+            image: "heart.fill",
+            tintColor: .gray,
+            amount: "0 BPM", // ✅ แสดงว่าไม่มีข้อมูลจริง
+            goalValue: "60-100 BPM"
+        )
+
+        self.activities["todayHeartRate"] = mockActivity
+        print("✅ Set Mock Data for Heart Rate Activity")
+    }
+
+
     // ✅ ฟังก์ชันตรวจสอบ Heart Rate
-    private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) -> (UIColor, String) {
-        let goalValue = "60-100 BPM"
-        let isHeartRateHigh = heartRate >= 90  // ✅ กำหนดช่วงอัตราการเต้นของหัวใจ
-        let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount) // ✅ ตรวจสอบว่าก้าวเดินไม่เพิ่มขึ้น
+    private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
+        let isHeartRateHigh = heartRate >= 90
+        let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
+
+        print("🔍 Checking Heart Rate Warning...")
+        print("💓 Heart Rate: \(heartRate) BPM")
+        print("🚶‍♂️ Step Count: \(stepCount)")
+
         if isHeartRateHigh && isNotMoving {
             print("🚨 Triggering Heart Rate Alert!")
-            AlertsManager().triggerHeartRateAlert() // ✅ แจ้งเตือน
-            return (.red, "\(t("Warning: High Heart Rate", in: "Chart_screen"))!")
+            AlertsManager().triggerHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจสูง
         } else {
             print("✅ Heart Rate is normal.")
         }
 
-        // ✅ อัปเดต previousStepCount เป็นค่าล่าสุด
+        // ✅ อัปเดตค่า previousStepCount เพื่อตรวจสอบว่ามีการเดินหรือไม่
         previousStepCount = stepCount
-
-        return (.green, "\(t("Goal", in: "Chart_screen")): \(goalValue)")
     }
+
 
     func fetchTodayDistance() {
         let distance = HKQuantityType(.distanceWalkingRunning)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+
         let query = HKStatisticsQuery(quantityType: distance, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
             if let error = error {
-                print("Error fetching today's distance data: \(error.localizedDescription)")
+                print("❌ Error fetching today's distance data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self?.activities["dayDistance"] = self?.mockActivities["dayDistance"]
+                    self?.setMockDistanceActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
 
             guard let quantity = result?.sumQuantity() else {
-                print("No distance data available for today.")
+                print("⚠️ No distance data available for today.")
                 DispatchQueue.main.async {
-                    self?.activities["dayDistance"] = self?.mockActivities["dayDistance"]
+                    self?.setMockDistanceActivity() // ✅ ใช้ Mock Data แทน
                 }
                 return
             }
@@ -345,22 +426,45 @@ class HealthManager: ObservableObject {
             let distanceInKilometers = distanceInMeters / 1000.0
             let goalValue = "5 km"
 
-            let activity = Activity(
-                id: 3,
-                titleKey: t("Today's Distance", in: "Chart_screen"),
-                subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
-                image: "figure.walk.circle",
-                tintColor: .blue,
-                amount: distanceInKilometers.formattedString(),
-                goalValue: goalValue
-            )
-
             DispatchQueue.main.async {
+                let translatedTitle = t("Today's Distance", in: "Chart_screen")
+                print("🌎 Translated Title: \(translatedTitle)")
+
+                let activity = Activity(
+                    id: 3,
+                    titleKey: translatedTitle,  // ✅ ใช้ค่าที่แปลแล้ว
+                    subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
+                    image: "figure.walk.circle",
+                    tintColor: .blue,
+                    amount: distanceInKilometers.formattedString(),
+                    goalValue: goalValue
+                )
+
                 self?.activities["dayDistance"] = activity
+                print("🔄 Updated Activity: \(activity.titleKey)")
             }
         }
         healthStore.execute(query)
-    }   
+    }
+
+    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
+    private func setMockDistanceActivity() {
+        print("⚠️ Using Mock Data for Distance")
+
+        let mockActivity = Activity(
+            id: 3,
+            titleKey: t("Today's Distance", in: "Chart_screen"),
+            subtitleKey: "\(t("Goal", in: "Chart_screen")): 5 km",
+            image: "figure.walk.circle",
+            tintColor: .gray,
+            amount: "--", // ✅ แสดงว่าไม่มีข้อมูลจริง
+            goalValue: "5 km"
+        )
+
+        self.activities["dayDistance"] = mockActivity
+        print("✅ Set Mock Data for Distance Activity")
+    }
+
     
     func handleAlertDismiss() {
         DispatchQueue.main.async {

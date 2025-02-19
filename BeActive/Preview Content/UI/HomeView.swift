@@ -68,7 +68,9 @@ struct HomeView: View {
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
-                            TodayActivitiesView(manager: _manager, textColor: themeManager.textColor)
+                            TodayActivitiesView(textColor: themeManager.textColor)
+                                .environmentObject(manager)
+
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
@@ -250,45 +252,6 @@ struct ReminderSection: View {
         }
     }
 }
-
-struct TodayActivitiesView: View {
-    @EnvironmentObject var manager: HealthManager
-    var textColor: Color
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(t("Today Activities", in: "home_screen"))
-                    .font(.headline)
-                    .foregroundColor(textColor)
-                Spacer()
-                HStack {
-                    Image(systemName: "star.circle")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(.yellow)
-                    Text("\(manager.stepScore+manager.waterScore)")
-                        .font(.headline)
-                        .padding(8)
-                        .background(Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 5)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 1) {
-                    ForEach(manager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                        ActivityCard(activity: item.value)
-                            .frame(width: 200, height: 180)
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-}
-
 struct ReminderCard: View {
     var color: Color
     

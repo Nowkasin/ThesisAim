@@ -53,74 +53,41 @@ class HealthManager: ObservableObject {
     @Published var stepScore: Int = 0
     @AppStorage("waterScore") var waterScore: Int = 0
     private var previousStepCount: Double = 0
-    
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health
-    @Published var activities: [String: Activity] = [
-            "todaySteps": Activity(
-                id: 0,
-                titleKey: t("Today Steps", in: "Chart_screen"),
-                subtitleKey: t("Goal", in: "Chart_screen"), // ✅ แปลคำว่า Goal เท่านั้น
-                image: "figure.walk",
-                tintColor: .green,
-                amount: "0",
-                goalValue: "10,000" // ✅ ใส่ค่าของ Goal ไว้ที่นี่
-            ),
-            "todayCalories": Activity(
-                id: 1,
-                titleKey: t("Today Calories", in: "Chart_screen"),
-                subtitleKey: t("Goal", in: "Chart_screen"),
-                image: "flame",
-                tintColor: .orange,
-                amount: "0",
-                goalValue: "900"
-            ),
-            "todayHeartRate": Activity(
-                id: 2,
-                titleKey: t("Today Heart Rate", in: "Chart_screen"),
-                subtitleKey: t("Goal", in: "Chart_screen"),
-                image: "heart.fill",
-                tintColor: .red,
-                amount: "0 BPM",
-                goalValue: "60-100 BPM"
-            ),
-            "dayDistance": Activity(
-                id: 3,
-                titleKey: t("Today's Distance", in: "Chart_screen"),
-                subtitleKey: t("Goal", in: "Chart_screen"),
-                image: "figure.walk.circle",
-                tintColor: .blue,
-                amount: "0",
-                goalValue: "5 km"
-            )
+    @Published var activities: [String: Activity] = [:]
 
-        ]
-    var mockActivities: [String: Activity] = [
-        "todaySteps": Activity(id: 0, titleKey: "Today Steps", subtitleKey: t("Goal", in: "Chart_screen"), image: "figure.walk", tintColor: .green, amount: "0", goalValue: "10,000"),
-        "todayCalories": Activity(id: 1, titleKey: "Today Calories", subtitleKey: t("Goal", in: "Chart_screen"), image: "flame", tintColor: .orange, amount: "0", goalValue: "900"),
-        "todayHeartRate": Activity(id: 2, titleKey: "Today Heart Rate", subtitleKey: t("Goal", in: "Chart_screen"), image: "heart.fill", tintColor: .red, amount: "0", goalValue: "60-100 BPM"),
-        "dayDistance": Activity(id: 3, titleKey: "Today's Distance", subtitleKey: t("Goal", in: "Chart_screen"), image: "figure.walk.circle", tintColor: .blue, amount: "0", goalValue: "5 km")
-    ]
-    
     init() {
-        startTimer()//เริ่มนับเวลาในแต่ละฟังก์ชั่น
+        // เซ็ตค่า Mock Data เริ่มต้น
+        setMockActivity(id: 0, key: "todaySteps", titleKey: "Today Steps", goalValue: "10,000", image: "figure.walk", tintColor: .gray, amount: "0")
+        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "--")
+        setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "--")
+
+        // เริ่มจับเวลา
+        startTimer()
+
+        // กำหนดค่าประเภทข้อมูล HealthKit
         let steps = HKQuantityType(.stepCount)
         let calories = HKQuantityType(.activeEnergyBurned)
         let heartRate = HKQuantityType(.heartRate)
         let distance = HKQuantityType(.distanceWalkingRunning)
         let water = HKQuantityType(.dietaryWater)
         let healthTypes: Set = [steps, calories, heartRate, distance, water]
+
         self.alertsManager = AlertsManager()
-        
+
+        // ขออนุญาตเข้าถึง HealthKit และเริ่มการสังเกตข้อมูลสุขภาพ
         Task {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: healthTypes)
-                startObservingHealthData()//ประกาศ เพื่อเริ่มการทำงานของฟังก์ชั่นต่างๆ
+                startObservingHealthData() // เริ่มดึงข้อมูลจาก HealthKit
                 startTimer()
             } catch {
                 print("Error requesting health data authorization: \(error.localizedDescription)")
             }
         }
     }
+
     
     private func startTimer() {
         timer = Timer.publish(every: 2, on: .main, in: .common) // Change to 30 seconds
@@ -172,6 +139,7 @@ class HealthManager: ObservableObject {
         }
     }
     
+    // ประกาศตัวแปรแยกเฉพาะสำหรับคำนวณคะแนนเดิน
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
@@ -180,7 +148,7 @@ class HealthManager: ObservableObject {
             if let error = error {
                 print("❌ Error fetching today's step data: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self?.setMockStepActivity() // ✅ ใช้ Mock Data แทน
+                    self?.setMockStepActivity()
                 }
                 return
             }
@@ -188,53 +156,38 @@ class HealthManager: ObservableObject {
             guard let quantity = result?.sumQuantity() else {
                 print("⚠️ No step data available for today.")
                 DispatchQueue.main.async {
-                    self?.setMockStepActivity() // ✅ ใช้ Mock Data แทน
+                    self?.setMockStepActivity()
                 }
                 return
             }
 
             let stepCount = quantity.doubleValue(for: .count())
-            let goalValue = "10,000" // ✅ เปลี่ยนค่าคงที่เป็นตัวแปร
+            let goalValue = "10,000"
+            
+            // คำนวณคะแนนเดินแบบคำนวณครั้งเดียวจากจำนวนก้าวทั้งหมด
+            // โดยที่ 100 ก้าว = 1 คะแนน
+            let newScore = Int(stepCount / 100)
+            DispatchQueue.main.async {
+                ScoreManager.shared.stepScore = newScore
+                print("StepScore updated to: \(newScore)")
+            }
 
             DispatchQueue.main.async {
                 let translatedTitle = t("Today Steps", in: "Chart_screen")
-                print("🌎 Translated Title: \(translatedTitle)")
-
                 let activity = Activity(
                     id: 0,
-                    titleKey: translatedTitle,  // ✅ ใช้ค่าที่แปลแล้ว
+                    titleKey: translatedTitle,
                     subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
                     image: "figure.walk",
                     tintColor: .green,
                     amount: stepCount.formattedString(),
                     goalValue: goalValue
                 )
-
                 self?.activities["todaySteps"] = activity
-                print("🔄 Updated Activity: \(activity.titleKey)")
             }
         }
         healthStore.execute(query)
     }
-
-    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
-    private func setMockStepActivity() {
-        print("⚠️ Using Mock Data for Steps")
-
-        let mockActivity = Activity(
-            id: 0,
-            titleKey: t("Today Steps", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 10,000",
-            image: "figure.walk",
-            tintColor: .gray,
-            amount: "0", // ✅ แสดงว่าไม่มีข้อมูลจริง
-            goalValue: "10,000"
-        )
-
-        self.activities["todaySteps"] = mockActivity
-        print("✅ Set Mock Data for Steps Activity")
-    }
-
 
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
@@ -280,25 +233,6 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-
-    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
-    private func setMockCaloriesActivity() {
-        print("⚠️ Using Mock Data for Calories")
-
-        let mockActivity = Activity(
-            id: 1,
-            titleKey: t("Today Calories", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 900",
-            image: "flame",
-            tintColor: .gray,
-            amount: "--", // ✅ แสดงว่าไม่มีข้อมูลจริง
-            goalValue: "900"
-        )
-
-        self.activities["todayCalories"] = mockActivity
-        print("✅ Set Mock Data for Calories Activity")
-    }
-
 
     func fetchTodayHeartRate() {
         let heartRateType = HKQuantityType(.heartRate)
@@ -360,25 +294,6 @@ class HealthManager: ObservableObject {
         }
         healthStore.execute(query)
     }
-
-    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
-    private func setMockHeartRateActivity() {
-        print("⚠️ Using Mock Data for Heart Rate")
-
-        let mockActivity = Activity(
-            id: 2,
-            titleKey: t("Today Heart Rate", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 60-100 BPM",
-            image: "heart.fill",
-            tintColor: .gray,
-            amount: "0 BPM", // ✅ แสดงว่าไม่มีข้อมูลจริง
-            goalValue: "60-100 BPM"
-        )
-
-        self.activities["todayHeartRate"] = mockActivity
-        print("✅ Set Mock Data for Heart Rate Activity")
-    }
-
 
     // ✅ ฟังก์ชันตรวจสอบ Heart Rate
     private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
@@ -447,22 +362,36 @@ class HealthManager: ObservableObject {
         healthStore.execute(query)
     }
 
-    // ✅ ใช้ Mock Data แทนเมื่อไม่มีข้อมูลจาก HealthKit
-    private func setMockDistanceActivity() {
-        print("⚠️ Using Mock Data for Distance")
+    private func setMockActivity(id: Int, key: String, titleKey: String, goalValue: String, image: String, tintColor: Color, amount: String) {
+        print("⚠️ Using Mock Data for \(titleKey)")
 
         let mockActivity = Activity(
-            id: 3,
-            titleKey: t("Today's Distance", in: "Chart_screen"),
-            subtitleKey: "\(t("Goal", in: "Chart_screen")): 5 km",
-            image: "figure.walk.circle",
-            tintColor: .gray,
-            amount: "--", // ✅ แสดงว่าไม่มีข้อมูลจริง
-            goalValue: "5 km"
+            id: id,
+            titleKey: t(titleKey, in: "Chart_screen"),
+            subtitleKey: "\(t("Goal", in: "Chart_screen")): \(goalValue)",
+            image: image,
+            tintColor: tintColor,
+            amount: amount, // ✅ แสดงว่าไม่มีข้อมูลจริง
+            goalValue: goalValue
         )
 
-        self.activities["dayDistance"] = mockActivity
-        print("✅ Set Mock Data for Distance Activity")
+        self.activities[key] = mockActivity // ใช้ key ที่ถูกต้อง
+        print("✅ Set Mock Data for \(titleKey) Activity")
+    }
+    private func setMockStepActivity() {
+        setMockActivity(id: 0, key: "todaySteps", titleKey: "Today Steps", goalValue: "10,000", image: "figure.walk", tintColor: .gray, amount: "0")
+    }
+
+    private func setMockCaloriesActivity() {
+        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "--")
+    }
+
+    private func setMockHeartRateActivity() {
+        setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
+    }
+
+    private func setMockDistanceActivity() {
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "--")
     }
 
     

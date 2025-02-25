@@ -9,38 +9,50 @@ import SwiftUI
 import Charts
 
 struct StepChartView: View {
-    let activity: Activity  // ✅ รับค่า Activity
+    let activity: Activity
     @StateObject private var viewModel = StepCountViewModel()
+    @State private var selectedRange: TimeRange = .month
 
     var body: some View {
-        List {
-            VStack {
-                Text(activity.titleKey) // ✅ ใช้ค่าจาก Activity
-                    .font(.title)
-                    .bold()
-
-                if viewModel.stepCountData.isEmpty {
-                    Text("No data available")
-                        .foregroundColor(.primary)
-                        .transition(.opacity)
-                } else {
-                    StepCountGraph(data: viewModel.stepCountData)
-                        .frame(height: 200)
-                        .padding()
-                        .transition(.slide)
+        VStack {
+            // ✅ Picker สำหรับเลือกช่วงเวลา
+            Picker("ช่วงเวลา", selection: $selectedRange) {
+                ForEach(TimeRange.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .pickerStyle(SegmentedPickerStyle())
             .padding()
+
+            // ✅ ข้อมูลสรุปด้านบน
+            VStack(alignment: .leading, spacing: 5) {
+                Text("\(viewModel.averageSteps, specifier: "%.0f") ก้าว")
+                    .font(.largeTitle)
+                    .bold()
+                Text(viewModel.dateRangeText(for: selectedRange))
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
+            // ✅ กราฟแสดงผล
+            StepCountGraph(data: viewModel.filteredData(for: selectedRange))
+                .frame(height: 250)
+                .padding()
+
+            Spacer()
         }
-        .navigationTitle(activity.titleKey) // ✅ ใช้ชื่อ Activity เป็น Title
+        .navigationTitle(activity.titleKey)
         .onAppear {
-            viewModel.fetchWeeklyStepCount()
+            viewModel.fetchStepCount(for: selectedRange)
+        }
+        .onChange(of: selectedRange) { newRange in
+            viewModel.fetchStepCount(for: newRange)
         }
     }
 }
 
-// 🔍 แก้ไข `#Preview` ให้ใช้ Activity จำลอง
 #Preview {
     StepChartView(activity: Activity(
         id: 2,

@@ -183,6 +183,7 @@ struct WaterView: View {
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String? // Persist last opened date
 
     @EnvironmentObject var healthManager: HealthManager // Use HealthManager to update water score
+    @EnvironmentObject var scoreManager: ScoreManager
 
     private let totalWaterIntake = 2100 // Total daily goal
     @State private var schedule: [ScheduleItem] = [
@@ -227,7 +228,7 @@ struct WaterView: View {
                     Circle()
                         .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
                         .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                        .foregroundColor(themeManager.textColor)
+                        .foregroundColor(.blue)
                         .rotationEffect(.degrees(-90))
                         .animation(.easeInOut, value: waterIntake)
 
@@ -305,23 +306,24 @@ struct WaterView: View {
     }
 
     private func toggleCompletion(for item: ScheduleItem) {
-        if let index = schedule.firstIndex(where: { $0.id == item.id }) {
-            if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
-                schedule[index].completed = true
-                waterIntake += schedule[index].amount
-            } else if schedule[index].completed {
-                schedule[index].completed = false
-                waterIntake -= schedule[index].amount
-            }
-            saveSchedule()
+           if let index = schedule.firstIndex(where: { $0.id == item.id }) {
+               if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
+                   schedule[index].completed = true
+                   waterIntake += schedule[index].amount
+               } else if schedule[index].completed {
+                   schedule[index].completed = false
+                   waterIntake -= schedule[index].amount
+               }
+               saveSchedule()
 
-            // Check if all checkmarks are selected
-            if schedule.allSatisfy({ $0.completed }) {
-                showCongratulations = true
-                healthManager.waterScore += 10 // Increase water score by 10 in HealthManager
-            }
-        }
-    }
+               // ถ้าทุกรายการถูกทำเครื่องหมายว่าเสร็จแล้ว
+               if schedule.allSatisfy({ $0.completed }) {
+                   showCongratulations = true
+                   scoreManager.addWaterScore(10)  // เพิ่มคะแนนน้ำเข้า ScoreManager
+               }
+           }
+       }
+
 
     private func saveSchedule() {
         do {
@@ -367,5 +369,6 @@ struct WaterView: View {
 
 #Preview {
     WaterView()
+        .environmentObject(ScoreManager.shared)
         .environmentObject(HealthManager()) // Pass HealthManager as environment object
 }

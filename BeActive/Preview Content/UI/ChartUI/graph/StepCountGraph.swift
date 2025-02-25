@@ -18,7 +18,7 @@ struct StepCountGraph: View {
                     x: .value("Day", entry.date, unit: .day),
                     y: .value("Steps", entry.steps)
                 )
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.orange) // ✅ เปลี่ยนสีให้เหมือน Apple Health
             }
         }
         .chartYAxis {
@@ -27,11 +27,13 @@ struct StepCountGraph: View {
         .chartXAxis {
             AxisMarks()
         }
-        .frame(height: 200)
+        .frame(height: 250)
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6))) // ✅ เพิ่ม Background
     }
 }
 
-// ✅ แก้ไข `#Preview` ให้ถูกต้อง
+// ✅ ตัวอย่าง Preview
 #Preview {
     StepCountGraph(data: [
         (date: Calendar.current.date(byAdding: .day, value: -6, to: Date())!, steps: 5000),

@@ -68,10 +68,9 @@ struct HomeView: View {
                             
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
-                            TodayActivitiesView(textColor: themeManager.textColor)
+                            TabCardControlView(textColor: themeManager.textColor)
                                 .environmentObject(manager)
 
-                            
                             Spacer().frame(height: geometry.size.height * 0.01)
                             
                             Text(t("Reminders", in: "home_screen"))
@@ -267,6 +266,7 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
             .environmentObject(HealthManager())
+            .environmentObject(ScoreManager.shared)
     }
 }
 

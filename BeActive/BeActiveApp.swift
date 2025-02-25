@@ -20,6 +20,7 @@ struct BeActiveApp: App {
     var body: some Scene {
         WindowGroup {
             Login()
+                .environmentObject(ScoreManager.shared)
                 .environmentObject(HealthManager())// Make sure this is correctly applied
                 .environmentObject(ThemeManager())
         }

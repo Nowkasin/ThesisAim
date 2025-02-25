@@ -29,7 +29,7 @@ struct ActivityCard: View {
             VStack(spacing: 20) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("✅ \(activity.titleKey)") // ✅ Debugging Print
+                        Text("\(activity.titleKey)") // ✅ Debugging Print
                             .font(.system(size: 14))
                             .foregroundColor(.primary)
 

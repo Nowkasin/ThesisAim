@@ -9,13 +9,14 @@ import SwiftUI
 import Charts
 
 struct CalGraph: View {
-    var data: [(time: Date, calories: Double)] // ✅ รับข้อมูลแคลอรี่ที่เผาผลาญ
+    var data: [(time: Date, calories: Double)]
+    var timeRange: TimeRange  // ✅ รับค่าช่วงเวลาจาก ViewModel
 
     var body: some View {
         VStack {
             Chart {
                 if data.isEmpty {
-                    // ✅ ถ้ายังไม่มีข้อมูลจริง ให้แสดงแกนเปล่าๆ
+                    // ✅ ถ้ายังไม่มีข้อมูลจริง ให้แสดงเส้นแกนเปล่าๆ
                     RuleMark(y: .value("Calories", 100))
                         .foregroundStyle(.gray.opacity(0.3))
                     RuleMark(y: .value("Calories", 500))
@@ -23,10 +24,10 @@ struct CalGraph: View {
                 } else {
                     ForEach(data, id: \.time) { entry in
                         BarMark(
-                            x: .value("Time", entry.time),
+                            x: .value("Time", entry.time, unit: xAxisUnit()),
                             y: .value("Calories", entry.calories)
                         )
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.orange) // ✅ เปลี่ยนสีให้เหมือน Apple Health
                     }
                 }
             }
@@ -39,15 +40,35 @@ struct CalGraph: View {
             }
             .chartXAxis {
                 AxisMarks {
-                    AxisValueLabel(format: .dateTime.hour().minute())
+                    AxisValueLabel(format: xAxisLabelFormat()) // ✅ ปรับการแสดงผลตามช่วงเวลา
                 }
             }
             .frame(height: 250)
             .padding()
+            .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6))) // ✅ เพิ่ม Background
+        }
+    }
+
+    // ✅ ฟังก์ชันกำหนดหน่วยของแกน X ตามช่วงเวลา
+    private func xAxisUnit() -> Calendar.Component {
+        switch timeRange {
+        case .today, .week:
+            return .hour  // ✅ แสดงผลเป็นรายชั่วโมง
+        case .month, .sixMonths, .year:
+            return .month  // ✅ แสดงผลเป็นรายเดือน
+        }
+    }
+
+    // ✅ ฟังก์ชันกำหนดฟอร์แมตของแกน X
+    private func xAxisLabelFormat() -> Date.FormatStyle {
+        switch timeRange {
+        case .today, .week:
+            return .dateTime.hour().minute()  // ✅ แสดงเป็นเวลา (08:00, 12:00, …)
+        case .month, .sixMonths, .year:
+            return .dateTime.month()  // ✅ แสดงเป็นเดือน (Jan, Feb, …)
         }
     }
 }
-
 
 // ✅ Mock Data สำหรับ Preview
 extension CalGraph {
@@ -62,6 +83,5 @@ extension CalGraph {
 }
 
 #Preview {
-    CalGraph(data: CalGraph.sampleData)
+    CalGraph(data: CalGraph.sampleData, timeRange: .today)
 }
-

@@ -10,31 +10,49 @@ import SwiftUI
 import Charts
 
 struct CalChartView: View {
-    let activity: Activity  // ✅ รับค่า Activity
-    @StateObject private var viewModel = CalorieViewModel() // ✅ ใช้ ViewModel ดึงข้อมูลแคลอรี่
+    let activity: Activity
+    @StateObject private var viewModel = CalorieViewModel()
+    @State private var selectedRange: TimeRange = .today
 
     var body: some View {
-        List {
-            VStack {
-                Text(activity.titleKey)
-                    .font(.title)
-                    .bold()
-
-                // ✅ ใช้ข้อมูล Placeholder ถ้ายังไม่มีข้อมูลจริง
-                CalGraph(data: viewModel.caloriesData.isEmpty ? CalChartView.placeholderData : viewModel.caloriesData)
-                    .frame(height: 200)
-                    .padding()
-                    .transition(.slide)
+        VStack {
+            // ✅ Picker สำหรับเลือกช่วงเวลา
+            Picker("ช่วงเวลา", selection: $selectedRange) {
+                ForEach(TimeRange.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
+                }
             }
-            .frame(maxWidth: .infinity)
+            .pickerStyle(SegmentedPickerStyle())
             .padding()
+
+            // ✅ ข้อมูลสรุปด้านบน
+            VStack(alignment: .leading, spacing: 5) {
+                Text("\(viewModel.averageCalories, specifier: "%.0f") kcal")
+                    .font(.largeTitle)
+                    .bold()
+                Text(viewModel.dateRangeText(for: selectedRange))
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
+            // ✅ กราฟแสดงผล
+            CalGraph(data: viewModel.filteredData(for: selectedRange), timeRange: selectedRange)
+                .frame(height: 250)
+                .padding()
+
+            Spacer()
         }
         .navigationTitle(activity.titleKey)
         .onAppear {
-            viewModel.fetchTodayCalories()
+            viewModel.fetchCalories(for: selectedRange)
+        }
+        .onChange(of: selectedRange) { newRange in
+            viewModel.fetchCalories(for: newRange)
         }
     }
-    
+
     // ✅ Placeholder Data (ถ้ายังไม่มีข้อมูลจริง)
     static let placeholderData: [(time: Date, calories: Double)] = [
         (time: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, calories: 0),
@@ -46,15 +64,17 @@ struct CalChartView: View {
     ]
 }
 
-// 🔍 Preview ใช้ Activity จำลอง
+// 🔍 Preview ใช้ Activity จำลอง และต้องสร้าง ViewModel เพื่อส่งเข้าไป
 #Preview {
-    CalChartView(activity: Activity(
-        id: 3,
-        titleKey: "Calories Burned",
-        subtitleKey: "Goal: 900 kcal",
-        image: "flame",
-        tintColor: .red,
-        amount: "450 kcal",
-        goalValue: "900 kcal"
-    ))
+    CalChartView(
+        activity: Activity(
+            id: 3,
+            titleKey: "Calories Burned",
+            subtitleKey: "Goal: 900 kcal",
+            image: "flame",
+            tintColor: .red,
+            amount: "450 kcal",
+            goalValue: "900 kcal"
+        )
+    )
 }

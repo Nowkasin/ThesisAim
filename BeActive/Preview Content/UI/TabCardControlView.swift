@@ -32,9 +32,9 @@ struct TabCardControlView: View {
                             ActivityCard(activity: item.value)
                                 .frame(width: 200, height: 180)
                         }
-                        .onAppear {
-                            print("📌 Loading ActivityCard for: \(item.value.titleKey)")
-                        }
+//                        .onAppear {
+//                            print("📌 Loading ActivityCard for: \(item.value.titleKey)")
+//                        }
                     }
                 }
                 .padding(.horizontal)
@@ -49,11 +49,7 @@ struct TabCardControlView: View {
         let todayStepsKey = t("Today Steps", in: "Chart_screen").lowercased()
         let todayCalKey = t("Today Calories", in: "Chart_screen").lowercased()
         let todayDistanceKey = t("Today's Distance", in: "Chart_screen").lowercased()
-
-        print("📌 Navigating to: \(activity.titleKey)")
-        print("🔍 Expected Heart Rate Key: \(todayHeartRateKey)")
-        print("🔍 Expected Steps Key: \(todayStepsKey)")
-
+        
         if titleKey == todayHeartRateKey {
             return AnyView(HeartChartView(activity: activity))
         } else if titleKey == todayStepsKey {

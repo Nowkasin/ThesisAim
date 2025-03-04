@@ -9,79 +9,122 @@ import SwiftUI
 import Charts
 
 struct CalGraph: View {
-    var data: [(time: Date, calories: Double)]
-    var timeRange: TimeRange  // ✅ รับค่าช่วงเวลาจาก ViewModel
+    @StateObject var themeManager = ThemeManager() // ✅ ใช้งาน ThemeManager
+    var data: [CalorieData]  // ✅ ใช้ `CalorieData` แทน Tuple
+    var timeRange: TimeRange
+
+    @State private var selectedData: CalorieData? // ✅ เก็บค่าที่ถูกเลือก
+    @State private var tooltipXPosition: CGFloat = .zero // ✅ เก็บตำแหน่ง X ของ Tooltip
+    @State private var showTooltip: Bool = false // ✅ ควบคุมการแสดง Tooltip
 
     var body: some View {
-        VStack {
-            Chart {
-                if data.isEmpty {
-                    // ✅ ถ้ายังไม่มีข้อมูลจริง ให้แสดงเส้นแกนเปล่าๆ
-                    RuleMark(y: .value("Calories", 100))
-                        .foregroundStyle(.gray.opacity(0.3))
-                    RuleMark(y: .value("Calories", 500))
-                        .foregroundStyle(.gray.opacity(0.3))
-                } else {
-                    ForEach(data, id: \.time) { entry in
-                        BarMark(
-                            x: .value("Time", entry.time, unit: xAxisUnit()),
-                            y: .value("Calories", entry.calories)
+        GeometryReader { geo in
+            ZStack {
+                Chart {
+                    if data.isEmpty {
+                        RuleMark(y: .value("Calories", 100))
+                            .foregroundStyle(.gray.opacity(0.3))
+                        RuleMark(y: .value("Calories", 500))
+                            .foregroundStyle(.gray.opacity(0.3))
+                    } else {
+                        ForEach(data) { entry in
+                            BarMark(
+                                x: .value("Time", entry.time, unit: xAxisUnit()),
+                                y: .value("Calories", entry.calories)
+                            )
+                            .foregroundStyle(Color.orange)
+                        }
+                    }
+                }
+                .chartOverlay { proxy in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    let position = value.location
+                                    if let xDate: Date = proxy.value(atX: position.x) {
+                                        if let matchedData = data.first(where: { Calendar.current.isDate($0.time, inSameDayAs: xDate) }) {
+                                            selectedData = matchedData
+                                            if let barPositionX = proxy.position(forX: xDate) {
+                                                tooltipXPosition = barPositionX
+                                            }
+                                            showTooltip = true
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        showTooltip = false
+                                    }
+                                }
                         )
-                        .foregroundStyle(.orange) // ✅ เปลี่ยนสีให้เหมือน Apple Health
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading) {
+                        AxisGridLine()
+                        AxisTick()
+                        AxisValueLabel()
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks {
+                        AxisValueLabel(format: xAxisLabelFormat())
+                    }
+                }
+                .frame(height: 250)
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(themeManager.backgroundColor))
+                .animation(.easeInOut(duration: 0.3), value: data)
+
+                if showTooltip, let selected = selectedData {
+                    VStack {
+                        Text("\(Int(selected.calories)) แคลอรี่")
+                            .font(.headline)
+                            .bold()
+                            .foregroundColor(themeManager.textColor)
+                            .padding(8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
+                            .offset(x: tooltipXPosition - geo.size.width / 2, y: -120)
                     }
                 }
             }
-            .chartYAxis {
-                AxisMarks(position: .leading) {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel()
-                }
-            }
-            .chartXAxis {
-                AxisMarks {
-                    AxisValueLabel(format: xAxisLabelFormat()) // ✅ ปรับการแสดงผลตามช่วงเวลา
-                }
-            }
-            .frame(height: 250)
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6))) // ✅ เพิ่ม Background
         }
     }
 
-    // ✅ ฟังก์ชันกำหนดหน่วยของแกน X ตามช่วงเวลา
     private func xAxisUnit() -> Calendar.Component {
         switch timeRange {
         case .today, .week:
-            return .hour  // ✅ แสดงผลเป็นรายชั่วโมง
+            return .hour
         case .month, .sixMonths, .year:
-            return .month  // ✅ แสดงผลเป็นรายเดือน
+            return .month
         }
     }
 
-    // ✅ ฟังก์ชันกำหนดฟอร์แมตของแกน X
     private func xAxisLabelFormat() -> Date.FormatStyle {
         switch timeRange {
         case .today, .week:
-            return .dateTime.hour().minute()  // ✅ แสดงเป็นเวลา (08:00, 12:00, …)
+            return .dateTime.hour().minute()
         case .month, .sixMonths, .year:
-            return .dateTime.month()  // ✅ แสดงเป็นเดือน (Jan, Feb, …)
+            return .dateTime.month()
         }
     }
 }
 
 // ✅ Mock Data สำหรับ Preview
 extension CalGraph {
-    static let sampleData: [(time: Date, calories: Double)] = [
-        (time: Date().addingTimeInterval(-3600 * 5), calories: 200),
-        (time: Date().addingTimeInterval(-3600 * 4), calories: 250),
-        (time: Date().addingTimeInterval(-3600 * 3), calories: 230),
-        (time: Date().addingTimeInterval(-3600 * 2), calories: 280),
-        (time: Date().addingTimeInterval(-3600 * 1), calories: 260),
-        (time: Date(), calories: 300)
+    static let sampleData: [CalorieData] = [
+        CalorieData(time: Date().addingTimeInterval(-3600 * 5), calories: 200),
+        CalorieData(time: Date().addingTimeInterval(-3600 * 4), calories: 250),
+        CalorieData(time: Date().addingTimeInterval(-3600 * 3), calories: 230),
+        CalorieData(time: Date().addingTimeInterval(-3600 * 2), calories: 280),
+        CalorieData(time: Date().addingTimeInterval(-3600 * 1), calories: 260),
+        CalorieData(time: Date(), calories: 300)
     ]
 }
 
+// ✅ ตัวอย่าง Preview
 #Preview {
     CalGraph(data: CalGraph.sampleData, timeRange: .today)
 }

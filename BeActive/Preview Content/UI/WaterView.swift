@@ -170,22 +170,22 @@
 import SwiftUI
 
 struct ScheduleItem: Codable, Identifiable {
-    let id = UUID() // Unique identifier for each item
+    let id = UUID()
     let time: String
     let amount: Int
     var completed: Bool
 }
 
 struct WaterView: View {
-    @StateObject var themeManager = ThemeManager()  // Use @StateObject to initialize ThemeManager
-    @AppStorage("waterIntake") private var waterIntake = 0 // Persist water intake
-    @AppStorage("scheduleData") private var scheduleData: Data? // Persist schedule as Data
-    @AppStorage("lastOpenedDate") private var lastOpenedDate: String? // Persist last opened date
+    @StateObject var themeManager = ThemeManager()
+    @AppStorage("waterIntake") private var waterIntake = 0
+    @AppStorage("scheduleData") private var scheduleData: Data?
+    @AppStorage("lastOpenedDate") private var lastOpenedDate: String?
 
-    @EnvironmentObject var healthManager: HealthManager // Use HealthManager to update water score
+    @EnvironmentObject var healthManager: HealthManager
     @EnvironmentObject var scoreManager: ScoreManager
 
-    private let totalWaterIntake = 2100 // Total daily goal
+    private let totalWaterIntake = 2100
     @State private var schedule: [ScheduleItem] = [
         ScheduleItem(time: "09:30", amount: 500, completed: false),
         ScheduleItem(time: "11:30", amount: 500, completed: false),
@@ -193,137 +193,126 @@ struct WaterView: View {
         ScheduleItem(time: "15:30", amount: 500, completed: false),
         ScheduleItem(time: "17:30", amount: 100, completed: false),
     ]
-    @State private var showCongratulations = false // State for popup visibility
-
-    init() {
-        checkForNewDay()
-        loadSchedule()
-    }
+    @State private var showCongratulations = false
 
     var body: some View {
-        NavigationView {
-            VStack {
-                // Header Section
-                VStack(spacing: 8) {
-                    Text(t("Water to Drink", in: "Water_screen"))
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.blue)
-
-                    Text(t("Don't forget to drink water!", in: "Water_screen"))
-                        .font(.system(size: 18))
-                        .foregroundColor(themeManager.textColor)
-                }
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical)
-
-                Spacer()
-
-                // Water Level Section
-                ZStack {
-                    Circle()
-                        .stroke(lineWidth: 10)
-                        .foregroundColor(.blue.opacity(0.3))
-
-                    Circle()
-                        .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
-                        .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                        .foregroundColor(.blue)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut, value: waterIntake)
-
-                    VStack {
-                        Text("\(waterIntake) / \(totalWaterIntake)")
-                            .font(.system(size: 18))
-                            .fontWeight(.semibold)
-                            .foregroundColor(themeManager.textColor)
-
-                        Image(systemName: "drop.circle.fill")
-                            .resizable()
-                            .frame(width: 40, height: 40)
+        GeometryReader { geometry in
+            let isIpad = geometry.size.width > 600
+            
+            NavigationView {
+                VStack {
+                    // Header Section
+                    VStack(spacing: isIpad ? 16 : 8) {
+                        Text("น้ำที่ต้องดื่ม")
+                            .font(.system(size: isIpad ? 44 : 34, weight: .bold))
                             .foregroundColor(.blue)
+
+                        Text("อย่าลืมดื่มน้ำ!")
+                            .font(.system(size: isIpad ? 22 : 18))
+                            .foregroundColor(themeManager.textColor)
                     }
-                }
-                .frame(width: 200, height: 200)
+                    .multilineTextAlignment(.center)
+                    .padding(.vertical, isIpad ? 20 : 10)
 
-                Spacer()
+                    Spacer()
 
-                // Water Schedule Section
-                VStack(alignment: .leading) {
-                    ForEach(schedule) { item in
-                        HStack {
-                            Image(systemName: "clock.fill")
-                                .foregroundColor(.blue)
-                            Text(item.time)
-                                .font(.system(size: 18, weight: .semibold))
+                    // Water Level Section
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: isIpad ? 15 : 10)
+                            .foregroundColor(.blue.opacity(0.3))
+
+                        Circle()
+                            .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
+                            .stroke(style: StrokeStyle(lineWidth: isIpad ? 15 : 10, lineCap: .round))
+                            .foregroundColor(.blue)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.easeInOut, value: waterIntake)
+
+                        VStack {
+                            Text("\(waterIntake) / \(totalWaterIntake)")
+                                .font(.system(size: isIpad ? 22 : 18))
+                                .fontWeight(.semibold)
                                 .foregroundColor(themeManager.textColor)
 
-                            Spacer()
-
-                            Text("\(item.amount) \(t("mi", in: "Water_screen"))")
-                                .foregroundColor(themeManager.textColor.opacity(0.7))
-                                .font(.system(size: 16))
-
-                            Button(action: {
-                                toggleCompletion(for: item)
-                            }) {
-                                Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(item.completed ? .green : themeManager.textColor.opacity(0.7))
-                            }
+                            Image(systemName: "drop.circle.fill")
+                                .resizable()
+                                .frame(width: isIpad ? 50 : 40, height: isIpad ? 50 : 40)
+                                .foregroundColor(.blue)
                         }
-                        .padding(.vertical, 5)
                     }
+                    .frame(width: isIpad ? 300 : 200, height: isIpad ? 300 : 200)
+
+                    Spacer()
+
+                    // Water Schedule Section
+                    VStack(alignment: .leading, spacing: isIpad ? 12 : 8) {
+                        ForEach(schedule) { item in
+                            HStack {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(.blue)
+                                Text(item.time)
+                                    .font(.system(size: isIpad ? 22 : 18, weight: .semibold))
+                                    .foregroundColor(themeManager.textColor)
+
+                                Spacer()
+
+                                Text("\(item.amount) mi")
+                                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                                    .font(.system(size: isIpad ? 18 : 16))
+
+                                Button(action: {
+                                    toggleCompletion(for: item)
+                                }) {
+                                    Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
+                                        .resizable()
+                                        .frame(width: isIpad ? 30 : 24, height: isIpad ? 30 : 24)
+                                        .foregroundColor(item.completed ? .green : themeManager.textColor.opacity(0.7))
+                                }
+                            }
+                            .padding(.vertical, isIpad ? 8 : 5)
+                        }
+                    }
+                    .padding()
+
+                    Spacer()
+
+                    // Simulate New Day Button
+                    Button(action: simulateNewDay) {
+                        Text("Simulate New Day")
+                            .font(.headline)
+                            .padding()
+                            .frame(width: isIpad ? 300 : 200)
+                            .background(.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding()
                 }
-                .padding()
-
-                Spacer()
-
-                // Simulate New Day Button
-                Button(action: simulateNewDay) {
-                    Text("Simulate New Day")
-                        .font(.headline)
-                        .padding()
-                        .background(.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // บังคับให้ UI เต็มจอ
+                .background(themeManager.backgroundColor)
             }
-            .padding()
-            .background(themeManager.backgroundColor) // Apply the background color from ThemeManager
-            .alert(isPresented: $showCongratulations) {
-                Alert(
-                    title: Text(t("Congratulations!", in: "Water_screen")),
-                    message: Text(t("You have completed your daily water schedule!", in: "Water_screen")),
-                    dismissButton: .default(Text("OK"))
-                )
-            }
-            .navigationBarHidden(true)
+            .navigationViewStyle(StackNavigationViewStyle()) // ป้องกัน UI แสดงผิดบน iPad
         }
     }
 
     private func toggleCompletion(for item: ScheduleItem) {
-           if let index = schedule.firstIndex(where: { $0.id == item.id }) {
-               if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
-                   schedule[index].completed = true
-                   waterIntake += schedule[index].amount
-               } else if schedule[index].completed {
-                   schedule[index].completed = false
-                   waterIntake -= schedule[index].amount
-               }
-               saveSchedule()
+        if let index = schedule.firstIndex(where: { $0.id == item.id }) {
+            if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
+                schedule[index].completed = true
+                waterIntake += schedule[index].amount
+            } else if schedule[index].completed {
+                schedule[index].completed = false
+                waterIntake -= schedule[index].amount
+            }
+            saveSchedule()
 
-               // ถ้าทุกรายการถูกทำเครื่องหมายว่าเสร็จแล้ว
-               if schedule.allSatisfy({ $0.completed }) {
-                   showCongratulations = true
-                   scoreManager.addWaterScore(10)  // เพิ่มคะแนนน้ำเข้า ScoreManager
-               }
-           }
-       }
-
+            if schedule.allSatisfy({ $0.completed }) {
+                showCongratulations = true
+                scoreManager.addWaterScore(10)
+            }
+        }
+    }
 
     private func saveSchedule() {
         do {
@@ -370,5 +359,5 @@ struct WaterView: View {
 #Preview {
     WaterView()
         .environmentObject(ScoreManager.shared)
-        .environmentObject(HealthManager()) // Pass HealthManager as environment object
+        .environmentObject(HealthManager())
 }

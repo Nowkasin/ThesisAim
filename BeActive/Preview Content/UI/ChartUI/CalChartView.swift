@@ -10,6 +10,7 @@ import SwiftUI
 import Charts
 
 struct CalChartView: View {
+    @StateObject var themeManager = ThemeManager()  // ✅ ใช้ ThemeManager
     let activity: Activity
     @StateObject private var viewModel = CalorieViewModel()
     @State private var selectedRange: TimeRange = .today
@@ -24,15 +25,18 @@ struct CalChartView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding()
+            .background(themeManager.backgroundColor)  // ✅ เปลี่ยนสีพื้นหลัง Picker ตามธีม
+            .cornerRadius(8)
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
                 Text("\(viewModel.averageCalories, specifier: "%.0f") kcal")
                     .font(.largeTitle)
                     .bold()
+                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีตามธีม
                 Text(viewModel.dateRangeText(for: selectedRange))
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(themeManager.textColor.opacity(0.7)) // ✅ สีอ่อนลง
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
@@ -45,6 +49,7 @@ struct CalChartView: View {
             Spacer()
         }
         .navigationTitle(activity.titleKey)
+        .background(themeManager.backgroundColor) // ✅ เปลี่ยนพื้นหลังของ View ตามธีม
         .onAppear {
             viewModel.fetchCalories(for: selectedRange)
         }
@@ -54,13 +59,13 @@ struct CalChartView: View {
     }
 
     // ✅ Placeholder Data (ถ้ายังไม่มีข้อมูลจริง)
-    static let placeholderData: [(time: Date, calories: Double)] = [
-        (time: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, calories: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, calories: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, calories: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -2, to: Date())!, calories: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, calories: 0),
-        (time: Date(), calories: 0)
+    static let placeholderData: [CalorieData] = [
+        CalorieData(time: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, calories: 0),
+        CalorieData(time: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, calories: 0),
+        CalorieData(time: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, calories: 0),
+        CalorieData(time: Calendar.current.date(byAdding: .hour, value: -2, to: Date())!, calories: 0),
+        CalorieData(time: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, calories: 0),
+        CalorieData(time: Date(), calories: 0)
     ]
 }
 

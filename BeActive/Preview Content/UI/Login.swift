@@ -117,7 +117,6 @@ struct SplashScreen: View {
     @Binding var isActive: Bool
     let imageUrl: URL
     @State private var isFadedIn: Bool = false
-
     var body: some View {
         ZStack {
             Color.white

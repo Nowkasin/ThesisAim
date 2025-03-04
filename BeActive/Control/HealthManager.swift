@@ -59,9 +59,9 @@ class HealthManager: ObservableObject {
     init() {
         // เซ็ตค่า Mock Data เริ่มต้น
         setMockActivity(id: 0, key: "todaySteps", titleKey: "Today Steps", goalValue: "10,000", image: "figure.walk", tintColor: .gray, amount: "0")
-        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "--")
+        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "0")
         setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
-        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "--")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "0")
 
         // เริ่มจับเวลา
         startTimer()
@@ -383,7 +383,7 @@ class HealthManager: ObservableObject {
     }
 
     private func setMockCaloriesActivity() {
-        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "--")
+        setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "0")
     }
 
     private func setMockHeartRateActivity() {
@@ -391,7 +391,7 @@ class HealthManager: ObservableObject {
     }
 
     private func setMockDistanceActivity() {
-        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "--")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "0")
     }
 
     

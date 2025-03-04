@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct StepChartView: View {
+    @StateObject var themeManager = ThemeManager() // ✅ ใช้งาน ThemeManager
     let activity: Activity
     @StateObject private var viewModel = StepCountViewModel()
     @State private var selectedRange: TimeRange = .month
@@ -29,9 +30,10 @@ struct StepChartView: View {
                 Text("\(viewModel.averageSteps, specifier: "%.0f") ก้าว")
                     .font(.largeTitle)
                     .bold()
+                    .foregroundColor(themeManager.textColor)
                 Text(viewModel.dateRangeText(for: selectedRange))
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีข้อความจาก ThemeManager
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
@@ -44,6 +46,7 @@ struct StepChartView: View {
             Spacer()
         }
         .navigationTitle(activity.titleKey)
+        .background(themeManager.backgroundColor) // ✅ ตั้งค่าพื้นหลังของหน้าทั้งหมด
         .onAppear {
             viewModel.fetchStepCount(for: selectedRange)
         }

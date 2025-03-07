@@ -65,20 +65,20 @@ struct HomeView: View {
                             ScrollView {
                                 VStack(spacing: 15) {
                                     // แปลภาษาให้ด้วย
-                                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .yellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
+                                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .jasmineYellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
                                         .navigate(to: TaskView())
                                     
                                     // แปลภาษาให้ด้วย
-                                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .purple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)
+                                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .tropicalPurple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)
                                         .navigate(to: ExerciseView())
                                     
-                                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .blue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
+                                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
                                         .navigate(to: WaterView())
 
-                                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .red, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
+                                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .salmonPink, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
                                         .navigate(to: VoucherView())
 
-                                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
+                                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .magicMint, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
                                         .navigate(to: MatesView())
                                 }
                                 .padding()

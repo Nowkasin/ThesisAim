@@ -34,63 +34,63 @@ struct ExerciseView: View {
                 .edgesIgnoringSafeArea(.all)
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 20)) {
                     HStack {
                         Button(action: {
                             presentationMode.wrappedValue.dismiss() // ปิดหน้าจอเมื่อกด
                         }) {
                             HStack {
                                 Image(systemName: "chevron.left")
-                                    .font(.title)
-                                    .foregroundColor(.blue) // ใช้สีน้ำเงิน
+                                    .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 20)))
+                                    .foregroundColor(.blue)
                                 Text(t("Back", in: "Ex_screen"))
-                                    .foregroundColor(.blue) // ใช้สีน้ำเงิน
+                                    .foregroundColor(.blue)
                                     .fontWeight(.semibold)
+                                    .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 18)))
                             }
                         }
-                        .padding(.leading)
-                        
+                        .padding(.leading, DeviceHelper.adaptivePadding())
+
                         Spacer()
                     }
 
                     Text(t("Exercise", in: "Ex_screen"))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 34), weight: .bold))
                         .foregroundColor(.purple)
-                        .padding(.horizontal)
+                        .padding(.horizontal, DeviceHelper.adaptivePadding())
                     
                     Text(t("Recommended for you", in: "Ex_screen"))
-                        .font(.headline)
+                        .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 20), weight: .medium))
                         .foregroundColor(.blue)
-                        .padding(.horizontal)
-                        .padding(.top, -20)
-                        .padding(.bottom, 10)
-                    
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 35) {
+                        .padding(.horizontal, DeviceHelper.adaptivePadding())
+                        .padding(.top, -DeviceHelper.adaptiveSpacing(baseSpacing: 10))
+                        .padding(.bottom, DeviceHelper.adaptiveSpacing(baseSpacing: 10))
+
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 35)) {
                         ForEach($exercises) { $exercise in
                             ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
                         }
                     }
-                    .padding(.horizontal)
-                    
+                    .padding(.horizontal, DeviceHelper.adaptivePadding())
+
                     Text(t("Article & Tip", in: "Ex_screen"))
-                        .font(.headline)
+                        .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 20), weight: .medium))
                         .foregroundColor(.blue)
-                        .padding(.horizontal)
-                    
-                    VStack(spacing: 15) {
+                        .padding(.horizontal, DeviceHelper.adaptivePadding())
+
+                    VStack(spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 15)) {
                         ForEach(0..<4) { _ in
-                            RoundedRectangle(cornerRadius: 15)
+                            RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 15))
                                 .fill(themeManager.textColor.opacity(0.2))
-                                .frame(height: 100)
+                                .frame(height: DeviceHelper.adaptiveFrameSize(baseSize: 100))
                                 .onTapGesture {
                                     print("Go to Tips")
                                 }
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, DeviceHelper.adaptivePadding())
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, DeviceHelper.adaptiveSpacing(baseSpacing: 20))
             }
             .background(themeManager.backgroundColor)
             .sheet(item: $selectedURL) { identifiableURL in
@@ -101,8 +101,6 @@ struct ExerciseView: View {
     }
 }
 
-
-
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
     @Binding var selectedURL: IdentifiableURL?
@@ -110,7 +108,7 @@ struct ExerciseCard: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 15))
                 .fill(themeManager.textColor.opacity(0.2))
 
             VStack {
@@ -128,28 +126,29 @@ struct ExerciseCard: View {
 
                 RoundedRectangle(cornerRadius: 0)
                     .fill(themeManager.textColor.opacity(0.8))
-                    .frame(height: 50)
+                    .frame(height: DeviceHelper.adaptiveFrameSize(baseSize: 50))
 
                 HStack {
                     VStack(alignment: .leading) {
                         Text(exercise.title)
-                            .font(.headline)
+                            .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 18), weight: .semibold))
                             .foregroundColor(.purple)
                         Text(exercise.duration)
+                            .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 16)))
                             .foregroundColor(themeManager.backgroundColor)
                     }
                     Spacer()
 
                     Image(systemName: "play.circle.fill")
                         .foregroundColor(themeManager.textColor)
-                        .font(.title)
+                        .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 22)))
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 5)
+                .padding(.horizontal, DeviceHelper.adaptivePadding())
+                .padding(.vertical, DeviceHelper.adaptiveSpacing(baseSpacing: 5))
             }
         }
-        .frame(height: 150)
-        .padding(.bottom, 10)
+        .frame(height: DeviceHelper.adaptiveFrameSize(baseSize: 150))
+        .padding(.bottom, DeviceHelper.adaptiveSpacing(baseSpacing: 10))
         .onTapGesture {
             if let url = URL(string: exercise.videoURL) {
                 selectedURL = IdentifiableURL(url: url)

@@ -9,51 +9,69 @@ import SwiftUI
 import Charts
 
 struct HeartChartView: View {
-    let activity: Activity  // ✅ รับค่า Activity
+    @StateObject var themeManager = ThemeManager()  // ✅ ใช้ ThemeManager
+    let activity: Activity
     @StateObject private var viewModel = HeartRateViewModel()
+    @State private var selectedRange: TimeRange = .today  // ✅ ค่าเริ่มต้นเป็นวันนี้
 
     var body: some View {
-        List {
-            VStack {
-                Text(activity.titleKey)
-                    .font(.title)
-                    .bold()
-
-                // ✅ กราฟจะแสดงแม้ว่าจะไม่มีข้อมูลจริง โดยใช้ Placeholder Data
-                HeartRateGraph(data: viewModel.heartRateData.isEmpty ? HeartChartView.placeholderData : viewModel.heartRateData)
-                    .frame(height: 200)
-                    .padding()
-                    .transition(.slide)
+        VStack {
+            // ✅ Picker สำหรับเลือกช่วงเวลา
+            Picker("ช่วงเวลา", selection: $selectedRange) {
+                ForEach(TimeRange.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
+                }
             }
-            .frame(maxWidth: .infinity)
+            .pickerStyle(SegmentedPickerStyle())
             .padding()
+            .background(themeManager.backgroundColor)  // ✅ เปลี่ยนสีพื้นหลัง Picker ตามธีม
+            .cornerRadius(8)
+
+            // ✅ ข้อมูลสรุปด้านบน
+            VStack(alignment: .leading, spacing: 5) {
+                Text("\(Int(viewModel.heartRateRange.min)) - \(Int(viewModel.heartRateRange.max)) BPM")
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีตามธีม
+                Text("Avg: \(Int(viewModel.averageBPM)) BPM")
+                    .font(.headline)
+                    .foregroundColor(themeManager.textColor.opacity(0.8))
+                Text(viewModel.dateRangeText(for: selectedRange))
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor.opacity(0.7)) // ✅ สีอ่อนลง
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
+            // ✅ กราฟแสดงผล
+            HeartRateGraph(viewModel: viewModel, timeRange: selectedRange)
+                .frame(height: 250)
+                .padding()
+
+            Spacer()
         }
-        .navigationTitle("Today Heart Rate")
+        .navigationTitle(activity.titleKey)
+        .background(themeManager.backgroundColor) // ✅ เปลี่ยนพื้นหลังของ View ตามธีม
         .onAppear {
-            print("✅ HeartChartView appeared! Fetching heart rate data...")
-            viewModel.fetchTodayHeartRate()
-            print("📊 Current heartRateData: \(viewModel.heartRateData)")
+            viewModel.fetchHeartRate(for: selectedRange)
+        }
+        .onChange(of: selectedRange) { newRange in
+            viewModel.fetchHeartRate(for: newRange)
         }
     }
-    
-    // ✅ Placeholder Data กรณียังไม่มีข้อมูลจริง
-    static let placeholderData: [(time: Date, bpm: Double)] = [
-        (time: Calendar.current.date(byAdding: .minute, value: -30, to: Date())!, bpm: 0),
-        (time: Calendar.current.date(byAdding: .minute, value: -20, to: Date())!, bpm: 0),
-        (time: Calendar.current.date(byAdding: .minute, value: -10, to: Date())!, bpm: 0),
-        (time: Date(), bpm: 0)
-    ]
 }
 
-// 🔍 Preview
+// ✅ Preview
 #Preview {
-    HeartChartView(activity: Activity(
-        id: 1,
-        titleKey: "Today Heart Rate",
-        subtitleKey: "74-98 BPM",
-        image: "heart.fill",
-        tintColor: .red,
-        amount: "85 BPM",
-        goalValue: "60-100 BPM"
-    ))
+    HeartChartView(
+        activity: Activity(
+            id: 1,
+            titleKey: "Heart Rate",
+            subtitleKey: "74-98 BPM",
+            image: "heart.fill",
+            tintColor: .red,
+            amount: "85 BPM",
+            goalValue: "60-100 BPM"
+        )
+    )
 }

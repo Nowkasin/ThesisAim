@@ -169,10 +169,10 @@ struct SplashScreen: View {
 
 struct Login: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ ใช้ AppStorage เพื่อให้แอปรู้สถานะล็อกอิน
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
-    @State private var isLoggedIn: Bool = false
     @State private var isSplashScreenActive: Bool = false
 
     var body: some View {
@@ -180,7 +180,7 @@ struct Login: View {
             ZStack {
                 if isSplashScreenActive {
                     if isLoggedIn {
-                        HomeView()
+                        MainTab() // ✅ เปลี่ยนไป `MainTab()` หลังจากล็อกอิน
                             .transition(.move(edge: .trailing))
                             .animation(.easeInOut(duration: 0.5), value: isLoggedIn)
                     } else {
@@ -243,9 +243,7 @@ struct Login: View {
                             Spacer()
 
                             Button(action: {
-                                withAnimation {
-                                    isLoggedIn = true
-                                }
+                                handleLogin() // ✅ เปลี่ยนไป MainTab เมื่อกดปุ่ม
                             }) {
                                 Text(t("log_in", in: "login_screen"))
                                     .font(.system(size: 18, weight: .medium))
@@ -267,6 +265,13 @@ struct Login: View {
                         .transition(.opacity)
                 }
             }
+        }
+    }
+
+    /// ✅ ฟังก์ชันจำลองการล็อกอิน
+    func handleLogin() {
+        withAnimation {
+            isLoggedIn = true // ✅ อัปเดตสถานะล็อกอิน → ไปหน้า `MainTab`
         }
     }
 }

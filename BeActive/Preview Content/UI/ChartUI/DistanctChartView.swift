@@ -9,43 +9,53 @@ import SwiftUI
 import Charts
 
 struct DistanceChartView: View {
-    let activity: Activity  // ✅ รับค่า Activity
+    @StateObject var themeManager = ThemeManager() // ✅ ใช้ ThemeManager
+    let activity: Activity
     @StateObject private var viewModel = DistanceViewModel() // ✅ ใช้ ViewModel ดึงข้อมูลระยะทาง
+    @State private var selectedRange: TimeRange = .month // ✅ ค่าเริ่มต้นเป็นรายเดือน
 
     var body: some View {
-        List {
-            VStack {
-                Text(activity.titleKey)
-                    .font(.title)
-                    .bold()
-
-                // ✅ ใช้ Placeholder Data ถ้ายังไม่มีข้อมูลจริง
-                DistanceGraph(data: viewModel.distanceData.isEmpty ? DistanceChartView.placeholderData : viewModel.distanceData)
-                    .frame(height: 200)
-                    .padding()
-                    .transition(.slide)
+        VStack {
+            // ✅ Picker สำหรับเลือกช่วงเวลา
+            Picker("ช่วงเวลา", selection: $selectedRange) {
+                ForEach(TimeRange.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
+                }
             }
-            .frame(maxWidth: .infinity)
+            .pickerStyle(SegmentedPickerStyle())
             .padding()
+
+            // ✅ ข้อมูลสรุปด้านบน
+            VStack(alignment: .leading, spacing: 5) {
+                Text("\(viewModel.averageDistance, specifier: "%.2f") กม.")
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(themeManager.textColor)
+                Text(viewModel.dateRangeText(for: selectedRange))
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีข้อความจาก ThemeManager
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
+            // ✅ กราฟแสดงผล
+            DistanceGraph(data: viewModel.filteredData(for: selectedRange))
+                .frame(height: 250)
+                .padding()
+
+            Spacer()
         }
         .navigationTitle(activity.titleKey)
+        .background(themeManager.backgroundColor) // ✅ ตั้งค่าพื้นหลังของหน้าทั้งหมด
         .onAppear {
-            viewModel.fetchTodayDistance()
+            viewModel.fetchDistance(for: selectedRange)
+        }
+        .onChange(of: selectedRange) { newRange in
+            viewModel.fetchDistance(for: newRange)
         }
     }
-
-    // ✅ Placeholder Data (ถ้ายังไม่มีข้อมูลจริง)
-    static let placeholderData: [(time: Date, distance: Double)] = [
-        (time: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, distance: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, distance: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, distance: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -2, to: Date())!, distance: 0),
-        (time: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, distance: 0),
-        (time: Date(), distance: 0)
-    ]
 }
 
-// 🔍 Preview ใช้ Activity จำลอง
 #Preview {
     DistanceChartView(activity: Activity(
         id: 4,

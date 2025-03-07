@@ -18,7 +18,7 @@
 //struct WaterView: View {
 //    @AppStorage("waterIntake") private var waterIntake = 0 // Persist water intake
 //    @AppStorage("scheduleData") private var scheduleData: Data? // Persist schedule as Data
-//    
+//
 //    private let totalWaterIntake = 2100 // Total daily goal
 //    @State private var schedule: [ScheduleItem] = [
 //        ScheduleItem(time: "09:30", amount: 500, completed: false),
@@ -28,11 +28,11 @@
 //        ScheduleItem(time: "17:30", amount: 100, completed: false),
 //    ]
 //    @State private var showCongratulations = false // State for popup visibility
-//    
+//
 //    init() {
 //        loadSchedule()
 //    }
-//    
+//
 //    var body: some View {
 //        NavigationView {
 //            VStack {
@@ -41,7 +41,7 @@
 //                    Text("Water to Drink")
 //                        .font(.system(size: 34, weight: .bold))
 //                        .foregroundColor(.blue)
-//                    
+//
 //                    Text("Don't forget to drink water!")
 //                        .font(.system(size: 18))
 //                        .foregroundColor(.gray)
@@ -49,27 +49,27 @@
 //                .multilineTextAlignment(.center)
 //                .frame(maxWidth: .infinity)
 //                .padding(.vertical)
-//                
+//
 //                Spacer()
-//                
+//
 //                // Water Level Section
 //                ZStack {
 //                    Circle()
 //                        .stroke(lineWidth: 10)
 //                        .foregroundColor(.blue.opacity(0.3))
-//                    
+//
 //                    Circle()
 //                        .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
 //                        .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
 //                        .foregroundColor(.blue)
 //                        .rotationEffect(.degrees(-90))
 //                        .animation(.easeInOut, value: waterIntake)
-//                    
+//
 //                    VStack {
 //                        Text("\(waterIntake) / \(totalWaterIntake)")
 //                            .font(.system(size: 18))
 //                            .fontWeight(.semibold)
-//                        
+//
 //                        Image(systemName: "drop.circle.fill")
 //                            .resizable()
 //                            .frame(width: 40, height: 40)
@@ -77,9 +77,9 @@
 //                    }
 //                }
 //                .frame(width: 200, height: 200)
-//                
+//
 //                Spacer()
-//                
+//
 //                // Water Schedule Section
 //                VStack(alignment: .leading) {
 //                    ForEach(schedule) { item in
@@ -89,16 +89,16 @@
 //                            Text(item.time)
 //                                .font(.system(size: 18, weight: .semibold))
 //                                .foregroundColor(.black)
-//                            
+//
 //                            Spacer()
-//                            
+//
 //                            Text("\(item.amount) ml")
 //                                .foregroundColor(.gray)
 //                                .font(.system(size: 16))
-//                            
+//
 //                            Button(action: {
 //                                toggleCompletion(for: item)
-//                                
+//
 //                                // Check if all checkmarks are selected
 //                                if schedule.filter({ $0.completed }).count == schedule.count {
 //                                    showCongratulations = true
@@ -114,7 +114,7 @@
 //                    }
 //                }
 //                .padding()
-//                
+//
 //                Spacer()
 //            }
 //            .padding()
@@ -128,7 +128,7 @@
 //            .navigationBarHidden(true)
 //        }
 //    }
-//    
+//
 //    private func toggleCompletion(for item: ScheduleItem) {
 //        if let index = schedule.firstIndex(where: { $0.id == item.id }) {
 //            schedule[index].completed.toggle()
@@ -140,7 +140,7 @@
 //            saveSchedule()
 //        }
 //    }
-//    
+//
 //    private func saveSchedule() {
 //        do {
 //            let encodedSchedule = try JSONEncoder().encode(schedule)
@@ -149,7 +149,7 @@
 //            print("Failed to save schedule: \(error)")
 //        }
 //    }
-//    
+//
 //    private func loadSchedule() {
 //        guard let savedData = scheduleData else { return }
 //        do {
@@ -289,10 +289,17 @@ struct WaterView: View {
                     }
                     .padding()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity) // บังคับให้ UI เต็มจอ
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(themeManager.backgroundColor)
+                .alert(isPresented: $showCongratulations) { // ✅ แจ้งเตือนเมื่อดื่มน้ำครบ
+                    Alert(
+                        title: Text("Congratulations!"),
+                        message: Text("You have completed your daily water schedule!"),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
             }
-            .navigationViewStyle(StackNavigationViewStyle()) // ป้องกัน UI แสดงผิดบน iPad
+            .navigationViewStyle(StackNavigationViewStyle())
         }
     }
 

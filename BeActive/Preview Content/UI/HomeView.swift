@@ -11,80 +11,24 @@ struct HomeView: View {
     @StateObject var themeManager = ThemeManager()
     @EnvironmentObject var manager: HealthManager
     let welcomeArray = ["Hello", "Bienvenido", "Wassup"]
+    
     @State private var currentIndex = 0
     @State private var welcomeTimer: Timer?
     @State private var showAlert = false
     @State private var alertMessage = ""
-    @State private var selectedTab = "Home"
     @State private var isShowingSettings = false
     @State private var screenWidth: CGFloat = UIScreen.main.bounds.width
-// ตัว init กำหนดสี TabView
-    init() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = UIColor(red: 0.7, green: 0.9, blue: 1.0, alpha: 1.0)
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-    }
-    
+
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
                 ZStack {
-                    // DeviceHelper ตัวกำหนดขนาดอุปกรณ์ที่ใช้โดยตรวจสอบว่าเป็น Ipad หรือไม่
-                    if DeviceHelper.isTablet {
-                        VStack(spacing: 0) {
-                            Group {
-                                switch selectedTab {
-                                case "Profile":
-                                    ProfileView()
-                                case "Content":
-                                    ContentView()
-                                default:
-                                    buildHomeContent()
-                                }
-                            }
-                            .id(selectedTab)
-                            // เรียกใช้ Tab ที่กำหนดขนาด
-                            CustomTabBar(selectedTab: $selectedTab)
-                                .frame(height: 60)
-                                .background(Color(red: 0.7, green: 0.9, blue: 1.0))
-                                .edgesIgnoringSafeArea(.bottom)
-                        }
-                    } else {
-                        Color(red: 0.7, green: 0.9, blue: 1.0)
-                            .edgesIgnoringSafeArea(.all)
+                    buildHomeContent()
 
-                        TabView(selection: $selectedTab) {
-                            buildHomeContent()
-                                .tabItem {
-                                    Image(systemName: "house")
-                                    Text("Home")
-                                }
-                                .tag("Home")
-
-                            ProfileView()
-                                .tabItem {
-                                    Image(systemName: "person.crop.circle")
-                                    Text("Profile")
-                                }
-                                .tag("Profile")
-
-                            ContentView()
-                                .tabItem {
-                                    Image(systemName: "person")
-                                    Text("Content")
-                                }
-                                .tag("Content")
-                        }
-                        .background(Color.clear)
-                        .edgesIgnoringSafeArea(.bottom)
-                    }
-                    // เรียกใช้หน้า SettingView
                     if isShowingSettings {
                         ZStack(alignment: .trailing) {
                             Color.black.opacity(0.4)
-                                .edgesIgnoringSafeArea(.all)
+                                .ignoresSafeArea()
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         isShowingSettings = false
@@ -92,8 +36,7 @@ struct HomeView: View {
                                 }
 
                             SettingsView(isShowing: $isShowingSettings)
-                                .frame(width: DeviceHelper.isTablet ? geometry.size.width * 0.25 : geometry.size.width * 0.5,
-                                       height: geometry.size.height * 0.85)
+                                .frame(width: geometry.size.width * 0.5, height: geometry.size.height * 0.85)
                                 .background(Color.white)
                                 .cornerRadius(15)
                                 .shadow(radius: 5)
@@ -111,40 +54,39 @@ struct HomeView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
-// อัปเดตขนาดหน้าจอที่ใช้่ เพื่อคำนวณอัตโนมัติ
+
+    // ✅ อัปเดตขนาดหน้าจอที่ใช้ เพื่อคำนวณอัตโนมัติ
     func updateScreenWidth() {
         screenWidth = UIScreen.main.bounds.width
     }
-    
+
     func buildHomeContent() -> some View {
-        ZStack {
-            themeManager.backgroundColor
-                .edgesIgnoringSafeArea(.all)
-            
-            VStack(alignment: .leading) {
-                buildHeader()
-                
-                Text(getFormattedDate())
-                    .font(.system(size: 16))
-                    .foregroundColor(getDayColor())
-                    .padding(.horizontal)
-                
-                Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
-                
-                TabCardControlView(textColor: themeManager.textColor)
-                    .environmentObject(manager)
-                
-                Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
-                
-                buildReminders()
-                
-                Spacer()
-            }
-            .onAppear { requestNotificationPermission() }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    
+           ZStack {
+               themeManager.backgroundColor
+                   .ignoresSafeArea()
+
+               VStack(alignment: .leading) {
+                   buildHeader()
+
+                   Text(getFormattedDate())
+                       .font(.system(size: 16))
+                       .foregroundColor(getDayColor())
+                       .padding(.horizontal)
+
+                   Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
+
+                   TabCardControlView(textColor: themeManager.textColor)
+                       .environmentObject(manager)
+
+                   Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
+
+                   buildReminders()
+               }
+               .onAppear { requestNotificationPermission() }
+           }
+           .frame(maxWidth: .infinity, maxHeight: .infinity)
+       }
+
     func buildHeader() -> some View {
         HStack {
             Text("Hey \(welcomeArray[currentIndex])")
@@ -168,7 +110,7 @@ struct HomeView: View {
         .padding(.horizontal)
         .padding(.top, DeviceHelper.adaptivePadding())
     }
-    
+
     func buildReminders() -> some View {
         VStack(alignment: .leading) {
             Text(t("Reminders", in: "home_screen"))
@@ -176,12 +118,13 @@ struct HomeView: View {
                 .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
                 .padding(.bottom, 5)
-            
+
             ScrollView {
                 VStack(spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 15)) {
                     ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .yellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
                         .navigate(to: TaskView())
                     
+                    // แปลภาษาให้ด้วย
                     ReminderSection(title: t("Exercise", in: "home_screen"), color: .purple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)
                         .navigate(to: ExerciseView())
                     
@@ -194,12 +137,10 @@ struct HomeView: View {
                     ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .green, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
                         .navigate(to: MatesView())
                 }
-                .padding()
             }
             .padding(.horizontal)
         }
     }
-    
     func startWelcomeTimer() {
         welcomeTimer?.invalidate()
         welcomeTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
@@ -261,7 +202,6 @@ struct HomeView: View {
         }
     }
 }
-
 
 struct ReminderSection: View {
     var title: String

@@ -59,7 +59,9 @@
         },
         "Setting_screen":{
             "Settings": "Settings",
-            "Language": "Language"
+            "Language": "Language",
+            "Message" : "Message",
+            "How to use": "How to use"
         }
     },
     "th": {
@@ -130,7 +132,10 @@
         },
         "Setting_screen": {
             "Settings": "การตั้งค่า",
-            "Language": "ภาษา"
+            "Language": "ภาษา",
+            "Message" : "ข้อความ",
+            "How to use": "วิธีใช้งาน"
+            
         }
     }
 }

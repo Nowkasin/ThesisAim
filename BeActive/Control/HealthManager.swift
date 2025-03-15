@@ -143,7 +143,7 @@ class HealthManager: ObservableObject {
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
-
+        
         let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate, options: .cumulativeSum) { [weak self] _, result, error in
             if let error = error {
                 print("❌ Error fetching today's step data: \(error.localizedDescription)")
@@ -152,7 +152,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             guard let quantity = result?.sumQuantity() else {
                 print("⚠️ No step data available for today.")
                 DispatchQueue.main.async {
@@ -160,7 +160,7 @@ class HealthManager: ObservableObject {
                 }
                 return
             }
-
+            
             let stepCount = quantity.doubleValue(for: .count())
             let goalValue = "10,000"
             
@@ -171,7 +171,7 @@ class HealthManager: ObservableObject {
                 ScoreManager.shared.stepScore = newScore
                 print("StepScore updated to: \(newScore)")
             }
-
+            
             DispatchQueue.main.async {
                 let translatedTitle = t("Today Steps", in: "Chart_screen")
                 let activity = Activity(

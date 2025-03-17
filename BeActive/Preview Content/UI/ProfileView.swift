@@ -14,7 +14,7 @@ struct ProfileView: View {
     @State private var localHealthStats = HealthStats.placeholder
     let db = Firestore.firestore()
     
-    // ✅ เก็บข้อมูลผู้ใช้
+    // ✅ ข้อมูลผู้ใช้
     @State private var userName: String = "No user data"
     @State private var userAge: Int?
     @State private var userEmail: String = "No email"
@@ -24,6 +24,9 @@ struct ProfileView: View {
     @State private var userWeight: Int?
     @State private var errorMessage: String?
     
+    // ✅ เปิดหน้าแก้ไขโปรไฟล์
+    @State private var isEditingProfile = false
+
     var body: some View {
         ZStack {
             Color(.systemGray6).edgesIgnoringSafeArea(.all)
@@ -31,7 +34,35 @@ struct ProfileView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     ProfileHeader(userName: userName, userAge: userAge)
-                    
+
+                    // 🔹 ปุ่ม "Edit Profile"
+                    Button(action: {
+                        isEditingProfile = true
+                    }) {
+                        HStack {
+                            Image(systemName: "pencil")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("Edit Profile")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundColor(.primary)
+                        .padding(10)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
+                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        .padding(.horizontal)
+                    }
+                    .sheet(isPresented: $isEditingProfile) {
+                        EditProfileView(
+                            userName: $userName,
+                            userAge: $userAge,
+                            userEmail: $userEmail,
+                            userHeight: $userHeight,
+                            userPhone: $userPhone,
+                            userSex: $userSex,
+                            userWeight: $userWeight
+                        )
+                    }
+
                     InfoCard(title: "User Information", icon: "person.fill") {
                         UserInfoRow(icon: "envelope.fill", title: "Email", value: userEmail)
                         if let height = userHeight { UserInfoRow(icon: "ruler.fill", title: "Height", value: "\(height) cm") }
@@ -47,23 +78,23 @@ struct ProfileView: View {
                         HealthStatView(icon: "figure.walk.circle", color: .blue, title: "Distance", value: localHealthStats.distance)
                     }
                     
-                    // 🔹 **ปุ่ม Logout (ยังไม่มี FirebaseAuth)**
+                    // 🔴 **ปุ่ม Logout**
                     Button(action: {
-                        print("🔴 Logout Button Pressed") // ✅ กดแล้วแสดง Log
+                        print("🔴 Logout Button Pressed") // ✅ ยังไม่มี FirebaseAuth ใช้ print ก่อน
                     }) {
                         HStack {
                             Image(systemName: "arrow.right.circle.fill")
                                 .foregroundColor(.white)
                                 .font(.title2)
-                            Text("Logout")
+                            Text("Log Out")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.red)
-                        .cornerRadius(10)
-                        .shadow(radius: 3)
+                        .cornerRadius(12)
+                        .shadow(color: Color.red.opacity(0.3), radius: 4, x: 0, y: 2)
                         .padding(.horizontal)
                     }
                 }
@@ -117,7 +148,122 @@ struct ProfileView: View {
     }
 }
 
+// ✅ **หน้าสำหรับแก้ไขข้อมูลผู้ใช้**
+struct EditProfileView: View {
+    @Binding var userName: String
+    @Binding var userAge: Int?
+    @Binding var userEmail: String
+    @Binding var userHeight: Int?
+    @Binding var userPhone: String
+    @Binding var userSex: String
+    @Binding var userWeight: Int?
 
+    let db = Firestore.firestore()
+    @Environment(\.presentationMode) var presentationMode
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Personal Information").font(.headline)) {
+                    LabeledTextField(label: "Full Name", text: $userName)
+                    LabeledTextField(label: "Email Address", text: $userEmail)
+                        .keyboardType(.emailAddress)
+                    LabeledTextField(label: "Phone Number", text: $userPhone)
+                        .keyboardType(.phonePad)
+                }
+
+                Section(header: Text("Physical Information").font(.headline)) {
+                    LabeledNumberField(label: "Age", value: $userAge)
+                    LabeledNumberField(label: "Height (cm)", value: $userHeight)
+                    LabeledNumberField(label: "Weight (kg)", value: $userWeight)
+
+                    Picker("Sex", selection: $userSex) {
+                        Text("Male").tag("Male")
+                        Text("Female").tag("Female")
+                        Text("Other").tag("Other")
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+
+                Section {
+                    Button(action: {
+                        saveUserData()
+                    }) {
+                        Text("Save Changes")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.green)
+                            .cornerRadius(12)
+                            .shadow(color: Color.green.opacity(0.3), radius: 4, x: 0, y: 2)
+                    }
+                }
+            }
+            .navigationTitle("Edit Profile")
+            .navigationBarItems(trailing: Button("Cancel") {
+                presentationMode.wrappedValue.dismiss()
+            })
+        }
+    }
+
+    private func saveUserData() {
+        let updatedData: [String: Any] = [
+            "name": userName,
+            "age": userAge ?? 0,
+            "email": userEmail,
+            "height": userHeight ?? 0,
+            "phone": userPhone,
+            "sex": userSex,
+            "weight": userWeight ?? 0
+        ]
+
+        db.collection("users").document("user1").setData(updatedData) { error in
+            if let error = error {
+                print("❌ Error updating user: \(error.localizedDescription)")
+            } else {
+                print("✅ User data successfully updated!")
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+    }
+}
+
+
+// ✅ **TextField แบบมี Label**
+struct LabeledTextField: View {
+    var label: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            TextField(label, text: $text)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+        .padding(.vertical, 5)
+    }
+}
+
+// ✅ **TextField สำหรับตัวเลข**
+struct LabeledNumberField: View {
+    var label: String
+    @Binding var value: Int?
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            TextField(label, value: $value, formatter: NumberFormatter())
+                .keyboardType(.numberPad)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+        .padding(.vertical, 5)
+    }
+}
 
 
 // ✅ UI ส่วน Header

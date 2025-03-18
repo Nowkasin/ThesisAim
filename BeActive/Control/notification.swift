@@ -17,40 +17,53 @@ class AlertsManager {
     var soundID: SystemSoundID = 1005 // ✅ เก็บ SoundID เพื่อนำไปหยุด   
 
     func triggerWaterAlert() {
-            print("Attempting to trigger water alert...")
-            if !isWaterAlertActive {
-                let content = UNMutableNotificationContent()
-                content.title = "ดื่มน้ำได้แล้ว!"
-                content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
-                content.sound = .default
+        print("Attempting to trigger water alert...")
 
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false) // Start immediately
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let existingRequests = requests.filter { $0.identifier == "waterReminder" }
 
-                UNUserNotificationCenter.current().add(request) { error in
-                    if let error = error {
-                        print("Error triggering water reminder notification: \(error.localizedDescription)")
-                    } else {
-                        print("Water reminder notification scheduled successfully")
-                        self.isWaterAlertActive = true
-                        print("isWaterAlertActive set to true")
-                        self.scheduleNextWaterAlertAfterDelay() // Schedule the next alert
-                    }
+            if !existingRequests.isEmpty {
+                print("Skipping water alert: Already scheduled.")
+                return
+            }
+
+            let content = UNMutableNotificationContent()
+            content.title = "ดื่มน้ำได้แล้ว!"
+            content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1800, repeats: true)  // ⏳ แจ้งเตือนทุก 30 นาที
+            let request = UNNotificationRequest(identifier: "waterReminder", content: content, trigger: trigger)
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Error triggering water reminder notification: \(error.localizedDescription)")
+                } else {
+                    print("Water reminder notification scheduled successfully")
+                    self.isWaterAlertActive = true
                 }
+            }
+        }
+    }
+
+    private func removeOldWaterAlert() {
+        // ลบเฉพาะแจ้งเตือนที่แสดงไปแล้ว แต่ไม่ลบแจ้งเตือนที่รอทำงานอยู่
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ["waterReminder"])
+    }
+
+    private func checkAndScheduleWaterAlert() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let existingRequests = requests.filter { $0.identifier == "waterReminder" }
+
+            if existingRequests.isEmpty {
+                self.triggerWaterAlert()  // ถ้ายังไม่มีแจ้งเตือน ให้ตั้งใหม่
             } else {
-                print("Water reminder alert is already active, waiting for the next alert.")
+                print("Water reminder is already scheduled.")
             }
         }
+    }
 
-        private func scheduleNextWaterAlertAfterDelay() {
-            print("Starting 30 minutes delay for water reminder")
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1800) { // 1800 seconds = 30 minutes ลองทดสอบเป็น 10 วิได้
-                self.isWaterAlertActive = false
-                print("30 minutes passed, isWaterAlertActive set to false")
-                self.triggerWaterAlert() // Restart the alert
-            }
-        }
         
         func triggerMoveAlert() {
             if !isAlertActive { // ตรวจสอบว่ามีการแจ้งเตือนอยู่หรือไม่

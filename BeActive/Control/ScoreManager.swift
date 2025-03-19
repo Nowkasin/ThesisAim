@@ -10,7 +10,7 @@ import Combine
 
 class ScoreManager: ObservableObject {
     static let shared = ScoreManager()
-    
+    // ให้บันทึกคะแนนน้ำ และ การเดินลง DataBase ด้วย
     
     @Published var waterScore: Int = 0
     @Published var stepScore: Int = 0

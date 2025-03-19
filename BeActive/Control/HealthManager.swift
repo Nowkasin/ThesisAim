@@ -97,7 +97,7 @@ class HealthManager: ObservableObject {
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
-                self?.alertsManager?.triggerWaterAlert()
+                self?.alertsManager?.scheduleWaterAlerts() 
             }
     }
     func startObservingHealthData() {

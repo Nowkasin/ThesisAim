@@ -61,7 +61,8 @@
             "Settings": "Settings",
             "Language": "Language",
             "Message" : "Message",
-            "How to use": "How to use"
+            "How to use": "How to use",
+            "Water Notification" : "Water Notification"
         }
     },
     "th": {
@@ -134,7 +135,8 @@
             "Settings": "การตั้งค่า",
             "Language": "ภาษา",
             "Message" : "ข้อความ",
-            "How to use": "วิธีใช้งาน"
+            "How to use": "วิธีใช้งาน",
+            "Water Notification" : "การแจ้งเตือนน้ำ"
             
         }
     }

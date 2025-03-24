@@ -42,7 +42,7 @@ class StepCountViewModel: ObservableObject {
                 print("Observer query error: \(error.localizedDescription)")
                 return
             }
-            self?.fetchStepCount(for: .today) // ✅ โหลดข้อมูลใหม่เมื่อมีการเปลี่ยนแปลง
+            self?.fetchStepCount(for: .today)
         }
 
         healthStore.execute(observerQuery)
@@ -57,45 +57,46 @@ class StepCountViewModel: ObservableObject {
         let calendar = Calendar.current
         let now = Date()
         var startDate: Date?
-        var endDate: Date?
+        var endDate: Date = now
         var interval: DateComponents?
+        var anchorDate: Date = calendar.startOfDay(for: now)
 
         switch range {
         case .today:
             startDate = calendar.startOfDay(for: now)
-            endDate = calendar.date(byAdding: .day, value: 1, to: startDate!)
+            endDate = calendar.date(byAdding: .day, value: 1, to: startDate!)!
             interval = DateComponents(day: 1)
 
         case .week:
-            startDate = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
-            endDate = now
-            interval = DateComponents(day: 1) // ✅ ดึงข้อมูลรายวัน
+            startDate = calendar.date(byAdding: .day, value: -6, to: now)
+            interval = DateComponents(day: 1)
 
         case .month:
-            startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-            endDate = now
-            interval = DateComponents(day: 1) // ✅ ดึงข้อมูลรายวัน
+            startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))
+            interval = DateComponents(day: 1)
 
         case .sixMonths:
-            startDate = calendar.date(byAdding: .month, value: -6, to: now)
-            endDate = now
-            interval = DateComponents(month: 1) // ✅ ดึงข้อมูลรายเดือน
+            anchorDate = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
+            startDate = calendar.date(byAdding: .month, value: -6, to: anchorDate)
+            interval = DateComponents(day: 1)
 
         case .year:
-            startDate = calendar.date(from: calendar.dateComponents([.year], from: now))
-            endDate = now
-            interval = DateComponents(month: 1) // ✅ ดึงข้อมูลรายเดือน
+            anchorDate = calendar.dateInterval(of: .month, for: now)?.start ?? now
+            startDate = calendar.date(byAdding: .year, value: -1, to: anchorDate)
+            interval = DateComponents(day: 1)
         }
 
-        guard let startDate = startDate, let endDate = endDate, let interval = interval else { return }
+        guard let start = startDate, let intv = interval else { return }
 
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: endDate, options: .strictStartDate)
 
-        let query = HKStatisticsCollectionQuery(quantityType: stepCountType,
-                                                quantitySamplePredicate: predicate,
-                                                options: .cumulativeSum,
-                                                anchorDate: startDate,
-                                                intervalComponents: interval)
+        let query = HKStatisticsCollectionQuery(
+            quantityType: stepCountType,
+            quantitySamplePredicate: predicate,
+            options: .cumulativeSum,
+            anchorDate: anchorDate,
+            intervalComponents: intv
+        )
 
         query.initialResultsHandler = { _, results, _ in
             DispatchQueue.main.async {
@@ -117,53 +118,102 @@ class StepCountViewModel: ObservableObject {
 
         var stepData: [StepData] = []
         var totalSteps: Double = 0
-        var validDayCount: Int = 0 // ✅ นับเฉพาะวันที่มีการเดิน
-
-        let calendar = Calendar.current
+        var calendar = Calendar.current
+        calendar.firstWeekday = 2 // Monday
         let now = Date()
-        let startDate: Date
 
-        // ✅ ตั้งค่าช่วงเวลาให้แน่ใจว่าถูกต้อง
         switch range {
-        case .week:
-            startDate = calendar.date(byAdding: .day, value: -6, to: now)! // ✅ ครอบคลุม 7 วันย้อนหลัง
-        case .month:
-            startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        case .sixMonths:
-            startDate = calendar.date(byAdding: .month, value: -6, to: now)!
         case .year:
-            startDate = calendar.date(from: calendar.dateComponents([.year], from: now))!
-        default:
-            startDate = calendar.startOfDay(for: now)
-        }
+            let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: now)!
+            let startMonth = calendar.dateInterval(of: .month, for: oneYearAgo)!.start
+            let endMonth = calendar.dateInterval(of: .month, for: now)!.start
+            var monthlyDict: [Date: (total: Double, count: Int)] = [:]
+            var validDays = 0
 
-        var currentDate = startDate
-        while currentDate <= now {
-            let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+            for stat in statsCollection.statistics() {
+                let date = stat.startDate
+                guard date >= startMonth && date <= endMonth else { continue }
+                let steps = stat.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
 
-            let statistics = statsCollection.statistics(for: currentDate)
-            let steps = statistics?.sumQuantity()?.doubleValue(for: .count()) ?? 0
-
-            stepData.append(StepData(date: currentDate, steps: steps))
-
-            if steps > 0 { // ✅ นับเฉพาะวันที่มีการเดิน
-                totalSteps += steps
-                validDayCount += 1
+                monthlyDict[monthStart, default: (0, 0)].total += steps
+                if steps > 0 {
+                    monthlyDict[monthStart, default: (0, 0)].count += 1
+                    totalSteps += steps
+                    validDays += 1
+                }
             }
 
-            currentDate = nextDate
+            for (date, data) in monthlyDict.sorted(by: { $0.key < $1.key }) {
+                let avg = data.count > 0 ? data.total / Double(data.count) : 0
+                stepData.append(StepData(date: date, steps: avg))
+            }
+
+            self.averageSteps = validDays > 0 ? totalSteps / Double(validDays) : 0
+
+        case .month:
+            let start = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+            var currentDate = start
+            while currentDate <= now {
+                let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+                guard let stat = statsCollection.statistics(for: currentDate) else {
+                    currentDate = nextDate
+                    continue
+                }
+                let steps = stat.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                totalSteps += steps
+                stepData.append(StepData(date: currentDate, steps: steps))
+                currentDate = nextDate
+            }
+            let validDays = stepData.filter { $0.steps > 0 }.count
+            self.averageSteps = validDays > 0 ? totalSteps / Double(validDays) : 0
+
+        case .sixMonths:
+            let start = calendar.date(byAdding: .month, value: -6, to: now)!
+            var weeklyDict: [Date: [Double]] = [:]
+
+            for stat in statsCollection.statistics() {
+                let date = stat.startDate
+                guard date >= start && !calendar.isDateInToday(date) else { continue }
+                let steps = stat.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                let weekStart = calendar.dateInterval(of: .weekOfYear, for: date)?.start ?? date
+                weeklyDict[weekStart, default: []].append(steps)
+                totalSteps += steps
+            }
+
+            for (date, stepsArray) in weeklyDict.sorted(by: { $0.key < $1.key }) {
+                let valid = stepsArray.filter { $0 > 0 }
+                let avg = valid.isEmpty ? 0 : valid.reduce(0, +) / Double(valid.count)
+                stepData.append(StepData(date: date, steps: avg))
+            }
+
+            let totalDays = statsCollection.statistics().filter { !calendar.isDateInToday($0.startDate) }.count
+            self.averageSteps = totalDays > 0 ? totalSteps / Double(totalDays) : 0
+
+        default:
+            let start = calendar.date(byAdding: .day, value: -6, to: now)!
+            var currentDate = start
+            while currentDate <= now {
+                let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+                guard let stat = statsCollection.statistics(for: currentDate) else {
+                    currentDate = nextDate
+                    continue
+                }
+                let steps = stat.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                totalSteps += steps
+                stepData.append(StepData(date: currentDate, steps: steps))
+                currentDate = nextDate
+            }
+            let validDays = stepData.filter { $0.steps > 0 }.count
+            self.averageSteps = validDays > 0 ? totalSteps / Double(validDays) : 0
         }
 
         self.stepCountData = stepData
-
-        // ✅ คำนวณค่าเฉลี่ยเฉพาะวันที่มีการเดิน
-        self.averageSteps = validDayCount > 0 ? totalSteps / Double(validDayCount) : 0
-
-        print("Fetched Steps Data for \(range.rawValue): \(stepData)") // ✅ Debug
+        print("📊 Fetched Steps Data for \(range.rawValue)")
+        print("➡️ ค่าเฉลี่ยรวมแบบ HealthKit: \(self.averageSteps)")
     }
 
-    
-    func filteredData(for range: TimeRange) -> [StepData] { // ✅ คืนค่าเป็น [StepData]
+    func filteredData(for range: TimeRange) -> [StepData] {
         return stepCountData
     }
 
@@ -176,25 +226,28 @@ class StepCountViewModel: ObservableObject {
         switch range {
         case .today:
             return formatter.string(from: now)
-
         case .week:
-            if let start = calendar.date(byAdding: .day, value: -6, to: now) { // ✅ เริ่มจาก 6 วันก่อนหน้า
+            if let start = calendar.date(byAdding: .day, value: -6, to: now) {
                 return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
             }
-
         case .month:
             formatter.dateFormat = "MMMM yyyy"
             return formatter.string(from: now)
-
         case .sixMonths:
             if let start = calendar.date(byAdding: .month, value: -6, to: now) {
                 return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
             }
-
         case .year:
-            formatter.dateFormat = "yyyy"
-            return formatter.string(from: now)
+            if let start = calendar.date(byAdding: .year, value: -1, to: now) {
+                formatter.dateFormat = "MMM yyyy"
+                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+            }
         }
         return ""
     }
+}
+
+public protocol EquatableBytes: Equatable {
+    init(bytes: [UInt8])
+    var bytes: [UInt8] { get }
 }

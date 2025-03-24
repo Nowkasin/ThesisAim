@@ -39,39 +39,43 @@ class DistanceViewModel: ObservableObject {
         let calendar = Calendar.current
         let now = Date()
         var startDate: Date?
+        var endDate: Date = now
         var interval: DateComponents?
+        var anchorDate: Date = calendar.startOfDay(for: now)
 
         switch range {
         case .today:
             startDate = calendar.startOfDay(for: now)
-            interval = DateComponents(hour: 1) // ✅ ดึงข้อมูลรายชั่วโมง
+            interval = DateComponents(day: 1)
 
         case .week:
             startDate = calendar.date(byAdding: .day, value: -6, to: now)
-            interval = DateComponents(day: 1) // ✅ ดึงข้อมูลรายวัน
+            interval = DateComponents(day: 1)
 
         case .month:
             startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))
-            interval = DateComponents(day: 1) // ✅ ดึงข้อมูลรายวัน
+            interval = DateComponents(day: 1)
 
         case .sixMonths:
-            startDate = calendar.date(byAdding: .month, value: -6, to: now)
-            interval = DateComponents(month: 1) // ✅ ดึงข้อมูลรายเดือน
+            anchorDate = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
+            startDate = calendar.date(byAdding: .month, value: -6, to: anchorDate)
+            interval = DateComponents(day: 1)
 
         case .year:
-            startDate = calendar.date(from: calendar.dateComponents([.year], from: now))
-            interval = DateComponents(month: 1) // ✅ ดึงข้อมูลรายเดือน
+            startDate = calendar.date(byAdding: .year, value: -1, to: now)
+            interval = DateComponents(day: 1)
+            anchorDate = calendar.startOfDay(for: now)
         }
 
         guard let startDate = startDate, let interval = interval else { return }
 
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
 
         let query = HKStatisticsCollectionQuery(
             quantityType: distanceType,
             quantitySamplePredicate: predicate,
             options: .cumulativeSum,
-            anchorDate: startDate,
+            anchorDate: anchorDate,
             intervalComponents: interval
         )
 
@@ -95,51 +99,97 @@ class DistanceViewModel: ObservableObject {
 
         var distanceData: [DistanceData] = []
         var totalDistance: Double = 0
-        var validDayCount: Int = 0
-
         let calendar = Calendar.current
         let now = Date()
         let startDate: Date
 
         switch range {
-        case .week:
-            startDate = calendar.date(byAdding: .day, value: -6, to: now)!
-        case .month:
-            startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
         case .sixMonths:
             startDate = calendar.date(byAdding: .month, value: -6, to: now)!
         case .year:
-            startDate = calendar.date(from: calendar.dateComponents([.year], from: now))!
+            startDate = calendar.date(byAdding: .year, value: -1, to: now)!
+        case .month:
+            startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+        case .week:
+            startDate = calendar.date(byAdding: .day, value: -6, to: now)!
         default:
             startDate = calendar.startOfDay(for: now)
         }
 
-        var currentDate = startDate
-        while currentDate <= now {
-            let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        let stats = statsCollection.statistics()
 
-            let statistics = statsCollection.statistics(for: currentDate)
-            let distance = statistics?.sumQuantity()?.doubleValue(for: .meter()) ?? 0
+        if range == .year {
+            var monthlyDict: [Date: [Double]] = [:]
 
-            distanceData.append(DistanceData(time: currentDate, distance: distance))
-
-            if distance > 0 {
+            for stat in stats {
+                let date = stat.startDate
+                guard date >= startDate && date < now else { continue }
+                let distance = stat.sumQuantity()?.doubleValue(for: HKUnit.meterUnit(with: .kilo)) ?? 0
+                let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
+                monthlyDict[monthStart, default: []].append(distance)
                 totalDistance += distance
-                validDayCount += 1
             }
 
-            currentDate = nextDate
+            for (date, distanceArray) in monthlyDict.sorted(by: { $0.key < $1.key }) {
+                let valid = distanceArray.filter { $0 > 0 }
+                let avg = valid.count > 0 ? valid.reduce(0, +) / Double(valid.count) : 0
+                distanceData.append(DistanceData(time: date, distance: avg))
+            }
+
+            let totalDays = stats.filter { $0.startDate >= startDate && $0.startDate < now && $0.sumQuantity()?.doubleValue(for: HKUnit.meterUnit(with: .kilo)) ?? 0 > 0 }.count
+            self.averageDistance = totalDays > 0 ? totalDistance / Double(totalDays) : 0
+        }
+
+        else if range == .sixMonths {
+            let component: Calendar.Component = .weekOfYear
+            var groupedDict: [Date: [Double]] = [:]
+
+            for stat in stats {
+                let date = stat.startDate
+                guard !calendar.isDateInToday(date) else { continue }
+                let distance = stat.sumQuantity()?.doubleValue(for: HKUnit.meterUnit(with: .kilo)) ?? 0
+                let periodStart = calendar.dateInterval(of: component, for: date)?.start ?? date
+                groupedDict[periodStart, default: []].append(distance)
+                totalDistance += distance
+            }
+
+            for (date, distanceArray) in groupedDict.sorted(by: { $0.key < $1.key }) {
+                let valid = distanceArray.filter { $0 > 0 }
+                let avg = valid.count > 0 ? valid.reduce(0, +) / Double(valid.count) : 0
+                distanceData.append(DistanceData(time: date, distance: avg))
+            }
+
+            let totalDays = stats.filter { !calendar.isDateInToday($0.startDate) }.count
+            self.averageDistance = totalDays > 0 ? totalDistance / Double(totalDays) : 0
+        }
+
+        else {
+            var currentDate = startDate
+            var validDayCount = 0
+
+            while currentDate <= now {
+                let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+                guard let statistics = statsCollection.statistics(for: currentDate) else {
+                    currentDate = nextDate
+                    continue
+                }
+                let distance = statistics.sumQuantity()?.doubleValue(for: HKUnit.meterUnit(with: .kilo)) ?? 0
+                distanceData.append(DistanceData(time: currentDate, distance: distance))
+                if distance > 0 {
+                    totalDistance += distance
+                    validDayCount += 1
+                }
+                currentDate = nextDate
+            }
+
+            self.averageDistance = validDayCount > 0 ? totalDistance / Double(validDayCount) : 0
         }
 
         self.distanceData = distanceData
-
-        // ✅ คำนวณค่าเฉลี่ยเฉพาะวันที่มีการเดินหรือวิ่งจริง
-        self.averageDistance = validDayCount > 0 ? totalDistance / Double(validDayCount) : 0
-
-        print("📊 Fetched Distance Data for \(range.rawValue): \(distanceData)") // ✅ Debug
+        print("📊 ข้อมูลที่ดึงมา: \(distanceData)")
     }
 
-    func filteredData(for range: TimeRange) -> [DistanceData] { // ✅ คืนค่าเป็น [DistanceData]
+    func filteredData(for range: TimeRange) -> [DistanceData] {
         return distanceData
     }
 
@@ -152,24 +202,22 @@ class DistanceViewModel: ObservableObject {
         switch range {
         case .today:
             return formatter.string(from: now)
-
         case .week:
-            if let start = calendar.date(byAdding: .day, value: -6, to: now) { // ✅ เริ่มจาก 6 วันก่อนหน้า
+            if let start = calendar.date(byAdding: .day, value: -6, to: now) {
                 return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
             }
-
         case .month:
             formatter.dateFormat = "MMMM yyyy"
             return formatter.string(from: now)
-
         case .sixMonths:
             if let start = calendar.date(byAdding: .month, value: -6, to: now) {
                 return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
             }
-
         case .year:
-            formatter.dateFormat = "yyyy"
-            return formatter.string(from: now)
+            if let start = calendar.date(byAdding: .year, value: -1, to: now) {
+                formatter.dateFormat = "MMM yyyy"
+                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+            }
         }
         return ""
     }

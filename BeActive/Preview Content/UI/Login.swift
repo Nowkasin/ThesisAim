@@ -112,11 +112,14 @@
 //}
 
 import SwiftUI
+import Firebase
+import FirebaseFirestore
 
 struct SplashScreen: View {
     @Binding var isActive: Bool
     let imageUrl: URL
     @State private var isFadedIn: Bool = false
+
     var body: some View {
         ZStack {
             Color.white
@@ -125,22 +128,22 @@ struct SplashScreen: View {
             AsyncImage(url: imageUrl) { phase in
                 switch phase {
                 case .empty:
-                    ProgressView() // Show a loading indicator
+                    ProgressView()
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
-                        .opacity(isFadedIn ? 1 : 0) // Fade-in animation
+                        .opacity(isFadedIn ? 1 : 0)
                         .scaleEffect(isActive ? 2 : 1)
                         .animation(.easeInOut(duration: 3), value: isActive)
                         .onAppear {
                             withAnimation(.easeInOut(duration: 1.5)) {
-                                isFadedIn = true // Start fade-in animation
+                                isFadedIn = true
                             }
                         }
                 case .failure:
-                    Image(systemName: "xmark.octagon") // Fallback in case of failure
+                    Image(systemName: "xmark.octagon")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
@@ -157,10 +160,9 @@ struct SplashScreen: View {
             }
         }
         .onAppear {
-            // Simulate a delay for the splash screen
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation(.easeInOut(duration: 1.5)) {
-                    isActive = true // Start fading out and move to login
+                    isActive = true
                 }
             }
         }
@@ -169,18 +171,20 @@ struct SplashScreen: View {
 
 struct Login: View {
     @EnvironmentObject var themeManager: ThemeManager
-    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ ใช้ AppStorage เพื่อให้แอปรู้สถานะล็อกอิน
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
     @State private var isSplashScreenActive: Bool = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         NavigationStack {
             ZStack {
                 if isSplashScreenActive {
                     if isLoggedIn {
-                        MainTab() // ✅ เปลี่ยนไป `MainTab()` หลังจากล็อกอิน
+                        MainTab()
                             .transition(.move(edge: .trailing))
                             .animation(.easeInOut(duration: 0.5), value: isLoggedIn)
                     } else {
@@ -243,7 +247,7 @@ struct Login: View {
                             Spacer()
 
                             Button(action: {
-                                handleLogin() // ✅ เปลี่ยนไป MainTab เมื่อกดปุ่ม
+                                handleLogin()
                             }) {
                                 Text(t("log_in", in: "login_screen"))
                                     .font(.system(size: 18, weight: .medium))
@@ -256,6 +260,10 @@ struct Login: View {
                             .padding(.bottom, 50)
                         }
                         .background(themeManager.backgroundColor.ignoresSafeArea())
+                        .hideKeyboardOnTap()
+                        .alert(isPresented: $showAlert) {
+                            Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                        }
                     }
                 } else {
                     SplashScreen(
@@ -268,10 +276,44 @@ struct Login: View {
         }
     }
 
-    /// ✅ ฟังก์ชันจำลองการล็อกอิน
     func handleLogin() {
-        withAnimation {
-            isLoggedIn = true // ✅ อัปเดตสถานะล็อกอิน → ไปหน้า `MainTab`
+        let db = Firestore.firestore()
+        db.collection("users").getDocuments { snapshot, error in
+            if let error = error {
+                alertMessage = "Error fetching users: \(error.localizedDescription)"
+                showAlert = true
+                return
+            }
+
+            guard let documents = snapshot?.documents else {
+                alertMessage = "No users found."
+                showAlert = true
+                return
+            }
+
+            for document in documents {
+                let data = document.data()
+                let storedEmail = data["email"] as? String ?? ""
+                let storedPassword = data["pass"] as? String ?? ""
+
+                if storedEmail.lowercased() == email.lowercased() && storedPassword == password {
+                    withAnimation {
+                        isLoggedIn = true
+                    }
+                    return
+                }
+            }
+
+            alertMessage = "Incorrect email or password."
+            showAlert = true
+        }
+    }
+}
+
+extension View {
+    func hideKeyboardOnTap() -> some View {
+        self.onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
 }
@@ -284,3 +326,4 @@ struct Login_Previews: PreviewProvider {
             .environmentObject(ScoreManager())
     }
 }
+

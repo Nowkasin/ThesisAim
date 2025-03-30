@@ -174,7 +174,6 @@ struct Login: View {
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var isPasswordVisible: Bool = false
     @State private var isSplashScreenActive: Bool = false
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -185,81 +184,69 @@ struct Login: View {
                 if isSplashScreenActive {
                     if isLoggedIn {
                         MainTab()
-                            .transition(.move(edge: .trailing))
-                            .animation(.easeInOut(duration: 0.5), value: isLoggedIn)
                     } else {
-                        VStack {
-                            Spacer().frame(height: 50)
+                        VStack(alignment: .leading) {
+                            Spacer().frame(height: 60)
 
-                            Text(t("log_in", in: "login_screen"))
-                                .padding(.top, 30)
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(Color(red: 135/255, green: 206/255, blue: 235/255))
-                                .padding(.bottom, 20)
+                            // "Log In" Title
+                            Text("Log In")
+                                .font(.system(size: 36, weight: .bold))
+                                .foregroundColor(Color(red: 47/255, green: 69/255, blue: 109/255))
+                                .padding(.leading, 20)
+                                .padding(.bottom, 40)
 
-                            VStack(alignment: .leading, spacing: 15) {
-                                TextField(t("e_mail", in: "login_screen"), text: $email)
-                                    .padding()
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
-                                    .autocapitalization(.none)
-                                    .keyboardType(.emailAddress)
+                            // Email Field
+                            VStack(alignment: .leading) {
+                                TextField("E-mail Address", text: $email)
+                                    .padding(.bottom, 10)
+                                    .foregroundColor(.black)
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundColor(.gray.opacity(0.5))
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 20)
 
-                                ZStack {
-                                    if isPasswordVisible {
-                                        TextField(t("password", in: "login_screen"), text: $password)
-                                            .padding()
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(8)
-                                    } else {
-                                        SecureField(t("password", in: "login_screen"), text: $password)
-                                            .padding()
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(8)
-                                    }
-
-                                    HStack {
-                                        Spacer()
-                                        Button(action: {
-                                            isPasswordVisible.toggle()
-                                        }) {
-                                            Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                                .foregroundColor(.gray)
-                                        }
-                                        .padding(.trailing, 10)
-                                    }
-                                }
+                            // Password Field
+                            VStack(alignment: .leading) {
+                                SecureField("Password", text: $password)
+                                    .padding(.bottom, 10)
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundColor(.gray.opacity(0.5))
                             }
                             .padding(.horizontal, 20)
 
+                            // Register Link
                             HStack {
                                 Spacer()
-                                Text(t("no_account_yet", in: "login_screen"))
-                                    .foregroundColor(.gray)
+                                Text("No account yet?")
+                                    .foregroundColor(.black)
                                 NavigationLink(destination: RegisterView()) {
-                                    Text(t("register", in: "login_screen"))
-                                        .foregroundColor(themeManager.textColor)
+                                    Text("Register")
+                                        .foregroundColor(Color.blue)
                                 }
                             }
-                            .padding(.top, 10)
+                            .padding(.top, 20)
                             .padding(.horizontal, 20)
 
                             Spacer()
 
+                            // Log In Button
                             Button(action: {
                                 handleLogin()
                             }) {
-                                Text(t("log_in", in: "login_screen"))
+                                Text("Log In")
                                     .font(.system(size: 18, weight: .medium))
                                     .frame(maxWidth: .infinity, minHeight: 50)
-                                    .background(Color(red: 90/255, green: 200/255, blue: 250/255))
+                                    .background(Color(red: 173/255, green: 216/255, blue: 230/255))
                                     .foregroundColor(.white)
-                                    .cornerRadius(25)
-                                    .padding(.horizontal, 50)
+                                    .cornerRadius(35)
+                                    .padding(.horizontal, 40)
                             }
-                            .padding(.bottom, 50)
+                            .padding(.bottom, 40)
                         }
-                        .background(themeManager.backgroundColor.ignoresSafeArea())
+                        .background(Color.white.ignoresSafeArea())
                         .hideKeyboardOnTap()
                         .alert(isPresented: $showAlert) {
                             Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
@@ -309,6 +296,7 @@ struct Login: View {
         }
     }
 }
+
 
 extension View {
     func hideKeyboardOnTap() -> some View {

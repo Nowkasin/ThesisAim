@@ -291,7 +291,6 @@ struct ProfileHeader: View {
                     .foregroundColor(.gray)
             }
         }
-        .padding()
     }
 }
 

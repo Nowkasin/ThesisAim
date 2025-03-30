@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -58,8 +58,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8E5E7FC92D30E34800917EE0 /* Control */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Control; sourceTree = "<group>"; };
-		8EBDBC802D4B4A3D0076B811 /* UI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = UI; sourceTree = "<group>"; };
+		8E5E7FC92D30E34800917EE0 /* Control */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Control;
+			sourceTree = "<group>";
+		};
+		8EBDBC802D4B4A3D0076B811 /* UI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = UI;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -238,7 +246,6 @@
 				};
 			};
 			buildConfigurationList = 8E8FFA122C06D72400E0A56E /* Build configuration list for PBXProject "BeActive" */;
-			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -249,6 +256,7 @@
 			packageReferences = (
 				19BFD80E2D4CC13C00AFA144 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 8E8FFA182C06D72400E0A56E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -459,7 +467,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BeActive/Preview Content\"";
-				DEVELOPMENT_TEAM = P35D5KUG49;
+				DEVELOPMENT_TEAM = 4Q98AKZ685;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AimMates;
@@ -492,7 +500,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BeActive/Preview Content\"";
-				DEVELOPMENT_TEAM = P35D5KUG49;
+				DEVELOPMENT_TEAM = 4Q98AKZ685;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AimMates;
@@ -522,7 +530,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4Q98AKZ685;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
@@ -559,7 +567,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4Q98AKZ685;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Furun.BeActiveUITests;

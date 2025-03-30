@@ -281,5 +281,6 @@ struct Login_Previews: PreviewProvider {
         Login()
             .environmentObject(ThemeManager())
             .environmentObject(HealthManager())
+            .environmentObject(ScoreManager())
     }
 }

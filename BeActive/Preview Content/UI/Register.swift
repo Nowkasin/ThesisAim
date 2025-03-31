@@ -32,8 +32,8 @@ struct RegisterView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                themeManager.backgroundColor
-                    .ignoresSafeArea()
+//                themeManager.backgroundColor
+//                    .ignoresSafeArea()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {

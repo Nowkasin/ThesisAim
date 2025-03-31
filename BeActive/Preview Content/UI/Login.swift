@@ -155,7 +155,7 @@ struct Login: View {
                 } else {
                     SplashScreen(
                         isActive: $isSplashScreenActive,
-                        imageUrl: URL(string: "https://i.pinimg.com/736x/82/02/61/820261b353a82247509001ad71b18899.jpg")!
+                        imageUrl: URL(string: "https://cdn.discordapp.com/attachments/870641609665032233/1356160106013917226/Bear.png?ex=67eb8e05&is=67ea3c85&hm=e01d1b21b3c0c8ce1b46e30eb801811f3671b9f1b67973a0e7f8822f9d20cde4&")!
                     )
                         .transition(.opacity)
                 }

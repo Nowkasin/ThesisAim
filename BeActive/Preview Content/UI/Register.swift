@@ -9,8 +9,6 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 
-// แปลภาษาด้วย
-
 struct RegisterView: View {
     @EnvironmentObject var themeManager: ThemeManager
 
@@ -29,7 +27,6 @@ struct RegisterView: View {
     @State private var showLoginScreen = false
 
     private let passwordValidator = PasswordValidator()
-
     let sexOptions = ["Male", "Female", "Other"]
 
     var body: some View {
@@ -39,65 +36,25 @@ struct RegisterView: View {
                     .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 0) {
                         Text("Register")
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color(red: 135/255, green: 206/255, blue: 235/255))
-                            .padding(.top, 30)
-                            .padding(.bottom, 20)
+                            .foregroundColor(Color(red: 60/255, green: 60/255, blue: 90/255))
+                            .padding(.top, 40)
+                            .padding(.bottom, 30)
 
                         Group {
                             CustomTextField(placeholder: "Full Name", text: $name)
-                                .autocapitalization(.words)
-
-                            CustomTextField(placeholder: "Email", text: $email)
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-
+                            CustomTextField(placeholder: "E-mail Address", text: $email)
                             CustomPasswordField(placeholder: "Password", text: $password, isPasswordVisible: $isPasswordVisible)
                                 .onChange(of: password) { newValue in
                                     validatePassword(newValue)
                                 }
-
                             CustomTextField(placeholder: "Age", text: $age)
-                                .keyboardType(.numberPad)
-
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text("Sex")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-
-                                Menu {
-                                    ForEach(sexOptions, id: \.self) { option in
-                                        Button(action: {
-                                            sex = option
-                                        }) {
-                                            Text(option)
-                                        }
-                                    }
-                                } label: {
-                                    HStack {
-                                        Text(sex.isEmpty ? "Select" : sex)
-                                            .foregroundColor(sex.isEmpty ? .gray : .primary)
-                                        Spacer()
-                                        Image(systemName: "chevron.down")
-                                            .foregroundColor(.gray)
-                                    }
-                                    .padding()
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
-                                }
-                            }
-                            .padding(.bottom, 15)
-
+                            SexPickerView(sex: $sex, sexOptions: sexOptions)
                             CustomTextField(placeholder: "Height (cm)", text: $height)
-                                .keyboardType(.numberPad)
-
                             CustomTextField(placeholder: "Weight (kg)", text: $weight)
-                                .keyboardType(.numberPad)
-
                             CustomTextField(placeholder: "Phone", text: $phoneNumber)
-                                .keyboardType(.numberPad)
                         }
 
                         if !errorMessage.isEmpty {
@@ -118,7 +75,18 @@ struct RegisterView: View {
                                 .cornerRadius(25)
                         }
                         .padding(.top, 30)
-                        .padding(.bottom, 50)
+                        .padding(.bottom, 40)
+
+                        HStack {
+                            Text("Already have an account?")
+                                .foregroundColor(.primary)
+                            Button("Log In") {
+                                showLoginScreen = true
+                            }
+                            .foregroundColor(.blue)
+                        }
+                        .font(.footnote)
+                        .frame(maxWidth: .infinity)
                     }
                     .padding(.horizontal, 30)
                 }
@@ -133,7 +101,7 @@ struct RegisterView: View {
                 Text("You have successfully registered.")
             }
             .fullScreenCover(isPresented: $showLoginScreen) {
-                Login() // ⬅️ Replace with your actual login screen
+                Login()
             }
         }
     }
@@ -191,42 +159,38 @@ struct RegisterView: View {
     }
 }
 
-// MARK: - Custom TextField
+// MARK: - Minimal Text Field
 struct CustomTextField: View {
     var placeholder: String
-    var backgroundColor: Color = Color(.systemGray6)
     @Binding var text: String
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 4) {
             TextField(placeholder, text: $text)
                 .font(.system(size: 16))
-                .padding()
-                .background(backgroundColor)
-                .cornerRadius(8)
+                .padding(.vertical, 10)
+                .foregroundColor(.primary)
+
+            Divider()
+                .background(Color.gray.opacity(0.4))
         }
         .padding(.bottom, 15)
     }
 }
 
-// MARK: - Custom PasswordField
+// MARK: - Minimal Password Field
 struct CustomPasswordField: View {
     var placeholder: String
-    var backgroundColor: Color = Color(.systemGray6)
     @Binding var text: String
     @Binding var isPasswordVisible: Bool
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 if isPasswordVisible {
                     TextField(placeholder, text: $text)
-                        .font(.system(size: 16))
-                        .padding()
                 } else {
                     SecureField(placeholder, text: $text)
-                        .font(.system(size: 16))
-                        .padding()
                 }
 
                 Button(action: {
@@ -236,14 +200,54 @@ struct CustomPasswordField: View {
                         .foregroundColor(.gray)
                 }
             }
-            .background(backgroundColor)
-            .cornerRadius(8)
+            .font(.system(size: 16))
+            .padding(.vertical, 10)
+
+            Divider()
+                .background(Color.gray.opacity(0.4))
         }
         .padding(.bottom, 15)
     }
 }
 
-// MARK: - View Extension to Dismiss Keyboard
+// MARK: - Sex Picker (Styled)
+struct SexPickerView: View {
+    @Binding var sex: String
+    let sexOptions: [String]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Sex")
+                .font(.system(size: 16))
+                .foregroundColor(.gray)
+
+            Menu {
+                ForEach(sexOptions, id: \.self) { option in
+                    Button(action: {
+                        sex = option
+                    }) {
+                        Text(option)
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(sex.isEmpty ? "Select" : sex)
+                        .foregroundColor(sex.isEmpty ? .gray : .primary)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding(.vertical, 10)
+            }
+
+            Divider()
+                .background(Color.gray.opacity(0.4))
+        }
+        .padding(.bottom, 15)
+    }
+}
+
+// MARK: - Dismiss Keyboard
 extension View {
     func dismissKeyboardOnTap() -> some View {
         modifier(DismissKeyboardOnTap())

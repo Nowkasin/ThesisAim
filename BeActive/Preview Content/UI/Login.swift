@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
+import CryptoKit
 
 struct SplashScreen: View {
     @Binding var isActive: Bool
@@ -16,8 +17,7 @@ struct SplashScreen: View {
 
     var body: some View {
         ZStack {
-            Color.white
-                .ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             AsyncImage(url: imageUrl) { phase in
                 switch phase {
@@ -90,7 +90,6 @@ struct Login: View {
                                 .padding(.leading, 20)
                                 .padding(.bottom, 40)
 
-                            // Email Field
                             VStack(alignment: .leading) {
                                 TextField("E-mail Address", text: $email)
                                     .padding(.bottom, 10)
@@ -102,7 +101,6 @@ struct Login: View {
                             .padding(.horizontal, 20)
                             .padding(.bottom, 20)
 
-                            // Password Field
                             VStack(alignment: .leading) {
                                 SecureField("Password", text: $password)
                                     .padding(.bottom, 10)
@@ -112,7 +110,6 @@ struct Login: View {
                             }
                             .padding(.horizontal, 20)
 
-                            // Register Link
                             HStack {
                                 Spacer()
                                 Text("No account yet?")
@@ -132,7 +129,6 @@ struct Login: View {
 
                             Spacer()
 
-                            // Log In Button
                             Button(action: {
                                 handleLogin()
                             }) {
@@ -165,6 +161,8 @@ struct Login: View {
 
     func handleLogin() {
         let db = Firestore.firestore()
+        let hashedInput = hashPassword(password)
+
         db.collection("users").getDocuments { snapshot, error in
             if let error = error {
                 alertMessage = "Error fetching users: \(error.localizedDescription)"
@@ -181,11 +179,12 @@ struct Login: View {
             for document in documents {
                 let data = document.data()
                 let storedEmail = data["email"] as? String ?? ""
-                let storedPassword = data["pass"] as? String ?? ""
+                let storedHashedPass = data["pass"] as? String ?? ""
 
-                if storedEmail.lowercased() == email.lowercased() && storedPassword == password {
+                if storedEmail.lowercased() == email.lowercased() && storedHashedPass == hashedInput {
                     withAnimation {
                         isLoggedIn = true
+                        UserDefaults.standard.set(document.documentID, forKey: "currentUserId") // Save user ID
                     }
                     return
                 }
@@ -194,6 +193,12 @@ struct Login: View {
             alertMessage = "Incorrect Email or Password."
             showAlert = true
         }
+    }
+
+    func hashPassword(_ password: String) -> String {
+        let data = Data(password.utf8)
+        let hashed = SHA256.hash(data: data)
+        return hashed.map { String(format: "%02x", $0) }.joined()
     }
 }
 
@@ -213,5 +218,6 @@ struct Login_Previews: PreviewProvider {
             .environmentObject(ScoreManager())
     }
 }
+
 
 

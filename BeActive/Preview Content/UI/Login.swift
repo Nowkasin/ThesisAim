@@ -66,6 +66,7 @@ struct SplashScreen: View {
 struct Login: View {
     @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
+    @AppStorage("currentUserId") private var currentUserId: String = ""
 
     @State private var email: String = ""
     @State private var password: String = ""
@@ -81,81 +82,81 @@ struct Login: View {
                     if isLoggedIn {
                         MainTab()
                     } else {
-                        VStack(alignment: .leading) {
-                            Spacer().frame(height: 60)
-
-                            Text("Log In")
-                                .font(.system(size: 36, weight: .bold))
-                                .foregroundColor(Color(red: 47/255, green: 69/255, blue: 109/255))
-                                .padding(.leading, 20)
-                                .padding(.bottom, 40)
-
-                            VStack(alignment: .leading) {
-                                TextField("E-mail Address", text: $email)
-                                    .padding(.bottom, 10)
-                                    .foregroundColor(.black)
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.gray.opacity(0.5))
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 20)
-
-                            VStack(alignment: .leading) {
-                                SecureField("Password", text: $password)
-                                    .padding(.bottom, 10)
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.gray.opacity(0.5))
-                            }
-                            .padding(.horizontal, 20)
-
-                            HStack {
-                                Spacer()
-                                Text("No account yet?")
-                                    .foregroundColor(.black)
-                                Button(action: {
-                                    showRegisterScreen = true
-                                }) {
-                                    Text("Register")
-                                        .foregroundColor(.blue)
-                                }
-                                .fullScreenCover(isPresented: $showRegisterScreen) {
-                                    RegisterView()
-                                }
-                            }
-                            .padding(.top, 20)
-                            .padding(.horizontal, 20)
-
-                            Spacer()
-
-                            Button(action: {
-                                handleLogin()
-                            }) {
-                                Text("Log In")
-                                    .font(.system(size: 18, weight: .medium))
-                                    .frame(maxWidth: .infinity, minHeight: 50)
-                                    .background(Color(red: 90/255, green: 200/255, blue: 250/255))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(35)
-                                    .padding(.horizontal, 40)
-                            }
-                            .padding(.bottom, 40)
-                        }
-                        .background(Color.white.ignoresSafeArea())
-                        .hideKeyboardOnTap()
-                        .alert(isPresented: $showAlert) {
-                            Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-                        }
+                        loginForm
                     }
                 } else {
                     SplashScreen(
                         isActive: $isSplashScreenActive,
-                        imageUrl: URL(string: "https://cdn.discordapp.com/attachments/870641609665032233/1356160106013917226/Bear.png?ex=67eb8e05&is=67ea3c85&hm=e01d1b21b3c0c8ce1b46e30eb801811f3671b9f1b67973a0e7f8822f9d20cde4&")!
+                        imageUrl: URL(string: "https://i.imgur.com/TR7HwEa.png")!
                     )
-                        .transition(.opacity)
+                    .transition(.opacity)
                 }
             }
+        }
+    }
+
+    var loginForm: some View {
+        VStack(alignment: .leading) {
+            Spacer().frame(height: 60)
+
+            Text("Log In")
+                .font(.system(size: 36, weight: .bold))
+                .foregroundColor(Color(red: 47/255, green: 69/255, blue: 109/255))
+                .padding(.leading, 20)
+                .padding(.bottom, 40)
+
+            VStack(alignment: .leading) {
+                TextField("E-mail Address", text: $email)
+                    .padding(.bottom, 10)
+                    .foregroundColor(.black)
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.gray.opacity(0.5))
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+
+            VStack(alignment: .leading) {
+                SecureField("Password", text: $password)
+                    .padding(.bottom, 10)
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.gray.opacity(0.5))
+            }
+            .padding(.horizontal, 20)
+
+            HStack {
+                Spacer()
+                Text("No account yet?")
+                    .foregroundColor(.black)
+                Button("Register") {
+                    showRegisterScreen = true
+                }
+                .foregroundColor(.blue)
+                .fullScreenCover(isPresented: $showRegisterScreen) {
+                    RegisterView()
+                }
+            }
+            .padding(.top, 20)
+            .padding(.horizontal, 20)
+
+            Spacer()
+
+            Button(action: handleLogin) {
+                Text("Log In")
+                    .font(.system(size: 18, weight: .medium))
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color(red: 90/255, green: 200/255, blue: 250/255))
+                    .foregroundColor(.white)
+                    .cornerRadius(35)
+                    .padding(.horizontal, 40)
+            }
+            .padding(.bottom, 40)
+        }
+        .background(Color.white.ignoresSafeArea())
+        .hideKeyboardOnTap()
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
 
@@ -184,7 +185,7 @@ struct Login: View {
                 if storedEmail.lowercased() == email.lowercased() && storedHashedPass == hashedInput {
                     withAnimation {
                         isLoggedIn = true
-                        UserDefaults.standard.set(document.documentID, forKey: "currentUserId") // Save user ID
+                        currentUserId = document.documentID
                     }
                     return
                 }

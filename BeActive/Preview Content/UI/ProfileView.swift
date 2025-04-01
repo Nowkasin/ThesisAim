@@ -10,6 +10,9 @@ import FirebaseFirestore
 
 struct ProfileView: View {
     @EnvironmentObject var healthData: HealthDataManager
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
+    @AppStorage("currentUserId") private var currentUserId: String = ""
+    
     @State private var localHealthStats = HealthStats.placeholder
     let db = Firestore.firestore()
     
@@ -79,8 +82,8 @@ struct ProfileView: View {
                     }
 
                     Button(action: {
-                        UserDefaults.standard.removeObject(forKey: "currentUserId")
-                        UserDefaults.standard.set(false, forKey: "isLoggedIn")
+                        currentUserId = ""
+                        isLoggedIn = false
                     }) {
                         HStack {
                             Image(systemName: "arrow.right.circle.fill")
@@ -125,12 +128,12 @@ struct ProfileView: View {
     }
 
     private func getUserDataFromFirestore() {
-        guard let userId = UserDefaults.standard.string(forKey: "currentUserId") else {
+        guard !currentUserId.isEmpty else {
             self.errorMessage = "User not logged in"
             return
         }
 
-        db.collection("users").document(userId).getDocument { document, error in
+        db.collection("users").document(currentUserId).getDocument { document, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.errorMessage = "Error: \(error.localizedDescription)"
@@ -153,6 +156,7 @@ struct ProfileView: View {
         }
     }
 }
+
 
 struct EditProfileView: View {
     @Binding var userName: String

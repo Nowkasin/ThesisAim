@@ -46,7 +46,7 @@ struct BeActiveApp: App {
         FirebaseApp.configure()
 
         // ✅ Force logout every time app starts
-        UserDefaults.standard.set(false, forKey: "isLoggedIn")
+//        UserDefaults.standard.set(false, forKey: "isLoggedIn")
     }
 
     var body: some Scene {

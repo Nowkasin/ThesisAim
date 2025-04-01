@@ -15,7 +15,6 @@
 		19BFD8182D4CC13C00AFA144 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 19BFD8172D4CC13C00AFA144 /* FirebaseFirestore */; };
 		19BFD81A2D4CC13C00AFA144 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 19BFD8192D4CC13C00AFA144 /* FirebaseStorage */; };
 		8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */; };
-		8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1C2C06D72400E0A56E /* ContentView.swift */; };
 		8E8FFA1F2C06D72600E0A56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */; };
 		8E8FFA222C06D72600E0A56E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8FFA212C06D72600E0A56E /* Preview Assets.xcassets */; };
 		8E8FFA2C2C06D72600E0A56E /* BeActiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8FFA2B2C06D72600E0A56E /* BeActiveTests.swift */; };
@@ -45,7 +44,6 @@
 		19BFD80C2D4CC07200AFA144 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8E8FFA172C06D72400E0A56E /* BeActive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeActive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E8FFA1A2C06D72400E0A56E /* BeActiveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeActiveApp.swift; sourceTree = "<group>"; };
-		8E8FFA1C2C06D72400E0A56E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8FFA212C06D72600E0A56E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8E8FFA272C06D72600E0A56E /* BeActiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeActiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,7 +124,6 @@
 			children = (
 				19BFD80C2D4CC07200AFA144 /* GoogleService-Info.plist */,
 				8E8FFA502C06E8F500E0A56E /* BeActive.entitlements */,
-				8E8FFA1C2C06D72400E0A56E /* ContentView.swift */,
 				8ED304DB2D7B2CA5005E3560 /* MainTab.swift */,
 				8E8FFA1E2C06D72600E0A56E /* Assets.xcassets */,
 				8E8FFA202C06D72600E0A56E /* Preview Content */,
@@ -300,7 +297,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E8FFA1D2C06D72400E0A56E /* ContentView.swift in Sources */,
 				8ED304DC2D7B2CA6005E3560 /* MainTab.swift in Sources */,
 				8E8FFA1B2C06D72400E0A56E /* BeActiveApp.swift in Sources */,
 			);

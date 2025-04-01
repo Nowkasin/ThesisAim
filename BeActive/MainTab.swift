@@ -39,7 +39,7 @@ struct MainTab: View {
                                 .transition(.identity) // ✅ ป้องกัน Animation ไม่ให้กระพริบ
                                 .onAppear { print("✅ ProfileView Loaded") }
                         case 2:
-                            ContentView()
+                            PainScaleView()
                                 .transition(.move(edge: .trailing))
                                 .onAppear { print("✅ ContentView Loaded") }
                         default:
@@ -75,10 +75,10 @@ struct MainTab: View {
                         }
                         .tag(1)
 
-                    ContentView()
+                    PainScaleView()
                         .tabItem {
-                            Image(systemName: "person")
-                            Text("Content")
+                            Image(systemName: "quotelevel")
+                            Text("Pain Scale")
                         }
                         .tag(2)
                 }

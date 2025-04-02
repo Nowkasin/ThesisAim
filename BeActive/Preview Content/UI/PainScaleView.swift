@@ -22,6 +22,7 @@ struct PainScaleView: View {
     @State private var footPain: Double = 0
 
     @State private var history: [PainRecord] = []
+    @State private var showHistory = false
 
     let faceScaleImageURL = URL(string: "https://i.imgur.com/TR7HwEa.png")!
 
@@ -45,10 +46,9 @@ struct PainScaleView: View {
                         image
                             .resizable()
                             .scaledToFit()
-                            .frame(maxWidth: .infinity)
                             .frame(height: 200)
-                            .clipped()
                             .padding(.horizontal)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     case .failure:
                         Image(systemName: "exclamationmark.triangle")
                             .resizable()
@@ -80,40 +80,66 @@ struct PainScaleView: View {
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 30)
+                .padding(.bottom, 10)
 
-                // 🕓 History
+                // 🕓 Toggle History Button
                 if !history.isEmpty {
-                    Text("Saved History")
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                    Button(action: {
+                        withAnimation {
+                            showHistory.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                            Text(showHistory ? "Hide History" : "Show History")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.blue)
                         .padding(.horizontal)
+                    }
+                }
 
-                    ForEach(history.reversed()) { record in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-
-                            ForEach(record.values.sorted(by: { $0.key < $1.key }), id: \.key) { part, value in
+                // 🗂️ Saved History List
+                if showHistory && !history.isEmpty {
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(history.reversed()) { record in
+                            VStack(alignment: .leading, spacing: 6) {
                                 HStack {
-                                    Text(part)
+                                    Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+
                                     Spacer()
-                                    Text("\(value)")
-                                        .bold()
+
+                                    Button(role: .destructive) {
+                                        deleteRecord(record)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                    }
+                                }
+
+                                ForEach(record.values.sorted(by: { $0.key < $1.key }), id: \.key) { part, value in
+                                    HStack {
+                                        Text(part)
+                                        Spacer()
+                                        Text("\(value)")
+                                            .bold()
+                                    }
                                 }
                             }
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                            .padding(.horizontal)
                         }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
                     }
+                    .padding(.bottom, 20)
                 }
             }
         }
     }
+
+    // MARK: - UI Components
 
     func painSlider(label: String, value: Binding<Double>) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -130,10 +156,9 @@ struct PainScaleView: View {
                     Capsule()
                         .fill(sliderColor(for: value.wrappedValue))
                         .frame(width: CGFloat(value.wrappedValue / 10) * geometry.size.width, height: 8)
-                    
-                    // Full-width transparent layer for sliding
+
                     Color.clear
-                        .contentShape(Rectangle()) // Make sure full width is tappable
+                        .contentShape(Rectangle())
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { gesture in
@@ -157,6 +182,7 @@ struct PainScaleView: View {
         .padding(.horizontal)
     }
 
+    // MARK: - Logic
 
     func sliderColor(for value: Double) -> Color {
         switch value {
@@ -187,6 +213,10 @@ struct PainScaleView: View {
         )
         history.append(newRecord)
     }
+
+    func deleteRecord(_ record: PainRecord) {
+        history.removeAll { $0.id == record.id }
+    }
 }
 
 struct PainScaleView_Previews: PreviewProvider {
@@ -194,6 +224,7 @@ struct PainScaleView_Previews: PreviewProvider {
         PainScaleView()
     }
 }
+
 
 
 

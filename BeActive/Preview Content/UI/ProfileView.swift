@@ -310,6 +310,7 @@ struct UserInfoRow: View {
 
             Text(value)
                 .foregroundColor(.gray)
+                .font(.system(size: 15)) // ปรับขนาดตรงนี้
         }
         .padding(.horizontal)
     }

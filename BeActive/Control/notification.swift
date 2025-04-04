@@ -23,20 +23,27 @@ class AlertsManager {
         self.wakeUpTime = wakeUp
         self.bedTime = bed
         self.intervalHours = interval
-        removeAllWaterAlerts()
+        removeAllNotifications()
         scheduleWaterAlerts()
     }
 
     // ✅ ตั้งค่าแจ้งเตือนให้รองรับทั้งชั่วโมง และ นาที
     public func scheduleWaterAlerts() {
-        let startHour = wakeUpTime?.hour ?? 8
+        guard let interval = intervalHours else { return }
+
+        var startHour = wakeUpTime?.hour ?? 8
         let startMinute = wakeUpTime?.minute ?? 0
+
+        // ✅ เลื่อนเวลาเริ่มต้นไปอีก 1 ชั่วโมงหลังตื่น
+        startHour += 1
+        if startHour >= 24 { startHour = 0 }
+
         let endHour = bedTime?.hour ?? 22
         let endMinute = bedTime?.minute ?? 0
-        let interval = intervalHours ?? 1
 
-        // ✅ คำนวณช่วงเวลาตามที่ผู้ใช้กำหนด
-        let notificationTimes = generateNotificationTimes(
+        // 🟡 ลบเงื่อนไขที่บล็อกกรณีข้ามวันออกไป
+
+        let notificationTimes = generateRepeatingTimes(
             startHour: startHour,
             startMinute: startMinute,
             endHour: endHour,
@@ -55,9 +62,9 @@ class AlertsManager {
 
             UNUserNotificationCenter.current().add(request) { error in
                 if let error = error {
-                    print("Error scheduling water reminder: \(error.localizedDescription)")
+                    print("❌ Error scheduling water reminder: \(error.localizedDescription)")
                 } else {
-                    print("✅ Water reminder scheduled at \(time.hour ?? 0):\(time.minute ?? 0)")
+                    print("✅ Water reminder scheduled at \(time.hour ?? 0):\(String(format: "%02d", time.minute ?? 0))")
                 }
             }
         }
@@ -66,28 +73,71 @@ class AlertsManager {
     // ✅ ฟังก์ชันสร้างช่วงเวลาการแจ้งเตือนที่รองรับทั้งชั่วโมง และ นาที
     private func generateNotificationTimes(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, interval: Int) -> [DateComponents] {
         var times: [DateComponents] = []
-        var currentHour = startHour
-        var currentMinute = startMinute
 
-        while currentHour < endHour || (currentHour == endHour && currentMinute <= endMinute) {
-            times.append(DateComponents(hour: currentHour, minute: currentMinute))
+        var current = DateComponents()
+        current.hour = startHour
+        current.minute = startMinute
 
-            // ✅ อัปเดตเวลาเพิ่มตาม interval ที่กำหนด
-            currentHour += interval
+        let calendar = Calendar.current
 
-            // ✅ ป้องกันไม่ให้เกิน endHour
-            if currentHour > endHour || (currentHour == endHour && currentMinute > endMinute) {
+        while true {
+            guard let date = calendar.date(from: current) else { break }
+            let hour = calendar.component(.hour, from: date)
+            let minute = calendar.component(.minute, from: date)
+
+            if (hour > endHour) || (hour == endHour && minute > endMinute) {
+                break
+            }
+
+            times.append(DateComponents(hour: hour, minute: minute))
+
+            // ✅ เพิ่ม interval ชั่วโมง
+            if let next = calendar.date(byAdding: .hour, value: interval, to: date) {
+                current = calendar.dateComponents([.hour, .minute], from: next)
+            } else {
                 break
             }
         }
 
         return times
     }
+    
+    private func generateRepeatingTimes(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, interval: Int) -> [DateComponents] {
+        var times: [DateComponents] = []
+
+        let calendar = Calendar.current
+        var current = DateComponents()
+        current.hour = startHour
+        current.minute = startMinute
+
+        repeat {
+            times.append(DateComponents(hour: current.hour, minute: current.minute))
+
+            // เพิ่มเวลา
+            guard let currentDate = calendar.date(from: current),
+                  let nextDate = calendar.date(byAdding: .hour, value: interval, to: currentDate) else {
+                break
+            }
+
+            current = calendar.dateComponents([.hour, .minute], from: nextDate)
+
+            // หยุดเมื่อถึงรอบสุดท้าย (ตรงกับ endHour:endMinute)
+        } while !(
+            current.hour == endHour &&
+            current.minute == endMinute
+        )
+
+        // เพิ่มรอบสุดท้ายด้วย (end time)
+        times.append(DateComponents(hour: endHour, minute: endMinute))
+
+        return times
+    }
 
     // ✅ ลบแจ้งเตือนเก่าทั้งหมดเมื่อเปลี่ยนค่า
-    private func removeAllWaterAlerts() {
+    // ใน AlertsManager.swift
+    public func removeAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        print("🗑️ All water reminders removed.")
+        print("🗑️ All notifications removed.")
     }
 
     func triggerMoveAlert() {

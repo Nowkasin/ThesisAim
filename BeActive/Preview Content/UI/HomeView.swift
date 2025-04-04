@@ -6,12 +6,26 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct HomeView: View {
     @StateObject var themeManager = ThemeManager()
     @EnvironmentObject var manager: HealthManager
-    let welcomeArray = ["Hello", "Bienvenido", "Wassup"]
-    
+
+    @AppStorage("currentUserId") private var currentUserId: String = ""
+    private let db = Firestore.firestore()
+
+    @State private var userName: String = "Welcome"
+
+    // ใช้เฉพาะชื่อแรก
+    var firstName: String {
+        userName.components(separatedBy: " ").first ?? userName
+    }
+
+    var welcomeArray: [String] {
+        [firstName, "Wassup"]
+    }
+
     @State private var currentIndex = 0
     @State private var welcomeTimer: Timer?
     @State private var showAlert = false
@@ -46,13 +60,38 @@ struct HomeView: View {
                         }
                     }
                 }
-                .onAppear { updateScreenWidth() }
+                .onAppear {
+                    updateScreenWidth()
+                    fetchUserName()
+                }
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     updateScreenWidth()
                 }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+    }
+
+    private func fetchUserName() {
+        guard !currentUserId.isEmpty else {
+            print("❌ currentUserId is empty")
+            return
+        }
+
+        db.collection("users").document(currentUserId).getDocument { document, error in
+            if let error = error {
+                print("❌ Error fetching user name: \(error.localizedDescription)")
+                return
+            }
+
+            if let document = document, let data = document.data(), let name = data["name"] as? String {
+                DispatchQueue.main.async {
+                    self.userName = name
+                }
+            } else {
+                print("❌ User document not found or name is missing")
+            }
+        }
     }
 
     // ✅ อัปเดตขนาดหน้าจอที่ใช้ เพื่อคำนวณอัตโนมัติ

@@ -39,7 +39,7 @@ struct VoucherView: View {
             VStack(spacing: 20) {
                 Text("Voucher Shop")
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
+                    .foregroundColor(Color(red: 255/255, green: 182/255, blue: 182/255))
                     .padding(.top, 40)
 
                 ForEach(vouchers) { voucher in
@@ -52,7 +52,7 @@ struct VoucherView: View {
             .padding(.bottom, 40)
             .frame(maxWidth: .infinity)
         }
-        .background(Color.white.ignoresSafeArea())
+        .background(Color(.systemBackground).ignoresSafeArea())
     }
 }
 
@@ -90,7 +90,7 @@ struct VoucherCard: View {
 
                     Text(voucher.clinic)
                         .font(.subheadline)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(.blue)
 
                     Text("\(voucher.cost) Coins")
                         .font(.subheadline)
@@ -101,7 +101,9 @@ struct VoucherCard: View {
                 Spacer()
             }
             .padding()
-            .background(Color(red: 255/255, green: 182/255, blue: 182/255)) // pink
+            .background(
+                Color(red: 255/255, green: 182/255, blue: 182/255)
+            )
             .cornerRadius(25)
         }
         .buttonStyle(PlainButtonStyle())
@@ -110,7 +112,10 @@ struct VoucherCard: View {
 
 struct VoucherView_Previews: PreviewProvider {
     static var previews: some View {
-        VoucherView()
+        Group {
+            VoucherView().preferredColorScheme(.light)
+            VoucherView().preferredColorScheme(.dark)
+        }
     }
 }
 

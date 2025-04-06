@@ -36,12 +36,10 @@ class AlertsManager {
 
         // ✅ เลื่อนเวลาเริ่มต้นไปอีก 1 ชั่วโมงหลังตื่น
         startHour += 1
-        if startHour >= 24 { startHour = 0 }
+        if startHour >= 24 { startHour = startHour % 24 }
 
         let endHour = bedTime?.hour ?? 22
         let endMinute = bedTime?.minute ?? 0
-
-        // 🟡 ลบเงื่อนไขที่บล็อกกรณีข้ามวันออกไป
 
         let notificationTimes = generateRepeatingTimes(
             startHour: startHour,
@@ -50,6 +48,11 @@ class AlertsManager {
             endMinute: endMinute,
             interval: interval
         )
+
+        if notificationTimes.isEmpty {
+            print("⚠️ ไม่พบช่วงเวลาที่เหมาะสมสำหรับแจ้งเตือน (อาจเป็นเพราะเวลาสิ้นสุดอยู่ก่อนเวลาเริ่มต้น)")
+            return
+        }
 
         for (index, time) in notificationTimes.enumerated() {
             let content = UNMutableNotificationContent()
@@ -69,6 +72,7 @@ class AlertsManager {
             }
         }
     }
+
 
     // ✅ ฟังก์ชันสร้างช่วงเวลาการแจ้งเตือนที่รองรับทั้งชั่วโมง และ นาที
     private func generateNotificationTimes(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, interval: Int) -> [DateComponents] {
@@ -106,29 +110,30 @@ class AlertsManager {
         var times: [DateComponents] = []
 
         let calendar = Calendar.current
-        var current = DateComponents()
-        current.hour = startHour
-        current.minute = startMinute
+        var current = calendar.date(from: DateComponents(hour: startHour, minute: startMinute))!
+
+        // ถ้า end อยู่ก่อน start → ข้ามวัน
+        let end = calendar.date(from: DateComponents(hour: endHour, minute: endMinute))!
+        let crossesMidnight = end <= current
 
         repeat {
-            times.append(DateComponents(hour: current.hour, minute: current.minute))
+            let components = calendar.dateComponents([.hour, .minute], from: current)
+            times.append(components)
 
-            // เพิ่มเวลา
-            guard let currentDate = calendar.date(from: current),
-                  let nextDate = calendar.date(byAdding: .hour, value: interval, to: currentDate) else {
+            guard let next = calendar.date(byAdding: .hour, value: interval, to: current) else { break }
+            current = next
+
+            // หยุดเมื่อเวลาถึงรอบถัดไปของ end (พิจารณา cross-day)
+            if !crossesMidnight && current > end {
                 break
+            } else if crossesMidnight {
+                let nextHour = calendar.component(.hour, from: current)
+                let nextMinute = calendar.component(.minute, from: current)
+                if nextHour == endHour && nextMinute > endMinute {
+                    break
+                }
             }
-
-            current = calendar.dateComponents([.hour, .minute], from: nextDate)
-
-            // หยุดเมื่อถึงรอบสุดท้าย (ตรงกับ endHour:endMinute)
-        } while !(
-            current.hour == endHour &&
-            current.minute == endMinute
-        )
-
-        // เพิ่มรอบสุดท้ายด้วย (end time)
-        times.append(DateComponents(hour: endHour, minute: endMinute))
+        } while true
 
         return times
     }

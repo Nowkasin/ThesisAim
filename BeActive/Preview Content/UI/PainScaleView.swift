@@ -29,14 +29,12 @@ struct PainScaleView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
-                // 🔠 Title
                 Text("Pain Scale")
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(Color.salmonPink)
+                    .foregroundColor(.pink)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
 
-                // 🖼️ Face image
                 AsyncImage(url: faceScaleImageURL) { phase in
                     switch phase {
                     case .empty:
@@ -82,7 +80,6 @@ struct PainScaleView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 10)
 
-                // 🕓 Toggle History Button
                 if !history.isEmpty {
                     Button(action: {
                         withAnimation {
@@ -99,7 +96,6 @@ struct PainScaleView: View {
                     }
                 }
 
-                // 🗂️ Saved History List
                 if showHistory && !history.isEmpty {
                     VStack(alignment: .leading, spacing: 16) {
                         ForEach(history.reversed()) { record in
@@ -107,7 +103,7 @@ struct PainScaleView: View {
                                 HStack {
                                     Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
                                         .font(.subheadline)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
 
                                     Spacer()
 
@@ -128,7 +124,7 @@ struct PainScaleView: View {
                                 }
                             }
                             .padding()
-                            .background(Color(.systemGray6))
+                            .background(Color(.secondarySystemBackground))
                             .cornerRadius(12)
                             .padding(.horizontal)
                         }
@@ -137,15 +133,14 @@ struct PainScaleView: View {
                 }
             }
         }
+        .background(Color(.systemBackground))
     }
-
-    // MARK: - UI Components
 
     func painSlider(label: String, value: Binding<Double>) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.system(size: 20, weight: .bold))
-                .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
+                .foregroundColor(.primary)
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
@@ -182,8 +177,6 @@ struct PainScaleView: View {
         .padding(.horizontal)
     }
 
-    // MARK: - Logic
-
     func sliderColor(for value: Double) -> Color {
         switch value {
         case 0:
@@ -191,11 +184,11 @@ struct PainScaleView: View {
         case 1...3:
             return Color.green.opacity(0.8)
         case 4...6:
-            return Color.yellow
+            return .yellow
         case 7...8:
-            return Color.orange
+            return .orange
         default:
-            return Color.red
+            return .red
         }
     }
 
@@ -221,10 +214,9 @@ struct PainScaleView: View {
 
 struct PainScaleView_Previews: PreviewProvider {
     static var previews: some View {
-        PainScaleView()
+        Group {
+            PainScaleView().preferredColorScheme(.light)
+            PainScaleView().preferredColorScheme(.dark)
+        }
     }
 }
-
-
-
-

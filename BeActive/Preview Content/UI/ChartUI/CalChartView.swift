@@ -10,7 +10,6 @@ import SwiftUI
 import Charts
 
 struct CalChartView: View {
-    @StateObject var themeManager = ThemeManager()  // ✅ ใช้ ThemeManager
     let activity: Activity
     @StateObject private var viewModel = CalorieViewModel()
     @State private var selectedRange: TimeRange = .today
@@ -25,7 +24,7 @@ struct CalChartView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding()
-            .background(themeManager.backgroundColor)  // ✅ เปลี่ยนสีพื้นหลัง Picker ตามธีม
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(8)
 
             // ✅ ข้อมูลสรุปด้านบน
@@ -33,10 +32,10 @@ struct CalChartView: View {
                 Text("\(viewModel.averageCalories, specifier: "%.0f") kcal")
                     .font(.largeTitle)
                     .bold()
-                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีตามธีม
+                    .foregroundColor(.primary)
                 Text(viewModel.dateRangeText(for: selectedRange))
                     .font(.subheadline)
-                    .foregroundColor(themeManager.textColor.opacity(0.7)) // ✅ สีอ่อนลง
+                    .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
@@ -49,7 +48,7 @@ struct CalChartView: View {
             Spacer()
         }
         .navigationTitle(activity.titleKey)
-        .background(themeManager.backgroundColor) // ✅ เปลี่ยนพื้นหลังของ View ตามธีม
+        .background(Color(.systemBackground))
         .onAppear {
             viewModel.fetchCalories(for: selectedRange)
         }
@@ -69,7 +68,7 @@ struct CalChartView: View {
     ]
 }
 
-// 🔍 Preview ใช้ Activity จำลอง และต้องสร้าง ViewModel เพื่อส่งเข้าไป
+// 🔍 Preview
 #Preview {
     CalChartView(
         activity: Activity(

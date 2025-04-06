@@ -9,11 +9,10 @@ import SwiftUI
 import Charts
 
 struct HeartRateGraph: View {
-    @StateObject var themeManager = ThemeManager() // ✅ ใช้งาน ThemeManager
     @ObservedObject var viewModel: HeartRateViewModel
     var timeRange: TimeRange
 
-    @State private var selectedData: HeartRateData? // ✅ ใช้ Struct แทน Tuple
+    @State private var selectedData: HeartRateData?
     @State private var tooltipXPosition: CGFloat = .zero
     @State private var showTooltip: Bool = false
 
@@ -34,7 +33,7 @@ struct HeartRateGraph: View {
                                 x: .value("Time", entry.time, unit: xAxisUnit()),
                                 y: .value("BPM", entry.bpm)
                             )
-                            .foregroundStyle(Color.red)
+                            .foregroundStyle(.red)
                             .interpolationMethod(.catmullRom)
                         }
                     }
@@ -64,11 +63,7 @@ struct HeartRateGraph: View {
                         )
                 }
                 .chartYAxis {
-                    AxisMarks(position: .leading) {
-                        AxisGridLine()
-                        AxisTick()
-                        AxisValueLabel()
-                    }
+                    AxisMarks(position: .leading)
                 }
                 .chartXAxis {
                     AxisMarks {
@@ -77,7 +72,11 @@ struct HeartRateGraph: View {
                 }
                 .frame(height: 250)
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(themeManager.backgroundColor))
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(.systemBackground))
+                        .shadow(radius: 2)
+                )
                 .animation(.easeInOut(duration: 0.3), value: data)
 
                 if showTooltip, let selected = selectedData {
@@ -85,9 +84,13 @@ struct HeartRateGraph: View {
                         Text("\(Int(selected.bpm)) BPM")
                             .font(.headline)
                             .bold()
-                            .foregroundColor(themeManager.textColor)
+                            .foregroundColor(.primary)
                             .padding(8)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(.systemBackground))
+                                    .shadow(radius: 5)
+                            )
                             .offset(x: tooltipXPosition - geo.size.width / 2, y: -120)
                     }
                 }
@@ -114,7 +117,8 @@ struct HeartRateGraph: View {
     }
 }
 
-// ✅ ตัวอย่าง Preview
+// ✅ Preview
 #Preview {
     HeartRateGraph(viewModel: HeartRateViewModel(), timeRange: .today)
 }
+

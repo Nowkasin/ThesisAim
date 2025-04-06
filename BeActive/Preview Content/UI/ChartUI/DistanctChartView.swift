@@ -9,10 +9,9 @@ import SwiftUI
 import Charts
 
 struct DistanceChartView: View {
-    @StateObject var themeManager = ThemeManager() // ✅ ใช้ ThemeManager
     let activity: Activity
-    @StateObject private var viewModel = DistanceViewModel() // ✅ ใช้ ViewModel ดึงข้อมูลระยะทาง
-    @State private var selectedRange: TimeRange = .month // ✅ ค่าเริ่มต้นเป็นรายเดือน
+    @StateObject private var viewModel = DistanceViewModel()
+    @State private var selectedRange: TimeRange = .month
 
     var body: some View {
         VStack {
@@ -30,10 +29,11 @@ struct DistanceChartView: View {
                 Text("\(viewModel.averageDistance, specifier: "%.2f") กม.")
                     .font(.largeTitle)
                     .bold()
-                    .foregroundColor(themeManager.textColor)
+                    .foregroundColor(.primary)
+
                 Text(viewModel.dateRangeText(for: selectedRange))
                     .font(.subheadline)
-                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีข้อความจาก ThemeManager
+                    .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
@@ -46,7 +46,7 @@ struct DistanceChartView: View {
             Spacer()
         }
         .navigationTitle(activity.titleKey)
-        .background(themeManager.backgroundColor) // ✅ ตั้งค่าพื้นหลังของหน้าทั้งหมด
+        .background(Color(.systemBackground))
         .onAppear {
             viewModel.fetchDistance(for: selectedRange)
         }

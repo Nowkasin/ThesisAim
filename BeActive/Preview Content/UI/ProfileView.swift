@@ -29,7 +29,7 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGray6).edgesIgnoringSafeArea(.all)
+            Color(.systemBackground).edgesIgnoringSafeArea(.all)
 
             ScrollView {
                 VStack(spacing: 20) {
@@ -46,7 +46,7 @@ struct ProfileView: View {
                         }
                         .foregroundColor(.primary)
                         .padding(10)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
+                        .background(Color(.systemBackground))
                         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         .padding(.horizontal)
                     }
@@ -287,7 +287,11 @@ struct InfoCard<Content: View>: View {
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 15).fill(Color.white).shadow(radius: 3))
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color(.secondarySystemBackground))
+                .shadow(radius: 3)
+        )
         .padding(.horizontal)
     }
 }
@@ -305,11 +309,12 @@ struct UserInfoRow: View {
 
             Text(title)
                 .fontWeight(.medium)
+                .foregroundColor(.primary)
 
             Spacer()
 
             Text(value)
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
                 .font(.system(size: 15)) // ปรับขนาดตรงนี้
         }
         .padding(.horizontal)
@@ -339,7 +344,7 @@ struct HealthStatView: View {
             Spacer()
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(10)
     }
 }
@@ -379,8 +384,16 @@ struct LabeledNumberField: View {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView()
-            .environmentObject(HealthDataManager())
+        Group {
+            ProfileView()
+                .environmentObject(HealthDataManager())
+                .preferredColorScheme(.light)
+
+            ProfileView()
+                .environmentObject(HealthDataManager())
+                .preferredColorScheme(.dark)
+        }
     }
 }
+
 

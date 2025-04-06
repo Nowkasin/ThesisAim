@@ -8,75 +8,72 @@
 import SwiftUI
 
 struct SwitchLang: View {
-    @StateObject var themeManager = ThemeManager()  // ใช้ @StateObject เพื่อให้ ThemeManager ถูกสร้างครั้งเดียว // เพิ่มการเข้าถึง themeManager
-    @Binding var isShowing: Bool // ใช้ Binding เพื่อควบคุมการแสดงผล
-    @ObservedObject var language = Language.shared // เชื่อมต่อกับ Singleton
-    
+    @Binding var isShowing: Bool
+    @ObservedObject var language = Language.shared
+
     var body: some View {
         ZStack {
-            themeManager.backgroundColor // ใช้ backgroundColor จาก themeManager
+            Color(.systemBackground)
                 .edgesIgnoringSafeArea(.vertical)
                 .shadow(radius: 5)
-            
+
             VStack {
                 HStack {
                     Text(t("Select Language", in: "Language_screen"))
                         .font(.system(size: 20))
                         .fontWeight(.bold)
-                        .foregroundColor(themeManager.textColor)
-                    
+                        .foregroundColor(.primary)
+
                     Spacer()
-                    
+
                     Button(action: {
                         withAnimation(.easeInOut(duration: 1)) {
-                            isShowing = false // ปิดหน้า UILang
+                            isShowing = false
                         }
                     }) {
                         Image(systemName: "xmark")
                             .font(.title)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 .padding()
-                
+
                 Spacer()
-                
-                // ปุ่มเปลี่ยนเป็นภาษาไทย
+
                 Button(action: {
                     language.setLanguage("th")
-                    isShowing = false // ปิดหน้าภาษาเมื่อเลือก
+                    isShowing = false
                 }) {
                     Text("ภาษาไทย")
                         .font(.body)
-                        .foregroundColor(themeManager.textColor) // ใช้ textColor จาก themeManager
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(language.currentLanguage == "th" ? Color.blue : Color.gray)
+                        .background(language.currentLanguage == "th" ? Color.blue : Color.gray.opacity(0.3))
                         .cornerRadius(10)
                 }
-                .padding()
-                
-                // ปุ่มเปลี่ยนเป็นภาษาอังกฤษ
+                .padding(.horizontal)
+
                 Button(action: {
                     language.setLanguage("en")
-                    isShowing = false // ปิดหน้าภาษาเมื่อเลือก
+                    isShowing = false
                 }) {
                     Text("English")
                         .font(.body)
-                        .foregroundColor(themeManager.textColor) // ใช้ textColor จาก themeManager
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(language.currentLanguage == "en" ? Color.blue : Color.gray)
+                        .background(language.currentLanguage == "en" ? Color.blue : Color.gray.opacity(0.3))
                         .cornerRadius(10)
                 }
-                .padding()
-                
+                .padding(.horizontal)
+
                 Spacer()
             }
             .frame(maxWidth: .infinity)
-            .opacity(isShowing ? 1 : 0) // ใช้ opacity เพื่อการแอนิเมชัน
-            .offset(y: isShowing ? 0 : UIScreen.main.bounds.height) // ใช้ offset เพื่อเลื่อนจากด้านล่าง
-            .animation(.easeInOut(duration: 1), value: isShowing) // แอนิเมชันเมื่อ isShowing เปลี่ยน
+            .opacity(isShowing ? 1 : 0)
+            .offset(y: isShowing ? 0 : UIScreen.main.bounds.height)
+            .animation(.easeInOut(duration: 1), value: isShowing)
         }
     }
 }

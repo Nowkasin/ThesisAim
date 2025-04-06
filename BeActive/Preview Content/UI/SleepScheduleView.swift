@@ -16,6 +16,7 @@ struct SleepSchedule: Identifiable, Codable {
     let savedDate: Date
 }
 
+
 struct SleepScheduleView: View {
     @State private var wakeUpTime = Date()
     @State private var bedTime = Date()
@@ -29,105 +30,105 @@ struct SleepScheduleView: View {
 
     @State private var savedSchedules: [SleepSchedule] = []
 
-    let alertsManager = AlertsManager()
-    @Environment(\.presentationMode) private var presentationMode
+    var alertsManager = AlertsManager()
+    @Environment(\.presentationMode) var presentationMode
 
-    private let storageKey = "savedSleepSchedules"
+    let storageKey = "savedSleepSchedules"
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 16) {
-                Text("ตั้งค่าเวลาตื่น & เวลานอน")
-                    .font(.title)
-                    .bold()
+            VStack(spacing: 24) {
+                Text("กำหนดเวลาตื่นและนอน")
+                    .font(.title2)
+                    .fontWeight(.semibold)
                     .padding(.top)
 
-                scheduleForm
-                saveButton
-                historyList
+                VStack(spacing: 16) {
+                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "เวลาตื่น", selection: $wakeUpTime)
+                    timePickerRow(icon: "moon.fill", color: .purple, label: "เวลานอน", selection: $bedTime)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(16)
+                .padding(.horizontal)
+
+                Button(action: saveSettings) {
+                    Text(hasSetSleepSchedule ? "ตั้งเวลาแล้ว" : "บันทึกเวลา")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(hasSetSleepSchedule ? Color.gray.opacity(0.4) : Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .font(.headline)
+                        .padding(.horizontal)
+                }
+                .disabled(hasSetSleepSchedule)
+
+                if !savedSchedules.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("ประวัติการตั้งเวลา")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .padding(.horizontal)
+
+                        List {
+                            ForEach(savedSchedules.sorted { $0.savedDate > $1.savedDate }) { schedule in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("⏰ \(formattedTime(hour: schedule.wakeUpHour, minute: schedule.wakeUpMinute)) | 🌙 \(formattedTime(hour: schedule.bedHour, minute: schedule.bedMinute))")
+                                        .fontWeight(.medium)
+                                    Text("บันทึกเมื่อ \(formattedDate(schedule.savedDate))")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                            .onDelete(perform: deleteHistorySchedule)
+                        }
+                        .frame(height: 220)
+                        .listStyle(PlainListStyle())
+                    }
+                }
 
                 Spacer()
             }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .onAppear(perform: loadSchedules)
-            .background(Color(.systemGroupedBackground))
-            .navigationBarItems(
-                leading: Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.gray)
-                }
-            )
-        }
-    }
-
-    private var scheduleForm: some View {
-        Form {
-            Section(header: Text("⏰ เวลาตื่น").font(.headline)) {
-                HStack {
-                    Image(systemName: "sunrise.fill")
-                        .foregroundColor(.orange)
-                    DatePicker("เลือกเวลาตื่น", selection: $wakeUpTime, displayedComponents: .hourAndMinute)
-                        .labelsHidden()
-                }
-            }
-            Section(header: Text("🌙 เวลานอน").font(.headline)) {
-                HStack {
-                    Image(systemName: "moon.fill")
-                        .foregroundColor(.purple)
-                    DatePicker("เลือกเวลานอน", selection: $bedTime, displayedComponents: .hourAndMinute)
-                        .labelsHidden()
-                }
-            }
-        }
-        .cornerRadius(10)
-        .padding(.horizontal)
-    }
-
-    private var saveButton: some View {
-        Button(action: {
-            if hasSetSleepSchedule {
-                print("⚠️ ผู้ใช้ต้องลบเวลาที่ตั้งไว้ก่อน ถึงจะสามารถตั้งใหม่ได้")
-            } else {
-                saveSettings()
-            }
-        }) {
-            HStack {
-                Image(systemName: "checkmark.circle.fill")
-                Text("บันทึก")
-                    .bold()
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(hasSetSleepSchedule ? Color.gray : Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.horizontal)
-        }
-        .disabled(hasSetSleepSchedule)
-    }
-
-    private var historyList: some View {
-        Group {
-            if !savedSchedules.isEmpty {
-                List {
-                    Section(header: Text("📝 ประวัติการตั้งเวลา")) {
-                        ForEach(savedSchedules.sorted(by: { $0.savedDate > $1.savedDate })) { schedule in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("⏰ \(formattedTime(hour: schedule.wakeUpHour, minute: schedule.wakeUpMinute)) | 🌙 \(formattedTime(hour: schedule.bedHour, minute: schedule.bedMinute))")
-                                Text("บันทึกเมื่อ \(formattedDate(schedule.savedDate))")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                        .onDelete(perform: deleteHistorySchedule)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.gray)
                     }
                 }
-                .frame(height: 250)
             }
         }
     }
 
-    private func saveSettings() {
+    // MARK: - Subview for Time Picker
+    func timePickerRow(icon: String, color: Color, label: String, selection: Binding<Date>) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .foregroundColor(color)
+                .frame(width: 28)
+            VStack(alignment: .leading) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                DatePicker("", selection: selection, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+            }
+        }
+        .padding(.vertical, 6)
+    }
+
+    // MARK: - Other functions (ไม่เปลี่ยน)
+    func saveSettings() {
+        guard !hasSetSleepSchedule else {
+            print("⚠️ ผู้ใช้ตั้งเวลาไว้แล้ว ต้องลบก่อนถึงจะตั้งใหม่ได้")
+            return
+        }
+
         let calendar = Calendar.current
         let wakeUpComponents = calendar.dateComponents([.hour, .minute], from: wakeUpTime)
         let bedTimeComponents = calendar.dateComponents([.hour, .minute], from: bedTime)
@@ -166,7 +167,7 @@ struct SleepScheduleView: View {
         presentationMode.wrappedValue.dismiss()
     }
 
-    private func deleteHistorySchedule(at offsets: IndexSet) {
+    func deleteHistorySchedule(at offsets: IndexSet) {
         savedSchedules.remove(atOffsets: offsets)
         saveSchedulesToStorage()
 
@@ -188,14 +189,19 @@ struct SleepScheduleView: View {
         }
     }
 
-    private func loadSchedules() {
+    func loadSchedules() {
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode([SleepSchedule].self, from: data) {
             savedSchedules = decoded
 
             if let latest = savedSchedules.sorted(by: { $0.savedDate > $1.savedDate }).first {
-                let wakeUp = DateComponents(hour: latest.wakeUpHour, minute: latest.wakeUpMinute)
-                let bed = DateComponents(hour: latest.bedHour, minute: latest.bedMinute)
+                var wakeUp = DateComponents()
+                wakeUp.hour = latest.wakeUpHour
+                wakeUp.minute = latest.wakeUpMinute
+
+                var bed = DateComponents()
+                bed.hour = latest.bedHour
+                bed.minute = latest.bedMinute
 
                 alertsManager.setWakeUpAndBedTime(
                     wakeUp: wakeUp,
@@ -215,31 +221,30 @@ struct SleepScheduleView: View {
         }
     }
 
-    private func saveSchedulesToStorage() {
+    func saveSchedulesToStorage() {
         if let encoded = try? JSONEncoder().encode(savedSchedules) {
             UserDefaults.standard.set(encoded, forKey: storageKey)
         }
     }
 
-    private func formattedTime(hour: Int, minute: Int) -> String {
-        let calendar = Calendar.current
+    func formattedTime(hour: Int, minute: Int) -> String {
         let dateComponents = DateComponents(hour: hour, minute: minute)
-        guard let date = calendar.date(from: dateComponents) else {
-            return "\(hour):\(String(format: "%02d", minute))"
+        let calendar = Calendar.current
+        if let date = calendar.date(from: dateComponents) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            return formatter.string(from: date)
         }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: date)
+        return "\(hour):\(String(format: "%02d", minute))"
     }
 
-    private func formattedDate(_ date: Date) -> String {
+    func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
 }
-
 struct SleepScheduleView_Previews: PreviewProvider {
     static var previews: some View {
         SleepScheduleView()

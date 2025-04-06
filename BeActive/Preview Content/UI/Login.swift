@@ -17,7 +17,7 @@ struct SplashScreen: View {
 
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
 
             AsyncImage(url: imageUrl) { phase in
                 switch phase {
@@ -64,7 +64,6 @@ struct SplashScreen: View {
 }
 
 struct Login: View {
-    @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
     @AppStorage("currentUserId") private var currentUserId: String = ""
 
@@ -101,14 +100,14 @@ struct Login: View {
 
             Text("Log In")
                 .font(.system(size: 36, weight: .bold))
-                .foregroundColor(Color(red: 47/255, green: 69/255, blue: 109/255))
+                .foregroundColor(.primary)
                 .padding(.leading, 20)
                 .padding(.bottom, 40)
 
             VStack(alignment: .leading) {
                 TextField("E-mail Address", text: $email)
                     .padding(.bottom, 10)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 Rectangle()
                     .frame(height: 1)
                     .foregroundColor(.gray.opacity(0.5))
@@ -128,7 +127,7 @@ struct Login: View {
             HStack {
                 Spacer()
                 Text("No account yet?")
-                    .foregroundColor(.black)
+                    .foregroundColor(.secondary)
                 Button("Register") {
                     showRegisterScreen = true
                 }
@@ -146,14 +145,14 @@ struct Login: View {
                 Text("Log In")
                     .font(.system(size: 18, weight: .medium))
                     .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color(red: 90/255, green: 200/255, blue: 250/255))
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .cornerRadius(35)
                     .padding(.horizontal, 40)
             }
             .padding(.bottom, 40)
         }
-        .background(Color.white.ignoresSafeArea())
+        .background(Color(.systemBackground).ignoresSafeArea())
         .hideKeyboardOnTap()
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
@@ -214,9 +213,8 @@ extension View {
 struct Login_Previews: PreviewProvider {
     static var previews: some View {
         Login()
-            .environmentObject(ThemeManager())
             .environmentObject(HealthManager())
-            .environmentObject(ScoreManager())
+            .environmentObject(ScoreManager.shared)
     }
 }
 

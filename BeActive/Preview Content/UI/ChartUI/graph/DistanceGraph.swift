@@ -9,14 +9,13 @@ import SwiftUI
 import Charts
 
 struct DistanceGraph: View {
-    @StateObject var themeManager = ThemeManager() // ✅ ใช้งาน ThemeManager
-    var data: [DistanceData] // ✅ ใช้ DistanceData แทน Tuple เพื่อความสม่ำเสมอ
-    @State private var selectedData: DistanceData? // ✅ เก็บค่าที่ถูกเลือก
-    @State private var tooltipXPosition: CGFloat = .zero // ✅ เก็บตำแหน่ง X ของ Tooltip
-    @State private var showTooltip: Bool = false // ✅ ควบคุมการแสดง Tooltip
+    var data: [DistanceData]
+    @State private var selectedData: DistanceData?
+    @State private var tooltipXPosition: CGFloat = .zero
+    @State private var showTooltip: Bool = false
 
     var body: some View {
-        GeometryReader { geo in // ✅ ใช้ GeometryReader ครอบทั้งหมด
+        GeometryReader { geo in
             ZStack {
                 Chart {
                     ForEach(data) { entry in
@@ -24,7 +23,7 @@ struct DistanceGraph: View {
                             x: .value("Time", entry.time),
                             y: .value("Distance", entry.distance)
                         )
-                        .foregroundStyle(entry.time.isSameHour(as: Date()) ? Color.red : Color.blue) // ✅ ใช้สีแดงสำหรับแท่งปัจจุบัน
+                        .foregroundStyle(entry.time.isSameHour(as: Date()) ? Color.red : Color.blue)
                     }
                 }
                 .chartOverlay { proxy in
@@ -36,10 +35,12 @@ struct DistanceGraph: View {
                                 .onChanged { value in
                                     let position = value.location
                                     if let xDate: Date = proxy.value(atX: position.x) {
-                                        if let matchedData = data.first(where: { Calendar.current.isDate($0.time, equalTo: xDate, toGranularity: .hour) }) {
+                                        if let matchedData = data.first(where: {
+                                            Calendar.current.isDate($0.time, equalTo: xDate, toGranularity: .hour)
+                                        }) {
                                             selectedData = matchedData
                                             if let barPositionX = proxy.position(forX: xDate) {
-                                                tooltipXPosition = barPositionX // ✅ ให้ Tooltip อยู่ตรงกลาง Bar
+                                                tooltipXPosition = barPositionX
                                             }
                                             showTooltip = true
                                         }
@@ -47,38 +48,37 @@ struct DistanceGraph: View {
                                 }
                                 .onEnded { _ in
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                        showTooltip = false // ✅ ซ่อน Tooltip หลังจาก 1 วินาที
+                                        showTooltip = false
                                     }
                                 }
                         )
                 }
                 .chartYAxis {
-                    AxisMarks(position: .leading) {
-                        AxisGridLine()
-                        AxisTick()
-                        AxisValueLabel()
-                    }
+                    AxisMarks(position: .leading)
                 }
                 .chartXAxis {
                     AxisMarks {
-                        AxisValueLabel(format: .dateTime.hour().minute()) // ✅ แสดงเวลาเป็น ชั่วโมง:นาที
+                        AxisValueLabel(format: .dateTime.hour().minute())
                     }
                 }
                 .frame(height: 250)
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(themeManager.backgroundColor)) // ✅ เปลี่ยนพื้นหลังกราฟตามธีม
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemBackground)))
                 .animation(.easeInOut(duration: 0.3), value: data)
 
-                // ✅ Tooltip ที่อยู่ตรงกลางของแท่งกราฟ
                 if showTooltip, let selected = selectedData {
                     VStack {
                         Text("\(String(format: "%.2f", selected.distance)) กม.")
                             .font(.headline)
                             .bold()
-                            .foregroundColor(themeManager.textColor) // ✅ เปลี่ยนสีตัวอักษรของ Tooltip ตามธีม
+                            .foregroundColor(.primary)
                             .padding(8)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
-                            .offset(x: tooltipXPosition - geo.size.width / 2, y: -120) // ✅ อยู่ตรงกลางแท่งกราฟ
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(.systemBackground))
+                                    .shadow(radius: 5)
+                            )
+                            .offset(x: tooltipXPosition - geo.size.width / 2, y: -120)
                     }
                 }
             }
@@ -89,8 +89,7 @@ struct DistanceGraph: View {
 // ✅ ฟังก์ชันตรวจสอบว่าชั่วโมงเดียวกันหรือไม่
 extension Date {
     func isSameHour(as otherDate: Date) -> Bool {
-        let calendar = Calendar.current
-        return calendar.isDate(self, equalTo: otherDate, toGranularity: .hour)
+        Calendar.current.isDate(self, equalTo: otherDate, toGranularity: .hour)
     }
 }
 
@@ -102,6 +101,6 @@ extension Date {
         DistanceData(time: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, distance: 1.8),
         DistanceData(time: Calendar.current.date(byAdding: .hour, value: -2, to: Date())!, distance: 3.0),
         DistanceData(time: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, distance: 2.6),
-        DistanceData(time: Date(), distance: 3.5) // 🔥 ชั่วโมงปัจจุบันเป็นสีแดง
+        DistanceData(time: Date(), distance: 3.5)
     ])
 }

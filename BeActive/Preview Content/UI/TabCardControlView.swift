@@ -10,20 +10,22 @@ import SwiftUI
 struct TabCardControlView: View {
     @EnvironmentObject var healthManager: HealthManager
     @EnvironmentObject var scoreManager: ScoreManager
-    var textColor: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            // Header: Today Activities and Score (ไม่มี background สีใดๆ)
+            // Header: Today Activities and Score
             HStack {
                 Text(t("Today Activities", in: "home_screen"))
                     .font(.headline)
-                    .foregroundColor(textColor)
+                    .foregroundColor(.primary)
                     .padding(.leading, 20)
+
                 Spacer()
-                ScoreView() // เรียกใช้ ScoreView ที่แยกออกมาแล้ว
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+
+                ScoreView()
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
+
             // Horizontal ScrollView สำหรับ Activity Cards
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -32,9 +34,6 @@ struct TabCardControlView: View {
                             ActivityCard(activity: item.value)
                                 .frame(width: 200, height: 180)
                         }
-//                        .onAppear {
-//                            print("📌 Loading ActivityCard for: \(item.value.titleKey)")
-//                        }
                     }
                 }
                 .padding(.horizontal)
@@ -42,14 +41,14 @@ struct TabCardControlView: View {
             .padding(.top, 10)
         }
     }
-    
+
     private func destinationView(for activity: Activity) -> some View {
         let titleKey = activity.titleKey.lowercased()
         let todayHeartRateKey = t("Today Heart Rate", in: "Chart_screen").lowercased()
         let todayStepsKey = t("Today Steps", in: "Chart_screen").lowercased()
         let todayCalKey = t("Today Calories", in: "Chart_screen").lowercased()
         let todayDistanceKey = t("Today's Distance", in: "Chart_screen").lowercased()
-        
+
         if titleKey == todayHeartRateKey {
             return AnyView(HeartChartView(activity: activity))
         } else if titleKey == todayStepsKey {
@@ -63,11 +62,11 @@ struct TabCardControlView: View {
         }
     }
 }
+
 struct TabCardControlView_Previews: PreviewProvider {
     static var previews: some View {
-        TabCardControlView(textColor: .primary)
+        TabCardControlView()
             .environmentObject(HealthManager())
             .environmentObject(ScoreManager.shared)
     }
 }
-

@@ -17,37 +17,36 @@ struct Exercise: Identifiable {
 }
 
 struct ExerciseView: View {
-    @StateObject var themeManager = ThemeManager() // ใช้ ThemeManager
     @Environment(\.presentationMode) var presentationMode
+
     @State private var exercises: [Exercise] = [
-        Exercise(title: t("Back Exercise", in: "Ex_screen"), duration: "10 " + t("Minutes", in: "Ex_screen"), videoURL: "https://youtu.be/4BYVwq2wv0Q?si=wfvsQSPgxiIz4Ldj", isFavorite: false),
+        Exercise(title: t("Back Exercise", in: "Ex_screen"), duration: "10 " + t("Minutes", in: "Ex_screen"), videoURL: "https://youtu.be/4BYVwq2wv0Q", isFavorite: false),
         Exercise(title: t("Neck Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/neck-exercise", isFavorite: false),
         Exercise(title: t("Arm Exercise", in: "Ex_screen"), duration: "7 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/arm-exercise", isFavorite: false),
         Exercise(title: t("Shoulder Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/shoulder-exercise", isFavorite: false)
     ]
-    
+
     @State private var selectedURL: IdentifiableURL?
-    
+
     var body: some View {
         ZStack {
-            themeManager.backgroundColor
+            Color(.systemBackground)
                 .edgesIgnoringSafeArea(.all)
-            
+
             ScrollView {
                 VStack(alignment: .leading, spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 20)) {
                     HStack {
                         Button(action: {
-                            presentationMode.wrappedValue.dismiss() // ปิดหน้าจอเมื่อกด
+                            presentationMode.wrappedValue.dismiss()
                         }) {
                             HStack {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 20)))
-                                    .foregroundColor(.blue)
                                 Text(t("Back", in: "Ex_screen"))
-                                    .foregroundColor(.blue)
                                     .fontWeight(.semibold)
                                     .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 18)))
                             }
+                            .foregroundColor(.blue)
                         }
                         .padding(.leading, DeviceHelper.adaptivePadding())
 
@@ -58,7 +57,7 @@ struct ExerciseView: View {
                         .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 34), weight: .bold))
                         .foregroundColor(.purple)
                         .padding(.horizontal, DeviceHelper.adaptivePadding())
-                    
+
                     Text(t("Recommended for you", in: "Ex_screen"))
                         .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 20), weight: .medium))
                         .foregroundColor(.blue)
@@ -68,7 +67,7 @@ struct ExerciseView: View {
 
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 35)) {
                         ForEach($exercises) { $exercise in
-                            ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, themeManager: themeManager)
+                            ExerciseCard(exercise: $exercise, selectedURL: $selectedURL)
                         }
                     }
                     .padding(.horizontal, DeviceHelper.adaptivePadding())
@@ -81,7 +80,7 @@ struct ExerciseView: View {
                     VStack(spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 15)) {
                         ForEach(0..<4) { _ in
                             RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 15))
-                                .fill(themeManager.textColor.opacity(0.2))
+                                .fill(Color.primary.opacity(0.1))
                                 .frame(height: DeviceHelper.adaptiveFrameSize(baseSize: 100))
                                 .onTapGesture {
                                     print("Go to Tips")
@@ -92,30 +91,30 @@ struct ExerciseView: View {
                 }
                 .padding(.bottom, DeviceHelper.adaptiveSpacing(baseSpacing: 20))
             }
-            .background(themeManager.backgroundColor)
+            .background(Color(.systemBackground))
             .sheet(item: $selectedURL) { identifiableURL in
                 SafariView(url: identifiableURL.url)
             }
         }
-        .navigationBarHidden(true) // ซ่อน navigation bar
+        .navigationBarHidden(true)
     }
 }
+
 
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
     @Binding var selectedURL: IdentifiableURL?
-    var themeManager: ThemeManager
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 15))
-                .fill(themeManager.textColor.opacity(0.2))
+                .fill(Color(.secondarySystemBackground))
 
             VStack {
                 HStack {
                     Spacer()
                     Image(systemName: exercise.isFavorite ? "star.fill" : "star")
-                        .foregroundColor(exercise.isFavorite ? Color.yellow : Color.purple)
+                        .foregroundColor(exercise.isFavorite ? Color.yellow : .purple)
                         .padding()
                         .onTapGesture {
                             exercise.isFavorite.toggle()
@@ -125,22 +124,23 @@ struct ExerciseCard: View {
                 Spacer()
 
                 RoundedRectangle(cornerRadius: 0)
-                    .fill(themeManager.textColor.opacity(0.8))
+                    .fill(Color.purple.opacity(0.8))
                     .frame(height: DeviceHelper.adaptiveFrameSize(baseSize: 50))
 
                 HStack {
                     VStack(alignment: .leading) {
                         Text(exercise.title)
                             .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 18), weight: .semibold))
-                            .foregroundColor(.purple)
+                            .foregroundColor(.white)
                         Text(exercise.duration)
                             .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 16)))
-                            .foregroundColor(themeManager.backgroundColor)
+                            .foregroundColor(.white.opacity(0.9))
                     }
+
                     Spacer()
 
                     Image(systemName: "play.circle.fill")
-                        .foregroundColor(themeManager.textColor)
+                        .foregroundColor(.white)
                         .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 22)))
                 }
                 .padding(.horizontal, DeviceHelper.adaptivePadding())
@@ -156,6 +156,7 @@ struct ExerciseCard: View {
         }
     }
 }
+
 
 // SafariView to open links inside the app
 struct SafariView: UIViewControllerRepresentable {

@@ -55,12 +55,12 @@ struct BeActiveApp: App {
                 MainTab()
                     .environmentObject(ScoreManager.shared)
                     .environmentObject(HealthManager())
-                    .environmentObject(ThemeManager())
+                    
             } else {
                 Login()
                     .environmentObject(ScoreManager.shared)
                     .environmentObject(HealthManager())
-                    .environmentObject(ThemeManager())
+                    
             }
         }
     }

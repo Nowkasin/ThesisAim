@@ -177,7 +177,6 @@ struct ScheduleItem: Codable, Identifiable {
 }
 
 struct WaterView: View {
-    @StateObject var themeManager = ThemeManager()
     @AppStorage("waterIntake") private var waterIntake = 0
     @AppStorage("scheduleData") private var scheduleData: Data?
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String?
@@ -198,10 +197,10 @@ struct WaterView: View {
     var body: some View {
         GeometryReader { geometry in
             let isIpad = geometry.size.width > 600
-            
+
             NavigationView {
                 VStack {
-                    // Header Section
+                    // Header
                     VStack(spacing: isIpad ? 16 : 8) {
                         Text("น้ำที่ต้องดื่ม")
                             .font(.system(size: isIpad ? 44 : 34, weight: .bold))
@@ -209,14 +208,14 @@ struct WaterView: View {
 
                         Text("อย่าลืมดื่มน้ำ!")
                             .font(.system(size: isIpad ? 22 : 18))
-                            .foregroundColor(themeManager.textColor)
+                            .foregroundColor(.primary)
                     }
                     .multilineTextAlignment(.center)
                     .padding(.vertical, isIpad ? 20 : 10)
 
                     Spacer()
 
-                    // Water Level Section
+                    // Water Circle
                     ZStack {
                         Circle()
                             .stroke(lineWidth: isIpad ? 15 : 10)
@@ -233,7 +232,7 @@ struct WaterView: View {
                             Text("\(waterIntake) / \(totalWaterIntake)")
                                 .font(.system(size: isIpad ? 22 : 18))
                                 .fontWeight(.semibold)
-                                .foregroundColor(themeManager.textColor)
+                                .foregroundColor(.primary)
 
                             Image(systemName: "drop.circle.fill")
                                 .resizable()
@@ -245,20 +244,21 @@ struct WaterView: View {
 
                     Spacer()
 
-                    // Water Schedule Section
+                    // Schedule
                     VStack(alignment: .leading, spacing: isIpad ? 12 : 8) {
                         ForEach(schedule) { item in
                             HStack {
                                 Image(systemName: "clock.fill")
                                     .foregroundColor(.blue)
+
                                 Text(item.time)
                                     .font(.system(size: isIpad ? 22 : 18, weight: .semibold))
-                                    .foregroundColor(themeManager.textColor)
+                                    .foregroundColor(.primary)
 
                                 Spacer()
 
                                 Text("\(item.amount) mi")
-                                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                                    .foregroundColor(.secondary)
                                     .font(.system(size: isIpad ? 18 : 16))
 
                                 Button(action: {
@@ -267,7 +267,7 @@ struct WaterView: View {
                                     Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
                                         .resizable()
                                         .frame(width: isIpad ? 30 : 24, height: isIpad ? 30 : 24)
-                                        .foregroundColor(item.completed ? .green : themeManager.textColor.opacity(0.7))
+                                        .foregroundColor(item.completed ? .green : .secondary)
                                 }
                             }
                             .padding(.vertical, isIpad ? 8 : 5)
@@ -277,7 +277,7 @@ struct WaterView: View {
 
                     Spacer()
 
-                    // Simulate New Day Button
+                    // Simulate New Day
                     Button(action: simulateNewDay) {
                         Text("Simulate New Day")
                             .font(.headline)
@@ -290,8 +290,9 @@ struct WaterView: View {
                     .padding()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(themeManager.backgroundColor)
-                .alert(isPresented: $showCongratulations) { // ✅ แจ้งเตือนเมื่อดื่มน้ำครบ
+                .background(Color(.systemBackground))
+                .onAppear(perform: checkForNewDay)
+                .alert(isPresented: $showCongratulations) {
                     Alert(
                         title: Text("Congratulations!"),
                         message: Text("You have completed your daily water schedule!"),
@@ -323,20 +324,19 @@ struct WaterView: View {
 
     private func saveSchedule() {
         do {
-            let encodedSchedule = try JSONEncoder().encode(schedule)
-            scheduleData = encodedSchedule
+            let encoded = try JSONEncoder().encode(schedule)
+            scheduleData = encoded
         } catch {
-            print("Failed to save schedule: \(error)")
+            print("❌ Failed to save schedule: \(error)")
         }
     }
 
     private func loadSchedule() {
-        guard let savedData = scheduleData else { return }
+        guard let data = scheduleData else { return }
         do {
-            let decodedSchedule = try JSONDecoder().decode([ScheduleItem].self, from: savedData)
-            schedule = decodedSchedule
+            schedule = try JSONDecoder().decode([ScheduleItem].self, from: data)
         } catch {
-            print("Failed to load schedule: \(error)")
+            print("❌ Failed to load schedule: \(error)")
         }
     }
 
@@ -350,6 +350,8 @@ struct WaterView: View {
             schedule = schedule.map { ScheduleItem(time: $0.time, amount: $0.amount, completed: false) }
             saveSchedule()
             lastOpenedDate = today
+        } else {
+            loadSchedule()
         }
     }
 
@@ -358,13 +360,14 @@ struct WaterView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         lastOpenedDate = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
         healthManager.waterScore = 0
-        print("Water score reset to 0 for the new day.")
         checkForNewDay()
     }
 }
+
 
 #Preview {
     WaterView()
         .environmentObject(ScoreManager.shared)
         .environmentObject(HealthManager())
+        .preferredColorScheme(.dark)
 }

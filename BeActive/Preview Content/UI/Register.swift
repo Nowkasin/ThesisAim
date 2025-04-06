@@ -278,8 +278,6 @@ import FirebaseFirestore
 import CryptoKit
 
 struct RegisterView: View {
-    @EnvironmentObject var themeManager: ThemeManager
-
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -304,7 +302,7 @@ struct RegisterView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Register")
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color(red: 60/255, green: 60/255, blue: 90/255))
+                            .foregroundColor(.primary)
                             .padding(.top, 40)
                             .padding(.bottom, 30)
 
@@ -335,7 +333,7 @@ struct RegisterView: View {
                             Text("Sign Up")
                                 .font(.system(size: 18, weight: .medium))
                                 .frame(maxWidth: .infinity, minHeight: 50)
-                                .background(Color(red: 90/255, green: 200/255, blue: 250/255))
+                                .background(Color.accentColor)
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                         }
@@ -358,6 +356,7 @@ struct RegisterView: View {
                 .ignoresSafeArea(.keyboard)
                 .dismissKeyboardOnTap()
             }
+            .background(Color(.systemBackground))
             .alert("Registration Successful", isPresented: $showSuccessAlert) {
                 Button("OK") {
                     showLoginScreen = true
@@ -492,7 +491,7 @@ struct SexPickerView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Sex")
                 .font(.system(size: 16))
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
 
             Menu {
                 ForEach(sexOptions, id: \.self) { option in
@@ -540,7 +539,9 @@ struct DismissKeyboardOnTap: ViewModifier {
 // MARK: - Preview
 struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
-        RegisterView()
-            .environmentObject(ThemeManager())
+        Group {
+            RegisterView().preferredColorScheme(.light)
+            RegisterView().preferredColorScheme(.dark)
+        }
     }
 }

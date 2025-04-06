@@ -9,7 +9,6 @@ import SwiftUI
 import FirebaseFirestore
 
 struct HomeView: View {
-    @StateObject var themeManager = ThemeManager()
     @EnvironmentObject var manager: HealthManager
 
     @AppStorage("currentUserId") private var currentUserId: String = ""
@@ -17,7 +16,6 @@ struct HomeView: View {
 
     @State private var userName: String = "Welcome"
 
-    // ใช้เฉพาะชื่อแรก
     var firstName: String {
         userName.components(separatedBy: " ").first ?? userName
     }
@@ -51,7 +49,7 @@ struct HomeView: View {
 
                             SettingsView(isShowing: $isShowingSettings)
                                 .frame(width: geometry.size.width * 0.5, height: geometry.size.height * 0.85)
-                                .background(Color.white)
+                                .background(Color(.systemBackground))
                                 .cornerRadius(15)
                                 .shadow(radius: 5)
                                 .transition(.move(edge: .trailing))
@@ -94,43 +92,42 @@ struct HomeView: View {
         }
     }
 
-    // ✅ อัปเดตขนาดหน้าจอที่ใช้ เพื่อคำนวณอัตโนมัติ
     func updateScreenWidth() {
         screenWidth = UIScreen.main.bounds.width
     }
 
     func buildHomeContent() -> some View {
-           ZStack {
-               themeManager.backgroundColor
-                   .ignoresSafeArea()
+        ZStack {
+            Color(.systemBackground)
+                .ignoresSafeArea()
 
-               VStack(alignment: .leading) {
-                   buildHeader()
+            VStack(alignment: .leading) {
+                buildHeader()
 
-                   Text(getFormattedDate())
-                       .font(.system(size: 16))
-                       .foregroundColor(getDayColor())
-                       .padding(.horizontal)
+                Text(getFormattedDate())
+                    .font(.system(size: 16))
+                    .foregroundColor(getDayColor())
+                    .padding(.horizontal)
 
-                   Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
+                Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
 
-                   TabCardControlView(textColor: themeManager.textColor)
-                       .environmentObject(manager)
+                TabCardControlView()
+                    .environmentObject(manager)
 
-                   Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
+                Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
 
-                   buildReminders()
-               }
-               .onAppear { requestNotificationPermission() }
-           }
-           .frame(maxWidth: .infinity, maxHeight: .infinity)
-       }
+                buildReminders()
+            }
+            .onAppear { requestNotificationPermission() }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
 
     func buildHeader() -> some View {
         HStack {
             Text("Hey \(welcomeArray[currentIndex])")
                 .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 32), weight: .bold))
-                .foregroundColor(themeManager.textColor)
+                .foregroundColor(.primary)
                 .onAppear { startWelcomeTimer() }
 
             Spacer()
@@ -140,10 +137,9 @@ struct HomeView: View {
                     isShowingSettings.toggle()
                 }
             }) {
-                // ปุ่มขีด 3 ขีด
                 Image(systemName: "line.3.horizontal")
                     .font(.title2)
-                    .foregroundColor(themeManager.textColor)
+                    .foregroundColor(.primary)
             }
         }
         .padding(.horizontal)
@@ -154,32 +150,32 @@ struct HomeView: View {
         VStack(alignment: .leading) {
             Text(t("Reminders", in: "home_screen"))
                 .font(.headline)
-                .foregroundColor(themeManager.textColor)
+                .foregroundColor(.primary)
                 .padding(.horizontal)
                 .padding(.bottom, 5)
 
             ScrollView {
                 VStack(spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 15)) {
-                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .jasmineYellow, icon: Image(systemName: "exclamationmark.bubble.fill"), textColor: themeManager.textColor)
+                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .jasmineYellow, icon: Image(systemName: "exclamationmark.bubble.fill"))
                         .navigate(to: TaskView())
-                    
-                    // แปลภาษาให้ด้วย
-                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .tropicalPurple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"), textColor: themeManager.textColor)
+
+                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .tropicalPurple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"))
                         .navigate(to: ExerciseView())
-                    
-                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"), textColor: themeManager.textColor)
+
+                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"))
                         .navigate(to: WaterView())
-                    
-                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .salmonPink, icon: Image(systemName: "ticket.fill"), textColor: themeManager.textColor)
+
+                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .salmonPink, icon: Image(systemName: "ticket.fill"))
                         .navigate(to: VoucherView())
-                    
-                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .magicMint, icon: Image(systemName: "cart"), textColor: themeManager.textColor)
+
+                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .magicMint, icon: Image(systemName: "cart"))
                         .navigate(to: MatesView())
                 }
             }
             .padding(.horizontal)
         }
     }
+
     func startWelcomeTimer() {
         welcomeTimer?.invalidate()
         welcomeTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
@@ -188,11 +184,11 @@ struct HomeView: View {
             }
         }
     }
-    
+
     func dynamicPadding(for width: CGFloat) -> CGFloat {
         return width > 600 ? 40 : 20
     }
-    
+
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if let error = error {
@@ -202,38 +198,35 @@ struct HomeView: View {
             }
         }
     }
-    //แก้ไขเวลา
+
     func getFormattedDate() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: Language.shared.currentLanguage == "th" ? "th_TH" : "en_US") // เปลี่ยน locale ตามภาษา
-        dateFormatter.dateFormat = "EEEE" // เอาเฉพาะชื่อวันก่อน
-        let dayName = dateFormatter.string(from: Date()) // ได้ค่าเป็น "Monday" หรือ "วันจันทร์"
-        
-        // ใช้ t() เพื่อแปลชื่อวัน
+        dateFormatter.locale = Locale(identifier: Language.shared.currentLanguage == "th" ? "th_TH" : "en_US")
+        dateFormatter.dateFormat = "EEEE"
+        let dayName = dateFormatter.string(from: Date())
         let translatedDayName = t(dayName, in: "Date")
-        
-        // ฟอร์แมตวันที่
+
         dateFormatter.dateFormat = "dd/MM/yyyy"
         let dateString = dateFormatter.string(from: Date())
-        
+
         return "\(translatedDayName) - \(dateString)"
     }
-    
+
     func getDayColor() -> Color {
         let colors: [Color] = [.red, .yellow, .pink, .green, .orange, .blue, .purple]
         let weekday = Calendar.current.component(.weekday, from: Date()) - 1
         return colors[weekday]
     }
-    
+
     func triggerNotification(message: String) {
         let content = UNMutableNotificationContent()
         content.title = (t("Time to Move!", in: "home_screen"))
         content.body = message
         content.sound = .default
-        
+
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-        
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error triggering notification: \(error.localizedDescription)")
@@ -246,8 +239,7 @@ struct ReminderSection: View {
     var title: String
     var color: Color
     var icon: Image
-    var textColor: Color
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -256,11 +248,11 @@ struct ReminderSection: View {
                     .font(.system(size: 20))
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(textColor)
+                    .foregroundColor(.primary)
             }
             .padding(.horizontal)
             .padding(.bottom, 5)
-            
+
             ReminderCard(color: color)
         }
     }
@@ -268,7 +260,7 @@ struct ReminderSection: View {
 
 struct ReminderCard: View {
     var color: Color
-    
+
     var body: some View {
         RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 12))
             .fill(color)

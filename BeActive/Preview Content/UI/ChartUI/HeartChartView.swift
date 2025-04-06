@@ -9,10 +9,9 @@ import SwiftUI
 import Charts
 
 struct HeartChartView: View {
-    @StateObject var themeManager = ThemeManager()  // ✅ ใช้ ThemeManager
     let activity: Activity
     @StateObject private var viewModel = HeartRateViewModel()
-    @State private var selectedRange: TimeRange = .today  // ✅ ค่าเริ่มต้นเป็นวันนี้
+    @State private var selectedRange: TimeRange = .today
 
     var body: some View {
         VStack {
@@ -24,7 +23,7 @@ struct HeartChartView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding()
-            .background(themeManager.backgroundColor)  // ✅ เปลี่ยนสีพื้นหลัง Picker ตามธีม
+            .background(Color(.systemBackground))
             .cornerRadius(8)
 
             // ✅ ข้อมูลสรุปด้านบน
@@ -32,13 +31,15 @@ struct HeartChartView: View {
                 Text("\(Int(viewModel.heartRateRange.min)) - \(Int(viewModel.heartRateRange.max)) BPM")
                     .font(.largeTitle)
                     .bold()
-                    .foregroundColor(themeManager.textColor) // ✅ ใช้สีตามธีม
+                    .foregroundColor(.primary)
+
                 Text("Avg: \(Int(viewModel.averageBPM)) BPM")
                     .font(.headline)
-                    .foregroundColor(themeManager.textColor.opacity(0.8))
+                    .foregroundColor(.primary)
+
                 Text(viewModel.dateRangeText(for: selectedRange))
                     .font(.subheadline)
-                    .foregroundColor(themeManager.textColor.opacity(0.7)) // ✅ สีอ่อนลง
+                    .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
@@ -51,7 +52,7 @@ struct HeartChartView: View {
             Spacer()
         }
         .navigationTitle(activity.titleKey)
-        .background(themeManager.backgroundColor) // ✅ เปลี่ยนพื้นหลังของ View ตามธีม
+        .background(Color(.systemBackground))
         .onAppear {
             viewModel.fetchHeartRate(for: selectedRange)
         }
@@ -61,7 +62,6 @@ struct HeartChartView: View {
     }
 }
 
-// ✅ Preview
 #Preview {
     HeartChartView(
         activity: Activity(

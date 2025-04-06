@@ -8,95 +8,95 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject var themeManager = ThemeManager()
     @Binding var isShowing: Bool
     @State private var showLanguageView = false
-    @State private var showSleepScheduleView = false // ✅ ใช้เปิดหน้า SleepScheduleView
+    @State private var showSleepScheduleView = false
 
-    // ✅ อัปเดตลิงก์ Google Drive (ต้องเป็นไฟล์ที่แชร์สาธารณะ)
     let pdfURL = URL(string: "https://drive.google.com/drive/u/0/my-drive")!
 
     var body: some View {
         ZStack {
-            themeManager.backgroundColor
+            Color(.systemBackground)
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack {
                 // Title และปุ่มปิด
                 HStack {
                     Text(t("Settings", in: "Setting_screen"))
                         .font(.title)
                         .fontWeight(.bold)
-                        .foregroundColor(themeManager.textColor)
-                    
+                        .foregroundColor(.primary)
+
                     Spacer()
-                    
+
                     Button(action: {
                         withAnimation(.easeInOut(duration: 1)) {
-                            isShowing = false // ปิด SettingsView
+                            isShowing = false
                         }
                     }) {
                         Image(systemName: "xmark")
                             .font(.title)
-                            .foregroundColor(themeManager.textColor)
+                            .foregroundColor(.primary)
                     }
                 }
                 .padding()
-                
-                // ✅ ปุ่มเปลี่ยนภาษา
+
+                // ปุ่มเปลี่ยนภาษา
                 settingButton(icon: "globe", title: t("Language", in: "Setting_screen")) {
                     withAnimation {
                         showLanguageView = true
                     }
                 }
-                
-                // ✅ ปุ่มแจ้งเตือนน้ำ (Water Notification)
+
+                // ปุ่มแจ้งเตือนน้ำ
                 settingButton(icon: "bell", title: t("Water Notification", in: "Setting_screen")) {
                     withAnimation {
-                        showSleepScheduleView = true // ✅ เปิดหน้า SleepScheduleView
+                        showSleepScheduleView = true
                     }
                 }
                 .fullScreenCover(isPresented: $showSleepScheduleView) {
-                    SleepScheduleView() // ✅ เปิดแบบเต็มจอ
+                    SleepScheduleView()
                 }
-                
-                Spacer() // ✅ เพิ่ม Spacer เพื่อให้ปุ่ม book อยู่ล่างสุด
 
-                // ✅ ปุ่มเปิดไฟล์ PDF (อยู่ล่างสุด)
+                Spacer()
+
+                // ปุ่มเปิดไฟล์ PDF
                 settingButton(icon: "book", title: t("How to use", in: "Setting_screen")) {
                     UIApplication.shared.open(pdfURL)
                 }
-                .padding(.bottom, 20) // ✅ เพิ่ม padding เพื่อให้ปุ่มไม่ติดขอบล่าง
+                .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity)
             .opacity(isShowing ? 1 : 0)
             .offset(y: isShowing ? 0 : UIScreen.main.bounds.height)
             .animation(.easeInOut(duration: 1), value: isShowing)
-            
-            // ✅ แสดงหน้าภาษาแบบ overlay
+
             if showLanguageView {
                 SwitchLang(isShowing: $showLanguageView)
             }
         }
     }
 
-    // ✅ ฟังก์ชันสร้างปุ่ม Setting
+    // ปุ่ม Setting
     func settingButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundColor(themeManager.textColor)
-                
+                    .foregroundColor(.primary)
+
                 Text(title)
                     .font(.body)
-                    .foregroundColor(themeManager.textColor)
-                
+                    .foregroundColor(.primary)
+
                 Spacer()
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.2)))
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray.opacity(0.2))
+            )
             .padding(.horizontal)
         }
     }
@@ -105,4 +105,5 @@ struct SettingsView: View {
 #Preview {
     @Previewable @State var isShowingSettings = true
     return SettingsView(isShowing: $isShowingSettings)
+        .preferredColorScheme(.dark)
 }

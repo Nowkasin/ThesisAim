@@ -9,13 +9,12 @@ import SwiftUI
 import Charts
 
 struct CalGraph: View {
-    @StateObject var themeManager = ThemeManager() // ✅ ใช้งาน ThemeManager
-    var data: [CalorieData]  // ✅ ใช้ `CalorieData` แทน Tuple
+    var data: [CalorieData]
     var timeRange: TimeRange
 
-    @State private var selectedData: CalorieData? // ✅ เก็บค่าที่ถูกเลือก
-    @State private var tooltipXPosition: CGFloat = .zero // ✅ เก็บตำแหน่ง X ของ Tooltip
-    @State private var showTooltip: Bool = false // ✅ ควบคุมการแสดง Tooltip
+    @State private var selectedData: CalorieData?
+    @State private var tooltipXPosition: CGFloat = .zero
+    @State private var showTooltip: Bool = false
 
     var body: some View {
         GeometryReader { geo in
@@ -62,11 +61,7 @@ struct CalGraph: View {
                         )
                 }
                 .chartYAxis {
-                    AxisMarks(position: .leading) {
-                        AxisGridLine()
-                        AxisTick()
-                        AxisValueLabel()
-                    }
+                    AxisMarks(position: .leading)
                 }
                 .chartXAxis {
                     AxisMarks {
@@ -75,7 +70,10 @@ struct CalGraph: View {
                 }
                 .frame(height: 250)
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(themeManager.backgroundColor))
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(.systemBackground))
+                )
                 .animation(.easeInOut(duration: 0.3), value: data)
 
                 if showTooltip, let selected = selectedData {
@@ -83,9 +81,13 @@ struct CalGraph: View {
                         Text("\(Int(selected.calories)) แคลอรี่")
                             .font(.headline)
                             .bold()
-                            .foregroundColor(themeManager.textColor)
+                            .foregroundColor(.primary)
                             .padding(8)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white).shadow(radius: 5))
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(.systemBackground))
+                                    .shadow(radius: 5)
+                            )
                             .offset(x: tooltipXPosition - geo.size.width / 2, y: -120)
                     }
                 }
@@ -112,7 +114,7 @@ struct CalGraph: View {
     }
 }
 
-// ✅ Mock Data สำหรับ Preview
+// ✅ ตัวอย่างข้อมูลสำหรับ Preview
 extension CalGraph {
     static let sampleData: [CalorieData] = [
         CalorieData(time: Date().addingTimeInterval(-3600 * 5), calories: 200),
@@ -124,7 +126,6 @@ extension CalGraph {
     ]
 }
 
-// ✅ ตัวอย่าง Preview
 #Preview {
     CalGraph(data: CalGraph.sampleData, timeRange: .today)
 }

@@ -40,6 +40,7 @@ import Firebase
 @main
 struct BeActiveApp: App {
     @StateObject var manager = HealthManager()
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @AppStorage("isLoggedIn") private var isLoggedIn = false
 
     init() {

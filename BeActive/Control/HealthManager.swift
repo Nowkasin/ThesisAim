@@ -297,7 +297,7 @@ class HealthManager: ObservableObject {
 
     // ✅ ฟังก์ชันตรวจสอบ Heart Rate
     private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
-        let isHeartRateHigh = heartRate >= 90
+        let isHeartRateHigh = heartRate >= 120
         let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
 
         print("🔍 Checking Heart Rate Warning...")

@@ -12,34 +12,41 @@ struct TabCardControlView: View {
     @EnvironmentObject var scoreManager: ScoreManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            // Header: Today Activities and Score
-            HStack {
-                Text(t("Today Activities", in: "home_screen"))
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                    .padding(.leading, 20)
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
+            let cardWidth = min(screenWidth * 0.45, 200) // Responsive but capped
+            let cardHeight = cardWidth * 0.9 // Maintain ratio
 
-                Spacer()
+            VStack(alignment: .leading, spacing: 5) {
+                // Header: Today Activities and Score
+                HStack {
+                    Text(t("Today Activities", in: "home_screen"))
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        .padding(.leading, 20)
 
-                ScoreView()
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
+                    Spacer()
 
-            // Horizontal ScrollView สำหรับ Activity Cards
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(healthManager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                        NavigationLink(destination: destinationView(for: item.value)) {
-                            ActivityCard(activity: item.value)
-                                .frame(width: 200, height: 180)
+                    ScoreView()
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+
+                // Horizontal ScrollView สำหรับ Activity Cards
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(healthManager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
+                            NavigationLink(destination: destinationView(for: item.value)) {
+                                ActivityCard(activity: item.value)
+                                    .frame(width: cardWidth, height: cardHeight)
+                            }
                         }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+                .padding(.top, 10)
             }
-            .padding(.top, 10)
         }
+        .frame(height: 220) // Prevent GeometryReader from expanding indefinitely
     }
 
     private func destinationView(for activity: Activity) -> some View {
@@ -68,5 +75,7 @@ struct TabCardControlView_Previews: PreviewProvider {
         TabCardControlView()
             .environmentObject(HealthManager())
             .environmentObject(ScoreManager.shared)
+            .previewLayout(.sizeThatFits)
+            .padding()
     }
 }

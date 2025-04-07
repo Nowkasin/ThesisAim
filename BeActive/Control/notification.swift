@@ -7,18 +7,15 @@
 
 import Foundation
 import UserNotifications
-import AudioToolbox
 
 class AlertsManager {
     var isWaterAlertActive = false
     var isAlertActive = false
     var isHeartRateAlertActive = false
-    var soundID: SystemSoundID = 1005
     var wakeUpTime: DateComponents? // เวลาตื่นที่ user กำหนด
     var bedTime: DateComponents? // เวลานอนที่ user กำหนด
     var intervalHours: Int? // ความถี่ในการแจ้งเตือน
 
-    // ✅ ตั้งค่าเวลาตื่น-นอน (ถ้าผู้ใช้ไม่ตั้งค่า จะใช้ค่าเริ่มต้นค่าเริ่มต้นคือเริ่มตอน 8 โมง จนถึง 4 ทุ่ม)
     func setWakeUpAndBedTime(wakeUp: DateComponents?, bed: DateComponents?, interval: Int?) {
         self.wakeUpTime = wakeUp
         self.bedTime = bed
@@ -27,14 +24,12 @@ class AlertsManager {
         scheduleWaterAlerts()
     }
 
-    // ✅ ตั้งค่าแจ้งเตือนให้รองรับทั้งชั่วโมง และ นาที
     public func scheduleWaterAlerts() {
         guard let interval = intervalHours else { return }
 
         var startHour = wakeUpTime?.hour ?? 8
         let startMinute = wakeUpTime?.minute ?? 0
 
-        // ✅ เลื่อนเวลาเริ่มต้นไปอีก 1 ชั่วโมงหลังตื่น
         startHour += 1
         if startHour >= 24 { startHour = startHour % 24 }
 
@@ -73,8 +68,6 @@ class AlertsManager {
         }
     }
 
-
-    // ✅ ฟังก์ชันสร้างช่วงเวลาการแจ้งเตือนที่รองรับทั้งชั่วโมง และ นาที
     private func generateNotificationTimes(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, interval: Int) -> [DateComponents] {
         var times: [DateComponents] = []
 
@@ -95,7 +88,6 @@ class AlertsManager {
 
             times.append(DateComponents(hour: hour, minute: minute))
 
-            // ✅ เพิ่ม interval ชั่วโมง
             if let next = calendar.date(byAdding: .hour, value: interval, to: date) {
                 current = calendar.dateComponents([.hour, .minute], from: next)
             } else {
@@ -105,14 +97,13 @@ class AlertsManager {
 
         return times
     }
-    
+
     private func generateRepeatingTimes(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, interval: Int) -> [DateComponents] {
         var times: [DateComponents] = []
 
         let calendar = Calendar.current
         var current = calendar.date(from: DateComponents(hour: startHour, minute: startMinute))!
 
-        // ถ้า end อยู่ก่อน start → ข้ามวัน
         let end = calendar.date(from: DateComponents(hour: endHour, minute: endMinute))!
         let crossesMidnight = end <= current
 
@@ -123,7 +114,6 @@ class AlertsManager {
             guard let next = calendar.date(byAdding: .hour, value: interval, to: current) else { break }
             current = next
 
-            // หยุดเมื่อเวลาถึงรอบถัดไปของ end (พิจารณา cross-day)
             if !crossesMidnight && current > end {
                 break
             } else if crossesMidnight {
@@ -138,8 +128,6 @@ class AlertsManager {
         return times
     }
 
-    // ✅ ลบแจ้งเตือนเก่าทั้งหมดเมื่อเปลี่ยนค่า
-    // ใน AlertsManager.swift
     public func removeAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         print("🗑️ All notifications removed.")
@@ -152,7 +140,7 @@ class AlertsManager {
             content.body = "คุณนั่งนานเกิน 1 ชั่วโมง ลุกขึ้นเดินได้แล้ว!"
             content.sound = .default
 
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true) // ✅ แจ้งเตือนทุก 1 ชั่วโมง
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true)
             let request = UNNotificationRequest(identifier: "moveReminder", content: content, trigger: trigger)
 
             UNUserNotificationCenter.current().add(request) { error in
@@ -183,29 +171,19 @@ class AlertsManager {
         content.body = "หัวใจของคุณเต้นเร็วเกินไปโดยไม่มีการเคลื่อนไหว โปรดพักหรือตรวจสอบสุขภาพของคุณ"
         content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
         let request = UNNotificationRequest(identifier: "heartRateAlert_\(UUID().uuidString)", content: content, trigger: trigger)
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("❌ Error triggering heart rate alert: \(error.localizedDescription)")
             } else {
-                print("✅ Heart rate alert scheduled successfully")
-                self.playSystemAlarm()
+                print("✅ Heart rate alert (with banner + sound) scheduled immediately")
             }
         }
 
         scheduleNextHeartRateAlertAfterDelay()
-    }
-
-    func playSystemAlarm() {
-        print("🔊 Playing System Sound 1005 (Alarm)")
-        AudioServicesPlaySystemSound(soundID)
-    }
-
-    func stopSystemAlarm() {
-        print("🔇 Stopping System Sound 1005 (Alarm)")
-        AudioServicesDisposeSystemSoundID(soundID)
     }
 
     private func scheduleNextHeartRateAlertAfterDelay() {
@@ -214,7 +192,6 @@ class AlertsManager {
         DispatchQueue.main.asyncAfter(deadline: .now() + 90) {
             self.isHeartRateAlertActive = false
             print("✅ 90 seconds passed, isHeartRateAlertActive set to false")
-            self.stopSystemAlarm()
         }
     }
 }

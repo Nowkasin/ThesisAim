@@ -30,7 +30,6 @@ struct MatesView: View {
     ]
 
     init() {
-        // 💡 Force nav bar to be transparent to remove white background
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = .clear
@@ -43,7 +42,7 @@ struct MatesView: View {
             VStack(spacing: 20) {
                 Text("Mates Shop")
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(Color(red: 178/255, green: 255/255, blue: 237/255))
+                    .foregroundColor(.primary)
                     .padding(.top, 40)
 
                 LazyVGrid(columns: columns, spacing: 20) {
@@ -58,7 +57,7 @@ struct MatesView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .background(Color.white.ignoresSafeArea()) // ✅ no white top corner
+        .background(Color(.systemBackground).ignoresSafeArea())
     }
 }
 
@@ -94,12 +93,12 @@ struct MateCard: View {
 
                 Text(mate.name)
                     .font(.headline)
-                    .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
+                    .foregroundColor(.black)
 
                 Text("\(mate.cost) Coins")
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
+                    .foregroundColor(.black)
             }
             .frame(maxWidth: .infinity)
             .padding()
@@ -113,9 +112,8 @@ struct MateCard: View {
 struct MatesView_Previews: PreviewProvider {
     static var previews: some View {
         MatesView()
+            .preferredColorScheme(.light) // ลองแสดงใน Light Mode
+        MatesView()
+            .preferredColorScheme(.dark)  // ลองแสดงใน Dark Mode
     }
 }
-
-
-
-

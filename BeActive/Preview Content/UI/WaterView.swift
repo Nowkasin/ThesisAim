@@ -378,13 +378,30 @@ struct WaterView: View {
         if lastOpenedDate == nil || lastOpenedDate != today {
             waterIntake = 0
             scoreGivenToday = false
+
+            #if targetEnvironment(simulator)
+            // ✅ Load default schedule when running on simulator
+            schedule = [
+                ScheduleItem(time: "09:30", amount: 500, completed: false),
+                ScheduleItem(time: "11:30", amount: 500, completed: false),
+                ScheduleItem(time: "13:30", amount: 500, completed: false),
+                ScheduleItem(time: "15:30", amount: 500, completed: false),
+                ScheduleItem(time: "17:30", amount: 100, completed: false)
+            ]
+            customTotalIntake = 2100
+            storedTotalIntake = 2100
+            #else
+            // 🧠 On device: just reset completions
             schedule = schedule.map { ScheduleItem(time: $0.time, amount: $0.amount, completed: false) }
+            #endif
+
             saveSchedule()
             lastOpenedDate = today
         } else {
             loadSchedule()
         }
     }
+
 
     private func simulateNewDay() {
         let formatter = DateFormatter()
@@ -486,5 +503,4 @@ struct ScheduleSettingsSheet: View {
     WaterView()
         .environmentObject(ScoreManager.shared)
         .environmentObject(HealthManager())
-        .preferredColorScheme(.dark)
 }

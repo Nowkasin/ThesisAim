@@ -31,8 +31,6 @@ struct PainScaleView: View {
     @State private var recordToDelete: PainRecord?
     @State private var showDeleteAlert = false
 
-    let faceScaleImageURL = URL(string: "https://i.imgur.com/TR7HwEa.png")!
-
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
@@ -42,29 +40,13 @@ struct PainScaleView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
 
-                AsyncImage(url: faceScaleImageURL) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(height: 200)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .padding(.horizontal)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    case .failure:
-                        Image(systemName: "exclamationmark.triangle")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .foregroundColor(.red)
-                            .padding(.horizontal)
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
+                // ✅ Local image from assets
+                Image("PainScale")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 300)
+                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity, alignment: .center)
 
                 // 🧍 Sliders
                 painSlider(label: "Head", value: $headPain)
@@ -293,5 +275,6 @@ struct PainScaleView_Previews: PreviewProvider {
         }
     }
 }
+
 
 

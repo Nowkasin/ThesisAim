@@ -166,13 +166,12 @@
 //}
 
 
-// Simulate New Day
 import SwiftUI
 
 struct ScheduleItem: Codable, Identifiable {
     let id = UUID()
-    let time: String
-    let amount: Int
+    var time: String
+    var amount: Int
     var completed: Bool
 }
 
@@ -180,118 +179,141 @@ struct WaterView: View {
     @AppStorage("waterIntake") private var waterIntake = 0
     @AppStorage("scheduleData") private var scheduleData: Data?
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String?
+    @AppStorage("totalWaterIntake") private var storedTotalIntake: Int = 2100
+    @AppStorage("scoreGivenToday") private var scoreGivenToday: Bool = false
 
     @EnvironmentObject var healthManager: HealthManager
     @EnvironmentObject var scoreManager: ScoreManager
 
-    private let totalWaterIntake = 2100
-    @State private var schedule: [ScheduleItem] = [
-        ScheduleItem(time: "09:30", amount: 500, completed: false),
-        ScheduleItem(time: "11:30", amount: 500, completed: false),
-        ScheduleItem(time: "13:30", amount: 500, completed: false),
-        ScheduleItem(time: "15:30", amount: 500, completed: false),
-        ScheduleItem(time: "17:30", amount: 100, completed: false),
-    ]
+    @State private var schedule: [ScheduleItem] = []
+    @State private var customTotalIntake: Int = 2100
     @State private var showCongratulations = false
+    @State private var showingPopup = false
+
+    @State private var selectedTime = Date()
+    @State private var selectedAmount = 250
+
+    private var totalWaterIntake: Int { customTotalIntake }
 
     var body: some View {
         GeometryReader { geometry in
-            let isIpad = geometry.size.width > 600
-
             NavigationView {
-                VStack {
-                    // Header
-                    VStack(spacing: isIpad ? 16 : 8) {
-                        Text("น้ำที่ต้องดื่ม")
-                            .font(.system(size: isIpad ? 44 : 34, weight: .bold))
-                            .foregroundColor(.blue)
-
-                        Text("อย่าลืมดื่มน้ำ!")
-                            .font(.system(size: isIpad ? 22 : 18))
-                            .foregroundColor(.primary)
-                    }
-                    .multilineTextAlignment(.center)
-                    .padding(.vertical, isIpad ? 20 : 10)
-
-                    Spacer()
-
-                    // Water Circle
-                    ZStack {
-                        Circle()
-                            .stroke(lineWidth: isIpad ? 15 : 10)
-                            .foregroundColor(.blue.opacity(0.3))
-
-                        Circle()
-                            .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
-                            .stroke(style: StrokeStyle(lineWidth: isIpad ? 15 : 10, lineCap: .round))
-                            .foregroundColor(.blue)
-                            .rotationEffect(.degrees(-90))
-                            .animation(.easeInOut, value: waterIntake)
-
-                        VStack {
-                            Text("\(waterIntake) / \(totalWaterIntake)")
-                                .font(.system(size: isIpad ? 22 : 18))
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-
-                            Image(systemName: "drop.circle.fill")
-                                .resizable()
-                                .frame(width: isIpad ? 50 : 40, height: isIpad ? 50 : 40)
+                ScrollView {
+                    VStack {
+                        // Header
+                        VStack(spacing: 16) {
+                            Text("น้ำที่ต้องดื่ม")
+                                .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.blue)
+
+                            Text("อย่าลืมดื่มน้ำ!")
+                                .font(.system(size: 18))
+                                .foregroundColor(.primary)
                         }
-                    }
-                    .frame(width: isIpad ? 300 : 200, height: isIpad ? 300 : 200)
+                        .multilineTextAlignment(.center)
+                        .padding(.top)
 
-                    Spacer()
+                        // Water Circle
+                        ZStack {
+                            Circle()
+                                .stroke(lineWidth: 10)
+                                .foregroundColor(.blue.opacity(0.3))
 
-                    // Schedule
-                    VStack(alignment: .leading, spacing: isIpad ? 12 : 8) {
-                        ForEach(schedule) { item in
-                            HStack {
-                                Image(systemName: "clock.fill")
-                                    .foregroundColor(.blue)
+                            Circle()
+                                .trim(from: 0.0, to: CGFloat(Double(waterIntake) / Double(totalWaterIntake)))
+                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                                .foregroundColor(.blue)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.easeInOut, value: waterIntake)
 
-                                Text(item.time)
-                                    .font(.system(size: isIpad ? 22 : 18, weight: .semibold))
+                            VStack {
+                                Text("\(waterIntake) / \(totalWaterIntake) ml")
+                                    .font(.system(size: 18))
+                                    .fontWeight(.semibold)
                                     .foregroundColor(.primary)
 
-                                Spacer()
-
-                                Text("\(item.amount) mi")
-                                    .foregroundColor(.secondary)
-                                    .font(.system(size: isIpad ? 18 : 16))
-
-                                Button(action: {
-                                    toggleCompletion(for: item)
-                                }) {
-                                    Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
-                                        .resizable()
-                                        .frame(width: isIpad ? 30 : 24, height: isIpad ? 30 : 24)
-                                        .foregroundColor(item.completed ? .green : .secondary)
-                                }
+                                Image(systemName: "drop.circle.fill")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(.blue)
                             }
-                            .padding(.vertical, isIpad ? 8 : 5)
                         }
-                    }
-                    .padding()
+                        .frame(width: 200, height: 200)
+                        .padding()
 
-                    Spacer()
+                        // Schedule List
+                        VStack(spacing: 12) {
+                            ForEach(schedule) { item in
+                                HStack {
+                                    Text(item.time)
+                                        .font(.system(size: 18, weight: .medium))
+                                    Spacer()
+                                    Text("\(item.amount) ml")
+                                        .foregroundColor(.gray)
+                                    Button(action: {
+                                        toggleCompletion(for: item)
+                                    }) {
+                                        Image(systemName: item.completed ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(item.completed ? .green : .gray)
+                                    }
+                                    .disabled(scoreGivenToday)
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.horizontal)
 
-                    // Simulate New Day
-                    Button(action: simulateNewDay) {
-                        Text("Simulate New Day")
-                            .font(.headline)
-                            .padding()
-                            .frame(width: isIpad ? 300 : 200)
-                            .background(.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                        // Customize Button
+                        Button(action: {
+                            showingPopup = true
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "gearshape")
+                                    .font(.system(size: 16, weight: .medium))
+                                Text("Customize Schedule")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemGray6))
+                            .foregroundColor(.blue)
+                            .cornerRadius(8)
+                        }
+
+
+                        // Simulate New Day
+//                        Button(action: simulateNewDay) {
+//                            Text("Simulate New Day")
+//                                .font(.headline)
+//                                .padding()
+//                                .frame(width: 200)
+//                                .background(.blue)
+//                                .foregroundColor(.white)
+//                                .cornerRadius(10)
+//                        }
+                        .padding(.bottom)
                     }
-                    .padding()
+                    .frame(minHeight: geometry.size.height)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemBackground))
-                .onAppear(perform: checkForNewDay)
+                .sheet(isPresented: $showingPopup) {
+                    ScheduleSettingsSheet(
+                        schedule: $schedule,
+                        totalIntake: $customTotalIntake,
+                        selectedTime: $selectedTime,
+                        selectedAmount: $selectedAmount,
+                        waterIntake: $waterIntake,
+                        onSave: {
+                            sortScheduleByTime()
+                            saveSchedule()
+                            storedTotalIntake = customTotalIntake
+                        }
+                    )
+                    .presentationDetents([.medium, .large])
+                }
+                .onAppear {
+                    customTotalIntake = storedTotalIntake
+                    checkForNewDay()
+                }
                 .alert(isPresented: $showCongratulations) {
                     Alert(
                         title: Text("Congratulations!"),
@@ -300,11 +322,12 @@ struct WaterView: View {
                     )
                 }
             }
-            .navigationViewStyle(StackNavigationViewStyle())
         }
     }
 
     private func toggleCompletion(for item: ScheduleItem) {
+        guard !scoreGivenToday else { return }
+
         if let index = schedule.firstIndex(where: { $0.id == item.id }) {
             if !schedule[index].completed && waterIntake + schedule[index].amount <= totalWaterIntake {
                 schedule[index].completed = true
@@ -313,11 +336,13 @@ struct WaterView: View {
                 schedule[index].completed = false
                 waterIntake -= schedule[index].amount
             }
+
             saveSchedule()
 
-            if schedule.allSatisfy({ $0.completed }) {
+            if schedule.allSatisfy({ $0.completed }) && !scoreGivenToday {
                 showCongratulations = true
                 scoreManager.addWaterScore(10)
+                scoreGivenToday = true
             }
         }
     }
@@ -335,9 +360,14 @@ struct WaterView: View {
         guard let data = scheduleData else { return }
         do {
             schedule = try JSONDecoder().decode([ScheduleItem].self, from: data)
+            sortScheduleByTime()
         } catch {
             print("❌ Failed to load schedule: \(error)")
         }
+    }
+
+    private func sortScheduleByTime() {
+        schedule.sort { $0.time < $1.time }
     }
 
     private func checkForNewDay() {
@@ -345,8 +375,9 @@ struct WaterView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         let today = formatter.string(from: Date())
 
-        if lastOpenedDate != today {
+        if lastOpenedDate == nil || lastOpenedDate != today {
             waterIntake = 0
+            scoreGivenToday = false
             schedule = schedule.map { ScheduleItem(time: $0.time, amount: $0.amount, completed: false) }
             saveSchedule()
             lastOpenedDate = today
@@ -364,6 +395,92 @@ struct WaterView: View {
     }
 }
 
+struct ScheduleSettingsSheet: View {
+    @Binding var schedule: [ScheduleItem]
+    @Binding var totalIntake: Int
+    @Binding var selectedTime: Date
+    @Binding var selectedAmount: Int
+    @Binding var waterIntake: Int
+    var onSave: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Total Water Intake")) {
+                    Text("\(totalIntake) ml")
+                        .foregroundColor(.gray)
+                }
+
+                Section(header: Text("Add Time Slot")) {
+                    DatePicker("Time", selection: $selectedTime, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                        .datePickerStyle(WheelDatePickerStyle())
+
+                    Picker("Amount", selection: $selectedAmount) {
+                        ForEach(Array(stride(from: 100, through: 1000, by: 50)), id: \.self) { amount in
+                            Text("\(amount) ml").tag(amount)
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                    .frame(height: 100)
+
+                    Button("Add Slot") {
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "HH:mm"
+                        let newItem = ScheduleItem(
+                            time: formatter.string(from: selectedTime),
+                            amount: selectedAmount,
+                            completed: false
+                        )
+                        schedule.append(newItem)
+                        totalIntake += selectedAmount
+                        schedule.sort { $0.time < $1.time }
+                        onSave()
+                    }
+                }
+
+                Section(header: Text("Your Time Slots")) {
+                    if schedule.isEmpty {
+                        Text("No slots added.")
+                            .foregroundColor(.gray)
+                    } else {
+                        ForEach(schedule) { item in
+                            HStack {
+                                Text(item.time)
+                                Spacer()
+                                Text("\(item.amount) ml")
+                            }
+                        }
+                        .onDelete { indexSet in
+                            for index in indexSet {
+                                let item = schedule[index]
+                                totalIntake -= item.amount
+                                if item.completed {
+                                    waterIntake -= item.amount
+                                }
+                            }
+                            schedule.remove(atOffsets: indexSet)
+                            schedule.sort { $0.time < $1.time }
+                            onSave()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Customize Schedule")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        onSave()
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
 
 #Preview {
     WaterView()

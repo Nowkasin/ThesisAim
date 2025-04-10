@@ -202,11 +202,11 @@ struct WaterView: View {
                     VStack {
                         // Header
                         VStack(spacing: 16) {
-                            Text("น้ำที่ต้องดื่ม")
+                            Text("Water to Drink")
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.blue)
 
-                            Text("อย่าลืมดื่มน้ำ!")
+                            Text("Don't forget to drink water!")
                                 .font(.system(size: 18))
                                 .foregroundColor(.primary)
                         }

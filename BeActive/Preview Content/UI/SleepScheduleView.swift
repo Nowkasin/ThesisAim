@@ -38,14 +38,14 @@ struct SleepScheduleView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
-                Text("กำหนดเวลาตื่นและนอน")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                Text("Sleep Schedule")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
                     .padding(.top)
 
                 VStack(spacing: 16) {
-                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "เวลาตื่น", selection: $wakeUpTime)
-                    timePickerRow(icon: "moon.fill", color: .purple, label: "เวลานอน", selection: $bedTime)
+                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "Wake-Up", selection: $wakeUpTime)
+                    timePickerRow(icon: "moon.fill", color: .purple, label: "Bedtime", selection: $bedTime)
                 }
                 .padding()
                 .background(Color(.systemGray6))
@@ -53,7 +53,7 @@ struct SleepScheduleView: View {
                 .padding(.horizontal)
 
                 Button(action: saveSettings) {
-                    Text(hasSetSleepSchedule ? "ตั้งเวลาแล้ว" : "บันทึกเวลา")
+                    Text(hasSetSleepSchedule ? "Schedule Saved" : "Save")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(hasSetSleepSchedule ? Color.gray.opacity(0.4) : Color.blue)
@@ -66,7 +66,7 @@ struct SleepScheduleView: View {
 
                 if !savedSchedules.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("ประวัติการตั้งเวลา")
+                        Text("Schedule History")
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .padding(.horizontal)
@@ -76,7 +76,7 @@ struct SleepScheduleView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("⏰ \(formattedTime(hour: schedule.wakeUpHour, minute: schedule.wakeUpMinute)) | 🌙 \(formattedTime(hour: schedule.bedHour, minute: schedule.bedMinute))")
                                         .fontWeight(.medium)
-                                    Text("บันทึกเมื่อ \(formattedDate(schedule.savedDate))")
+                                    Text("Saved on \(formattedDate(schedule.savedDate))")
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
@@ -125,7 +125,7 @@ struct SleepScheduleView: View {
     // MARK: - Other functions (ไม่เปลี่ยน)
     func saveSettings() {
         guard !hasSetSleepSchedule else {
-            print("⚠️ ผู้ใช้ตั้งเวลาไว้แล้ว ต้องลบก่อนถึงจะตั้งใหม่ได้")
+            print("⚠️ You’ve already set a time. Please delete it before setting a new one.")
             return
         }
 

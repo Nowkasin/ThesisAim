@@ -24,6 +24,13 @@ struct PainScaleView: View {
     @State private var history: [PainRecord] = []
     @State private var showHistory = false
 
+    @State private var showSaveConfirmation = false
+    @State private var showDeleteConfirmation = false
+
+    @State private var showSaveAlert = false
+    @State private var recordToDelete: PainRecord?
+    @State private var showDeleteAlert = false
+
     let faceScaleImageURL = URL(string: "https://i.imgur.com/TR7HwEa.png")!
 
     var body: some View {
@@ -68,7 +75,9 @@ struct PainScaleView: View {
                 painSlider(label: "Foot", value: $footPain)
 
                 // 💾 Save Button
-                Button(action: savePainData) {
+                Button(action: {
+                    showSaveAlert = true
+                }) {
                     Text("Save")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -108,7 +117,8 @@ struct PainScaleView: View {
                                     Spacer()
 
                                     Button(role: .destructive) {
-                                        deleteRecord(record)
+                                        recordToDelete = record
+                                        showDeleteAlert = true
                                     } label: {
                                         Image(systemName: "trash")
                                     }
@@ -118,8 +128,7 @@ struct PainScaleView: View {
                                     HStack {
                                         Text(part)
                                         Spacer()
-                                        Text("\(value)")
-                                            .bold()
+                                        Text("\(value)").bold()
                                     }
                                 }
                             }
@@ -134,6 +143,47 @@ struct PainScaleView: View {
             }
         }
         .background(Color(.systemBackground))
+        .alert("Save Pain Scale?", isPresented: $showSaveAlert) {
+            Button("Save", role: .none, action: savePainData)
+            Button("Cancel", role: .cancel) { }
+        }
+
+        .alert("Delete this record?", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                if let record = recordToDelete {
+                    deleteRecord(record)
+                }
+            }
+            Button("Cancel", role: .cancel) { recordToDelete = nil }
+        }
+
+        .overlay(
+            VStack(spacing: 10) {
+                if showSaveConfirmation {
+                    Text("Pain Scale Saved!")
+                        .font(.subheadline)
+                        .padding()
+                        .background(Color.green.opacity(0.9))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                if showDeleteConfirmation {
+                    Text("Record Deleted")
+                        .font(.subheadline)
+                        .padding()
+                        .background(Color.red.opacity(0.9))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                Spacer()
+            }
+            .padding(.top, 50)
+        )
+        .animation(.easeInOut, value: showSaveConfirmation || showDeleteConfirmation)
     }
 
     func painSlider(label: String, value: Binding<Double>) -> some View {
@@ -155,11 +205,14 @@ struct PainScaleView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { gesture in
-                                    let location = gesture.location.x
-                                    let percent = max(0, min(1, location / geometry.size.width))
-                                    value.wrappedValue = round(percent * 10)
+                            LongPressGesture(minimumDuration: 0.3)
+                                .sequenced(before: DragGesture(minimumDistance: 0))
+                                .onChanged { gestureValue in
+                                    if case .second(true, let drag?) = gestureValue {
+                                        let location = drag.location.x
+                                        let percent = max(0, min(1, location / geometry.size.width))
+                                        value.wrappedValue = round(percent * 10)
+                                    }
                                 }
                         )
                 }
@@ -205,10 +258,30 @@ struct PainScaleView: View {
             ]
         )
         history.append(newRecord)
+
+        withAnimation {
+            showSaveConfirmation = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showSaveConfirmation = false
+            }
+        }
     }
 
     func deleteRecord(_ record: PainRecord) {
         history.removeAll { $0.id == record.id }
+
+        withAnimation {
+            showDeleteConfirmation = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showDeleteConfirmation = false
+            }
+        }
     }
 }
 
@@ -220,3 +293,5 @@ struct PainScaleView_Previews: PreviewProvider {
         }
     }
 }
+
+

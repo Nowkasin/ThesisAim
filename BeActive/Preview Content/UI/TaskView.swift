@@ -7,28 +7,58 @@
 
 import SwiftUI
 
+struct TaskRecord: Identifiable {
+    let id = UUID()
+    let mission: String
+    let mate: String
+    let duration: Int
+    let completed: Bool
+    let timestamp: Date
+}
+
 struct TaskView: View {
     @AppStorage("mission") private var mission: String = ""
     @AppStorage("selectedTime") private var selectedTime: Double = 1
     @AppStorage("isTaskStarted") private var isTaskStarted: Bool = false
     @AppStorage("timeRemaining") private var timeRemaining: Double = 0
     @AppStorage("taskStartTime") private var taskStartTime: Double = 0
-    @AppStorage("showAlert") private var showAlert: Bool = false
+    @AppStorage("selectedMate") private var selectedMate: String = "Bear"
 
     @State private var timer: Timer? = nil
-    @State private var animateBearBounce = false
+    @State private var animateMateBounce = false
     @State private var showBadge = false
+    @State private var showMatePicker = false
+    @State private var showMissingMissionAlert = false
+    @State private var showGaveUpAlert = false
+    @State private var showCompletedAlert = false
 
-    let imageUrl: String = "https://i.imgur.com/TR7HwEa.png"
+    @State private var taskHistory: [TaskRecord] = []
+    @State private var showTaskHistory = false
+    @State private var recordToDelete: TaskRecord? = nil
+    @State private var showDeleteAlert = false
+
+    var mateEmoji: String {
+        switch selectedMate {
+        case "Cat": return "🐱"
+        case "Bunny": return "🐰"
+        case "Chick": return "🐤"
+        default: return "🐻"
+        }
+    }
+
+    var imageUrl: String {
+        switch selectedMate {
+        case "Cat": return "https://i.imgur.com/Sd2yxVq.png"
+        case "Bunny": return "https://i.imgur.com/yFoGzFQ.png"
+        case "Chick": return "https://i.imgur.com/LvL5ntV.png"
+        default: return "https://i.imgur.com/TR7HwEa.png"
+        }
+    }
 
     var body: some View {
-        ZStack {
-            LinearGradient(colors: [.white, .blue.opacity(0.05)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-                .onTapGesture { hideKeyboard() }
-
+        ScrollView {
             VStack(spacing: 24) {
-                Text("🐻 Bear Mate")
+                Text("\(mateEmoji) \(selectedMate) Mate")
                     .font(.system(size: 30, weight: .heavy))
                     .foregroundStyle(.blue)
 
@@ -37,13 +67,11 @@ struct TaskView: View {
                         .scaledToFit()
                         .frame(height: 130)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .shadow(color: animateBearBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
-                        .scaleEffect(animateBearBounce ? 1.08 : 0.92)
-                        .offset(y: animateBearBounce ? -4 : 4)
-                        .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: animateBearBounce)
-                        .onAppear {
-                            animateBearBounce = true
-                        }
+                        .shadow(color: animateMateBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
+                        .scaleEffect(animateMateBounce ? 1.08 : 0.92)
+                        .offset(y: animateMateBounce ? -4 : 4)
+                        .animation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true), value: animateMateBounce)
+                        .onAppear { animateMateBounce = true }
                 } placeholder: {
                     ProgressView()
                 }
@@ -69,6 +97,7 @@ struct TaskView: View {
 
                     Slider(value: $selectedTime, in: 1...120, step: 1)
                         .tint(.blue)
+                        .disabled(isTaskStarted) // ⛔ disable during countdown
                         .padding(.horizontal)
 
                     Text("\(Int(selectedTime)) minutes")
@@ -82,7 +111,17 @@ struct TaskView: View {
                         .padding(.top, 10)
                 }
 
-                Button(action: isTaskStarted ? giveUpTask : startTask) {
+                Button(action: {
+                    if isTaskStarted {
+                        giveUpTask()
+                    } else {
+                        if mission.isEmpty {
+                            showMissingMissionAlert = true
+                        } else {
+                            startTask()
+                        }
+                    }
+                }) {
                     Text(isTaskStarted ? "Give Up" : "Start")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -93,44 +132,119 @@ struct TaskView: View {
                         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                 }
                 .padding(.horizontal)
-                .disabled(mission.isEmpty)
+
+                Button("Select Another Mate") {
+                    showMatePicker = true
+                }
+                .font(.subheadline)
+                .foregroundColor(isTaskStarted ? .gray : .blue)
+                .disabled(isTaskStarted)
+
+                if !taskHistory.isEmpty {
+                    Button {
+                        withAnimation {
+                            showTaskHistory.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                            Text(showTaskHistory ? "Hide Task History" : "Show Task History")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                    }
+                }
+
+                if showTaskHistory {
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(taskHistory.reversed()) { record in
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+
+                                    Spacer()
+
+                                    Button(role: .destructive) {
+                                        recordToDelete = record
+                                        showDeleteAlert = true
+                                    } label: {
+                                        Image(systemName: "trash")
+                                    }
+                                }
+
+                                Text("📝 Mission: \(record.mission)")
+                                Text("🐾 Mate: \(emoji(for: record.mate)) \(record.mate)")
+                                Text("⏱ Duration: \(record.duration) min")
+                                Text("📊 Status: \(record.completed ? "Completed" : "Gave Up")")
+                            }
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showMatePicker) {
+            VStack(spacing: 16) {
+                Text("Choose Your Mate")
+                    .font(.headline)
+                    .padding(.top)
+
+                ForEach(["Bear", "Cat", "Bunny", "Chick"], id: \.self) { mate in
+                    Button(action: {
+                        selectedMate = mate
+                        showMatePicker = false
+                    }) {
+                        Text("\(emoji(for: mate)) \(mate)")
+                            .font(.title2)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(10)
+                    }
+                }
 
                 Spacer()
             }
             .padding()
-
-            if showBadge {
-                VStack {
-                    Text("✅ Mission Complete!")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .padding(12)
-                        .background(Color.green.opacity(0.9))
-                        .cornerRadius(12)
-                        .foregroundColor(.white)
-                        .shadow(radius: 5)
-                        .padding(.top, 20)
-                    Spacer()
-                }
-                .transition(.scale.combined(with: .opacity))
-            }
         }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("🎉 Task Complete"),
-                message: Text("Great job!"),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert("🚫 Mission Required", isPresented: $showMissingMissionAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Please enter your mission before starting.")
+        }
+        .alert("💡 Mission Abandoned", isPresented: $showGaveUpAlert) {
+            Button("OK") { }
+        } message: {
+            Text("You gave it your best — that’s what matters!")
+        }
+        .alert("🎉 Task Complete", isPresented: $showCompletedAlert) {
+            Button("OK") { }
+        } message: {
+            Text("Great job!")
+        }
+        .alert("Delete this task?", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                if let record = recordToDelete {
+                    taskHistory.removeAll { $0.id == record.id }
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                recordToDelete = nil
+            }
         }
         .onAppear { checkIfTaskCompleted() }
     }
 
-    // MARK: - Logic Functions
     func startTask() {
         isTaskStarted = true
         taskStartTime = Date().timeIntervalSince1970
         timeRemaining = selectedTime * 60
-        showAlert = false
         startTimer()
     }
 
@@ -157,15 +271,23 @@ struct TaskView: View {
         taskStartTime = 0
         timeRemaining = 0
 
-        withAnimation(.easeOut(duration: 0.5)) {
+        taskHistory.append(TaskRecord(
+            mission: mission,
+            mate: selectedMate,
+            duration: Int(selectedTime),
+            completed: true,
+            timestamp: Date()
+        ))
+
+        withAnimation {
             showBadge = true
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation(.easeOut(duration: 0.4)) {
+            withAnimation {
                 showBadge = false
             }
-            showAlert = true
+            showCompletedAlert = true
         }
     }
 
@@ -174,7 +296,16 @@ struct TaskView: View {
         isTaskStarted = false
         taskStartTime = 0
         timeRemaining = 0
-        showAlert = false
+
+        taskHistory.append(TaskRecord(
+            mission: mission,
+            mate: selectedMate,
+            duration: Int(selectedTime),
+            completed: false,
+            timestamp: Date()
+        ))
+
+        showGaveUpAlert = true
     }
 
     func checkIfTaskCompleted() {
@@ -188,18 +319,16 @@ struct TaskView: View {
         }
     }
 
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-
-    func formatTime(_ seconds: Double) -> String {
-        let minutes = Int(seconds) / 60
-        let secs = Int(seconds) % 60
-        return String(format: "%02d:%02d", minutes, secs)
+    func emoji(for mate: String) -> String {
+        switch mate {
+        case "Cat": return "🐱"
+        case "Bunny": return "🐰"
+        case "Chick": return "🐤"
+        default: return "🐻"
+        }
     }
 }
 
-// MARK: - Progress Circle
 struct ProgressCircle: View {
     var timeRemaining: Double
     var totalTime: Double
@@ -233,11 +362,17 @@ struct ProgressCircle: View {
     }
 }
 
+
+
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
         TaskView()
     }
 }
+
+
+
+
 
 
 

@@ -86,16 +86,17 @@ struct VoucherView: View {
     @AppStorage("purchasedVouchersData") private var purchasedVouchersData: Data = Data()
     @State private var selectedTab = 0
     @State private var showConfirm = false
+    @State private var showInsufficientPoints = false
     @State private var selectedVoucher: Voucher? = nil
     @State private var showCodePopup = false
 
     let vouchers: [Voucher] = [
-        Voucher(title: "ส่วนลด 20 บาท", clinic: "คลินิกกายภาพ มศว", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
-        Voucher(title: "ส่วนลด 30 บาท", clinic: "คลินิก ABC", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
-        Voucher(title: "ส่วนลด 40 บาท", clinic: "ศูนย์กายภาพ XYZ", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
-        Voucher(title: "ลดค่ารักษา 50 บาท", clinic: "คลินิก EF", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
-        Voucher(title: "บำบัดฟรี 1 ครั้ง", clinic: "คลินิก GH", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
-        Voucher(title: "ลด 60 บาท", clinic: "กายภาพ LightCare", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
+        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 4, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
+        Voucher(title: "Discount: ฿30", clinic: "ABC Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
+        Voucher(title: "Discount: ฿40", clinic: "XYZ Physical Center", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
+        Voucher(title: "Discount: ฿50", clinic: "EF Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
+        Voucher(title: "1 Free Treatment", clinic: "GH Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
+        Voucher(title: "Discount: ฿60", clinic: "Lightcare Physical Center", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
     ]
 
     var body: some View {
@@ -108,7 +109,7 @@ struct VoucherView: View {
                     }
                     .padding(.trailing, 20)
                     .padding(.top, 10)
-
+                    
                     Picker("", selection: $selectedTab) {
                         Text("Shop").tag(0)
                         Text("History").tag(1)
@@ -127,8 +128,12 @@ struct VoucherView: View {
                                 ForEach(vouchers) { voucher in
                                     if !scoreManager.purchasedVouchers.contains(where: { $0.id == voucher.id }) {
                                         VoucherCard(voucher: voucher) {
-                                            selectedVoucher = voucher
-                                            showConfirm = true
+                                            if scoreManager.totalScore >= voucher.cost {
+                                                selectedVoucher = voucher
+                                                showConfirm = true
+                                            } else {
+                                                showInsufficientPoints = true
+                                            }
                                         }
                                     }
                                 }
@@ -143,7 +148,7 @@ struct VoucherView: View {
                                 .padding(.top)
 
                             if scoreManager.purchasedVouchers.isEmpty {
-                                Text("🛒 ยังไม่มีการซื้อ Voucher")
+                                Text("🛒 Voucher has not been purchased yet")
                                     .foregroundColor(.gray)
                                     .padding()
                             } else {
@@ -221,21 +226,26 @@ struct VoucherView: View {
                 }
                 .background(Color(.systemBackground).ignoresSafeArea())
             }
-            .alert("ยืนยันการรับ Voucher?", isPresented: $showConfirm, actions: {
-                Button("รับเลย", role: .destructive) {
+            .alert("Confirm Voucher Redemption?", isPresented: $showConfirm, actions: {
+                Button("Redeem Now", role: .destructive) {
                     if let voucher = selectedVoucher {
                         _ = scoreManager.purchaseVoucher(voucher)
                         saveVouchers()
                     }
                 }
-                Button("ยกเลิก", role: .cancel) {}
+                Button("Cancel", role: .cancel) {}
             }, message: {
-                Text("คุณต้องการรับ \"\(selectedVoucher?.title ?? "")\" ใช่ไหม?")
+                Text("Do you want to redeem \"\(selectedVoucher?.title ?? "")\"?")
+            })
+            .alert("Insufficient Points", isPresented: $showInsufficientPoints, actions: {
+                Button("OK", role: .cancel) {}
+            }, message: {
+                Text("You don’t have enough points to redeem this voucher.")
             })
             .alert("Voucher Code", isPresented: $showCodePopup, actions: {
                 Button("OK", role: .cancel) {}
             }, message: {
-                Text(selectedVoucher?.code ?? "ไม่พบรหัส")
+                Text(selectedVoucher?.code ?? "Code not found")
             })
             .onAppear(perform: loadVouchers)
         }
@@ -264,8 +274,6 @@ extension StringProtocol {
         }.joined(separator: String(separator))
     }
 }
-
-
 
 struct VoucherView_Previews: PreviewProvider {
     static var previews: some View {

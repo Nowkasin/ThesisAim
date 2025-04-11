@@ -200,7 +200,6 @@ struct WaterView: View {
             NavigationView {
                 ScrollView {
                     VStack {
-                        // Header
                         VStack(spacing: 16) {
                             Text("Water to Drink")
                                 .font(.system(size: 34, weight: .bold))
@@ -213,7 +212,6 @@ struct WaterView: View {
                         .multilineTextAlignment(.center)
                         .padding(.top)
 
-                        // Water Circle
                         ZStack {
                             Circle()
                                 .stroke(lineWidth: 10)
@@ -241,7 +239,6 @@ struct WaterView: View {
                         .frame(width: 200, height: 200)
                         .padding()
 
-                        // Schedule List
                         VStack(spacing: 12) {
                             ForEach(schedule) { item in
                                 HStack {
@@ -263,7 +260,6 @@ struct WaterView: View {
                         }
                         .padding(.horizontal)
 
-                        // Customize Button
                         Button(action: {
                             showingPopup = true
                         }) {
@@ -280,8 +276,7 @@ struct WaterView: View {
                             .cornerRadius(8)
                         }
 
-
-                        // Simulate New Day
+                        // Simulate New Day (commented for production)
 //                        Button(action: simulateNewDay) {
 //                            Text("Simulate New Day")
 //                                .font(.headline)
@@ -357,15 +352,26 @@ struct WaterView: View {
     }
 
     private func loadSchedule() {
-        guard let data = scheduleData else { return }
+        guard let data = scheduleData else {
+            loadDefaultSchedule()
+            return
+        }
+
         do {
-            schedule = try JSONDecoder().decode([ScheduleItem].self, from: data)
-            sortScheduleByTime()
+            let decoded = try JSONDecoder().decode([ScheduleItem].self, from: data)
+
+            // ✅ Fix: If decode succeeds but schedule is empty
+            if decoded.isEmpty {
+                loadDefaultSchedule()
+            } else {
+                schedule = decoded
+                sortScheduleByTime()
+            }
         } catch {
-            print("❌ Failed to load schedule: \(error)")
+            print("❌ Failed to decode schedule: \(error)")
+            loadDefaultSchedule()
         }
     }
-
     private func sortScheduleByTime() {
         schedule.sort { $0.time < $1.time }
     }
@@ -375,33 +381,41 @@ struct WaterView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         let today = formatter.string(from: Date())
 
-        if lastOpenedDate == nil || lastOpenedDate != today {
+        let isNewDay = lastOpenedDate == nil || lastOpenedDate != today
+        lastOpenedDate = today
+
+        if isNewDay {
             waterIntake = 0
             scoreGivenToday = false
 
-            #if targetEnvironment(simulator)
-            // ✅ Load default schedule when running on simulator
-            schedule = [
-                ScheduleItem(time: "09:30", amount: 500, completed: false),
-                ScheduleItem(time: "11:30", amount: 500, completed: false),
-                ScheduleItem(time: "13:30", amount: 500, completed: false),
-                ScheduleItem(time: "15:30", amount: 500, completed: false),
-                ScheduleItem(time: "17:30", amount: 100, completed: false)
-            ]
-            customTotalIntake = 2100
-            storedTotalIntake = 2100
-            #else
-            // 🧠 On device: just reset completions
-            schedule = schedule.map { ScheduleItem(time: $0.time, amount: $0.amount, completed: false) }
-            #endif
+            if scheduleData == nil {
+                loadDefaultSchedule()
+            } else {
+                loadSchedule()
+            }
+
+            schedule = schedule.map {
+                ScheduleItem(time: $0.time, amount: $0.amount, completed: false)
+            }
 
             saveSchedule()
-            lastOpenedDate = today
         } else {
             loadSchedule()
         }
     }
 
+    private func loadDefaultSchedule() {
+        schedule = [
+            ScheduleItem(time: "09:30", amount: 500, completed: false),
+            ScheduleItem(time: "11:30", amount: 500, completed: false),
+            ScheduleItem(time: "13:30", amount: 500, completed: false),
+            ScheduleItem(time: "15:30", amount: 500, completed: false),
+            ScheduleItem(time: "17:30", amount: 100, completed: false)
+        ]
+        customTotalIntake = 2100
+        storedTotalIntake = 2100
+        saveSchedule()
+    }
 
     private func simulateNewDay() {
         let formatter = DateFormatter()

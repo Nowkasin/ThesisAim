@@ -7,14 +7,31 @@
 
 import SwiftUI
 
-struct Mate: Identifiable {
-    let id = UUID()
+// MARK: - Mate Model
+struct Mate: Identifiable, Codable, Equatable {
+    let id: UUID
     let name: String
     let cost: Int
     let imageUrl: URL
+
+    init(id: UUID = UUID(), name: String, cost: Int, imageUrl: URL) {
+        self.id = id
+        self.name = name
+        self.cost = cost
+        self.imageUrl = imageUrl
+    }
 }
 
+// MARK: - MatesView
 struct MatesView: View {
+    @EnvironmentObject var scoreManager: ScoreManager
+    @AppStorage("purchasedMatesData") private var purchasedMatesData: Data = Data()
+
+    @State private var selectedMate: Mate? = nil
+    @State private var showConfirm = false
+    @State private var showInsufficientPoints = false
+    @State private var selectedTab = 0
+
     let mates: [Mate] = [
         Mate(name: "Mates A", cost: 1, imageUrl: URL(string: "https://yourdomain.com/a.png")!),
         Mate(name: "Mates B", cost: 2, imageUrl: URL(string: "https://yourdomain.com/b.png")!),
@@ -29,38 +46,140 @@ struct MatesView: View {
         GridItem(.flexible(), spacing: 20)
     ]
 
-    init() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundColor = .clear
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-    }
-
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                Text("Mates Shop")
-                    .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(.primary)
-                    .padding(.top, 40)
+        NavigationView {
+            ZStack(alignment: .topTrailing) {
+                VStack {
+                    HStack {
+                        Spacer()
+                        ScoreView()
+                            .padding(.trailing, 20)
+                            .padding(.top, 10)
+                    }
 
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(mates) { mate in
-                        MateCard(mate: mate) {
-                            print("Tapped \(mate.name)")
+                    Picker("", selection: $selectedTab) {
+                        Text("Shop").tag(0)
+                        Text("History").tag(1)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(.horizontal)
+
+                    if selectedTab == 0 {
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                Text("Mates Shop")
+                                    .font(.system(size: 32, weight: .bold))
+                                    .foregroundColor(.primary)
+                                    .padding(.top, 20)
+
+                                LazyVGrid(columns: columns, spacing: 20) {
+                                    ForEach(mates.filter { mate in
+                                        !scoreManager.purchasedMates.contains(where: { $0.id == mate.id })
+                                    }) { mate in
+                                        MateCard(mate: mate) {
+                                            if scoreManager.totalScore >= mate.cost {
+                                                selectedMate = mate
+                                                showConfirm = true
+                                            } else {
+                                                showInsufficientPoints = true
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if scoreManager.purchasedMates.isEmpty {
+                                    Text("🧸 You haven’t unlocked any mates yet.")
+                                        .foregroundColor(.gray)
+                                        .padding(.top, 30)
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 40)
+                        }
+                    } else {
+                        VStack(spacing: 20) {
+                            Text("Unlocked Mates")
+                                .font(.largeTitle)
+                                .padding(.top)
+
+                            if scoreManager.purchasedMates.isEmpty {
+                                Text("🧸 You haven’t unlocked any mates yet.")
+                                    .foregroundColor(.gray)
+                                    .padding()
+                            } else {
+                                List(scoreManager.purchasedMates) { mate in
+                                    HStack(spacing: 15) {
+                                        AsyncImage(url: mate.imageUrl) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image.resizable().scaledToFill()
+                                            case .failure:
+                                                Image(systemName: "photo")
+                                            default:
+                                                Color.gray.opacity(0.2)
+                                            }
+                                        }
+                                        .frame(width: 50, height: 50)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                                        VStack(alignment: .leading) {
+                                            Text(mate.name)
+                                                .font(.headline)
+                                            Text("-\(mate.cost) Coins")
+                                                .font(.subheadline)
+                                                .foregroundColor(.red)
+                                        }
+
+                                        Spacer()
+                                    }
+                                }
+                                .listStyle(PlainListStyle())
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                .background(Color(.systemBackground).ignoresSafeArea())
+            }
+            .alert("Unlock Mate?", isPresented: $showConfirm, actions: {
+                Button("Unlock", role: .destructive) {
+                    if let mate = selectedMate {
+                        if scoreManager.purchaseMate(mate) {
+                            saveMates()
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
+                Button("Cancel", role: .cancel) {}
+            }, message: {
+                Text("Do you want to unlock \"\(selectedMate?.name ?? "")\" for \(selectedMate?.cost ?? 0) coins?")
+            })
+            .alert("Insufficient Coins", isPresented: $showInsufficientPoints, actions: {
+                Button("OK", role: .cancel) {}
+            }, message: {
+                Text("You don’t have enough coins to unlock this mate.")
+            })
+            .onAppear {
+                loadMates()
             }
-            .frame(maxWidth: .infinity)
         }
-        .background(Color(.systemBackground).ignoresSafeArea())
+    }
+
+    private func saveMates() {
+        if let data = try? JSONEncoder().encode(scoreManager.purchasedMates) {
+            purchasedMatesData = data
+        }
+    }
+
+    private func loadMates() {
+        if let loaded = try? JSONDecoder().decode([Mate].self, from: purchasedMatesData) {
+            scoreManager.purchasedMates = loaded
+        }
     }
 }
 
+// MARK: - MateCard
 struct MateCard: View {
     let mate: Mate
     let onTap: () -> Void
@@ -72,24 +191,19 @@ struct MateCard: View {
                     switch phase {
                     case .empty:
                         Color.gray.opacity(0.2)
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(15)
                     case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(15)
+                        image.resizable().scaledToFit()
                     case .failure:
                         Image(systemName: "photo")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 100, height: 100)
                             .foregroundColor(.gray)
                     @unknown default:
                         EmptyView()
                     }
                 }
+                .frame(width: 100, height: 100)
+                .cornerRadius(15)
 
                 Text(mate.name)
                     .font(.headline)
@@ -112,8 +226,6 @@ struct MateCard: View {
 struct MatesView_Previews: PreviewProvider {
     static var previews: some View {
         MatesView()
-            .preferredColorScheme(.light) // ลองแสดงใน Light Mode
-        MatesView()
-            .preferredColorScheme(.dark)  // ลองแสดงใน Dark Mode
+            .environmentObject(ScoreManager.shared)
     }
 }

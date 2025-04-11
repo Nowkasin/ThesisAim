@@ -237,10 +237,10 @@ struct VoucherView: View {
             }, message: {
                 Text("Do you want to redeem \"\(selectedVoucher?.title ?? "")\"?")
             })
-            .alert("Insufficient Points", isPresented: $showInsufficientPoints, actions: {
+            .alert("Insufficient Coins", isPresented: $showInsufficientPoints, actions: {
                 Button("OK", role: .cancel) {}
             }, message: {
-                Text("You don’t have enough points to redeem this voucher.")
+                Text("You don’t have enough coins to redeem this voucher.")
             })
             .alert("Voucher Code", isPresented: $showCodePopup, actions: {
                 Button("OK", role: .cancel) {}

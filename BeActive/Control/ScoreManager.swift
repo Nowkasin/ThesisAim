@@ -10,13 +10,12 @@ import Combine
 
 class ScoreManager: ObservableObject {
     static let shared = ScoreManager()
-    // ให้บันทึกคะแนนน้ำ และ การเดินลง DataBase ด้วย
-
+    
     @Published var waterScore: Int = 0
     @Published var stepScore: Int = 0
     @Published var purchasedVouchers: [Voucher] = []
+    @Published var purchasedMates: [Mate] = []
 
-    // คำนวณคะแนนรวมเป็นผลรวมของ waterScore กับ stepScore
     var totalScore: Int {
         waterScore + stepScore
     }
@@ -28,10 +27,10 @@ class ScoreManager: ObservableObject {
 
     func addStepScore(_ score: Int) {
         stepScore += score
-        print("StepScore1 \(stepScore)")
+        print("Step Score updated to: \(stepScore)")
     }
 
-    // ใช้คะแนนรวม (step + water) เพื่อซื้อของอะไรก็ได้
+    // Use score to purchase something (prioritize stepScore first)
     func spendScore(_ cost: Int) -> Bool {
         guard totalScore >= cost else { return false }
 
@@ -46,10 +45,19 @@ class ScoreManager: ObservableObject {
         return true
     }
 
-    // ซื้อ Voucher และเก็บไว้ในประวัติ
+    // Purchase voucher
     func purchaseVoucher(_ voucher: Voucher) -> Bool {
         if spendScore(voucher.cost) {
             purchasedVouchers.append(voucher)
+            return true
+        }
+        return false
+    }
+
+    // Purchase mate
+    func purchaseMate(_ mate: Mate) -> Bool {
+        if spendScore(mate.cost) {
+            purchasedMates.append(mate)
             return true
         }
         return false

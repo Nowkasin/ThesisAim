@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ScoreView: View {
     @EnvironmentObject var scoreManager: ScoreManager
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "star.circle")

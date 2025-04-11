@@ -21,7 +21,7 @@ struct HomeView: View {
     }
 
     var welcomeArray: [String] {
-        [firstName, "Wassup"]
+        ["Hey, Good to see you!", "Khun \(firstName)"]
     }
 
     @State private var currentIndex = 0
@@ -125,7 +125,7 @@ struct HomeView: View {
 
     func buildHeader() -> some View {
         HStack {
-            Text("Hey \(welcomeArray[currentIndex])")
+            Text("\(welcomeArray[currentIndex])")
                 .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 32), weight: .bold))
                 .foregroundColor(.primary)
                 .onAppear { startWelcomeTimer() }
@@ -178,7 +178,7 @@ struct HomeView: View {
 
     func startWelcomeTimer() {
         welcomeTimer?.invalidate()
-        welcomeTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
+        welcomeTimer = Timer.scheduledTimer(withTimeInterval: 6, repeats: true) { _ in
             withAnimation {
                 currentIndex = (currentIndex + 1) % welcomeArray.count
             }

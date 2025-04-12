@@ -15,6 +15,8 @@ struct HomeView: View {
     private let db = Firestore.firestore()
 
     @State private var userName: String = "Welcome"
+    @State private var pushedScore: Int = 0
+    @State private var showPushedScore: Bool = false
 
     var firstName: String {
         userName.components(separatedBy: " ").first ?? userName
@@ -60,7 +62,7 @@ struct HomeView: View {
                 }
                 .onAppear {
                     updateScreenWidth()
-                    fetchUserName()
+                    fetchUserData()
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     updateScreenWidth()
@@ -70,7 +72,7 @@ struct HomeView: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
 
-    private func fetchUserName() {
+    private func fetchUserData() {
         guard !currentUserId.isEmpty else {
             print("❌ currentUserId is empty")
             return
@@ -78,16 +80,26 @@ struct HomeView: View {
 
         db.collection("users").document(currentUserId).getDocument { document, error in
             if let error = error {
-                print("❌ Error fetching user name: \(error.localizedDescription)")
+                print("❌ Error fetching user data: \(error.localizedDescription)")
                 return
             }
 
-            if let document = document, let data = document.data(), let name = data["name"] as? String {
-                DispatchQueue.main.async {
+            guard let document = document, let data = document.data() else {
+                print("❌ User document not found or has no data")
+                return
+            }
+
+            DispatchQueue.main.async {
+                if let name = data["name"] as? String {
                     self.userName = name
                 }
-            } else {
-                print("❌ User document not found or name is missing")
+
+                if let score = data["score"] as? Int {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        self.pushedScore = score
+                        self.showPushedScore = true
+                    }
+                }
             }
         }
     }
@@ -108,6 +120,21 @@ struct HomeView: View {
                     .font(.system(size: 16))
                     .foregroundColor(getDayColor())
                     .padding(.horizontal)
+
+                if showPushedScore {
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                            .font(.system(size: 14))
+                        Text("\(pushedScore)")
+                            .font(.subheadline)
+                            .foregroundColor(.yellow)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 4)
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.3), value: pushedScore)
+                }
 
                 Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
 
@@ -269,6 +296,7 @@ struct ReminderCard: View {
             .padding(.horizontal, DeviceHelper.adaptivePadding())
     }
 }
+
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
@@ -288,3 +316,4 @@ extension View {
         }
     }
 }
+

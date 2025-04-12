@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import FirebaseFirestore
 
 class ScoreManager: ObservableObject {
     static let shared = ScoreManager()
@@ -16,10 +17,14 @@ class ScoreManager: ObservableObject {
     @Published var purchasedVouchers: [Voucher] = []
     @Published var purchasedMates: [Mate] = []
 
+    private let db = Firestore.firestore()
+    @AppStorage("currentUserId") private var currentUserId: String = ""
+
     var totalScore: Int {
         waterScore + stepScore
     }
 
+    // ✅ Add score locally (no change)
     func addWaterScore(_ score: Int) {
         waterScore += score
         print("Water Score updated to: \(waterScore)")
@@ -30,8 +35,8 @@ class ScoreManager: ObservableObject {
         print("Step Score updated to: \(stepScore)")
     }
 
-    // Use score to purchase something (prioritize stepScore first)
-    func spendScore(_ cost: Int) -> Bool {
+    // ❌ This local method is still used internally but no longer called directly when purchasing
+    private func spendLocalScore(_ cost: Int) -> Bool {
         guard totalScore >= cost else { return false }
 
         if stepScore >= cost {
@@ -45,22 +50,88 @@ class ScoreManager: ObservableObject {
         return true
     }
 
-    // Purchase voucher
-    func purchaseVoucher(_ voucher: Voucher) -> Bool {
-        if spendScore(voucher.cost) {
-            purchasedVouchers.append(voucher)
-            return true
+    // ✅ Firestore-based voucher purchase
+    func purchaseVoucher(_ voucher: Voucher, completion: @escaping (Bool) -> Void) {
+        guard !currentUserId.isEmpty else {
+            print("❌ purchaseVoucher: currentUserId not set")
+            completion(false)
+            return
         }
-        return false
+
+        let userRef = db.collection("users").document(currentUserId)
+        userRef.getDocument { snapshot, error in
+            if let error = error {
+                print("❌ Firestore fetch error: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+
+            guard let data = snapshot?.data(), let currentScore = data["score"] as? Int else {
+                print("❌ Cannot retrieve score from Firestore.")
+                completion(false)
+                return
+            }
+
+            if currentScore >= voucher.cost {
+                // ✅ Deduct in Firestore
+                userRef.updateData(["score": currentScore - voucher.cost]) { error in
+                    if let error = error {
+                        print("❌ Failed to update score: \(error.localizedDescription)")
+                        completion(false)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.purchasedVouchers.append(voucher)
+                        }
+                        completion(true)
+                    }
+                }
+            } else {
+                print("❌ Not enough score in Firestore.")
+                completion(false)
+            }
+        }
     }
 
-    // Purchase mate
-    func purchaseMate(_ mate: Mate) -> Bool {
-        if spendScore(mate.cost) {
-            purchasedMates.append(mate)
-            return true
+    // ✅ Firestore-based mate purchase
+    func purchaseMate(_ mate: Mate, completion: @escaping (Bool) -> Void) {
+        guard !currentUserId.isEmpty else {
+            print("❌ purchaseMate: currentUserId not set")
+            completion(false)
+            return
         }
-        return false
+
+        let userRef = db.collection("users").document(currentUserId)
+        userRef.getDocument { snapshot, error in
+            if let error = error {
+                print("❌ Firestore fetch error: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+
+            guard let data = snapshot?.data(), let currentScore = data["score"] as? Int else {
+                print("❌ Cannot retrieve score from Firestore.")
+                completion(false)
+                return
+            }
+
+            if currentScore >= mate.cost {
+                // ✅ Deduct in Firestore
+                userRef.updateData(["score": currentScore - mate.cost]) { error in
+                    if let error = error {
+                        print("❌ Failed to update score: \(error.localizedDescription)")
+                        completion(false)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.purchasedMates.append(mate)
+                        }
+                        completion(true)
+                    }
+                }
+            } else {
+                print("❌ Not enough score in Firestore.")
+                completion(false)
+            }
+        }
     }
 }
 

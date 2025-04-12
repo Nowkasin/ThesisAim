@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 // MARK: - Voucher Model
 struct Voucher: Identifiable, Equatable, Codable {
@@ -28,7 +29,6 @@ struct Voucher: Identifiable, Equatable, Codable {
     }
 }
 
-// MARK: - VoucherCard View
 struct VoucherCard: View {
     let voucher: Voucher
     let onTap: () -> Void
@@ -43,10 +43,7 @@ struct VoucherCard: View {
                     case .success(let image):
                         image.resizable().scaledToFill()
                     case .failure:
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.gray)
+                        Image(systemName: "photo").resizable().scaledToFit().foregroundColor(.gray)
                     @unknown default:
                         EmptyView()
                     }
@@ -55,24 +52,14 @@ struct VoucherCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(voucher.title)
-                        .font(.headline)
-                        .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
-
-                    Text(voucher.clinic)
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
-
-                    Text("\(voucher.cost) Coins")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color(red: 40/255, green: 54/255, blue: 85/255))
+                    Text(voucher.title).font(.headline).foregroundColor(.primary)
+                    Text(voucher.clinic).font(.subheadline).foregroundColor(.blue)
+                    Text("\(voucher.cost) Coins").font(.subheadline).fontWeight(.semibold).foregroundColor(.primary)
                 }
-
                 Spacer()
             }
             .padding()
-            .background(Color(red: 255/255, green: 182/255, blue: 182/255))
+            .background(Color(red: 1, green: 0.71, blue: 0.71))
             .cornerRadius(25)
         }
         .buttonStyle(PlainButtonStyle())
@@ -82,8 +69,9 @@ struct VoucherCard: View {
 // MARK: - VoucherView
 struct VoucherView: View {
     @EnvironmentObject var scoreManager: ScoreManager
-
     @AppStorage("purchasedVouchersData") private var purchasedVouchersData: Data = Data()
+    @AppStorage("currentUserId") private var currentUserId: String = ""
+
     @State private var selectedTab = 0
     @State private var showConfirm = false
     @State private var showInsufficientPoints = false
@@ -91,7 +79,7 @@ struct VoucherView: View {
     @State private var showCodePopup = false
 
     let vouchers: [Voucher] = [
-        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 4, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
+        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 3, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
         Voucher(title: "Discount: ฿30", clinic: "ABC Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
         Voucher(title: "Discount: ฿40", clinic: "XYZ Physical Center", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
         Voucher(title: "Discount: ฿50", clinic: "EF Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
@@ -101,34 +89,34 @@ struct VoucherView: View {
 
     var body: some View {
         NavigationView {
-            ZStack(alignment: .topTrailing) {
-                VStack {
-                    HStack {
-                        Spacer()
-                        ScoreView()
-                    }
-                    .padding(.trailing, 20)
-                    .padding(.top, 10)
-                    
-                    Picker("", selection: $selectedTab) {
-                        Text("Shop").tag(0)
-                        Text("History").tag(1)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding(.horizontal)
+            VStack {
+                HStack {
+                    Spacer()
+                    ScoreView()
+                        .padding(.trailing, 20)
+                        .padding(.top, 10)
+                }
 
-                    if selectedTab == 0 {
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                Text("Voucher Shop")
-                                    .font(.system(size: 32, weight: .bold))
-                                    .foregroundColor(Color(red: 255/255, green: 182/255, blue: 182/255))
-                                    .padding(.top, 20)
+                Picker("", selection: $selectedTab) {
+                    Text("Shop").tag(0)
+                    Text("History").tag(1)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
 
-                                ForEach(vouchers) { voucher in
-                                    if !scoreManager.purchasedVouchers.contains(where: { $0.id == voucher.id }) {
-                                        VoucherCard(voucher: voucher) {
-                                            if scoreManager.totalScore >= voucher.cost {
+                if selectedTab == 0 {
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            Text("Voucher Shop")
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(.pink)
+                                .padding(.top, 20)
+
+                            ForEach(vouchers) { voucher in
+                                if !scoreManager.purchasedVouchers.contains(where: { $0.id == voucher.id }) {
+                                    VoucherCard(voucher: voucher) {
+                                        checkFirestoreScore { dbScore in
+                                            if dbScore >= voucher.cost {
                                                 selectedVoucher = voucher
                                                 showConfirm = true
                                             } else {
@@ -138,115 +126,115 @@ struct VoucherView: View {
                                     }
                                 }
                             }
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 40)
                         }
-                    } else {
-                        VStack(spacing: 15) {
-                            Text("Voucher History")
-                                .font(.largeTitle)
-                                .padding(.top)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 40)
+                    }
+                } else {
+                    VStack(spacing: 15) {
+                        Text("Voucher History").font(.largeTitle).padding(.top)
 
-                            if scoreManager.purchasedVouchers.isEmpty {
-                                Text("🛒 Voucher has not been purchased yet")
-                                    .foregroundColor(.gray)
-                                    .padding()
-                            } else {
-                                List {
-                                    ForEach(scoreManager.purchasedVouchers) { voucher in
-                                        Button {
-                                            selectedVoucher = voucher
-                                            showCodePopup = true
-                                        } label: {
-                                            HStack {
-                                                AsyncImage(url: voucher.imageUrl) { phase in
-                                                    switch phase {
-                                                    case .success(let image):
-                                                        image.resizable().scaledToFill()
-                                                    case .failure:
-                                                        Image(systemName: "photo")
-                                                    default:
-                                                        Color.gray.opacity(0.2)
-                                                    }
+                        if scoreManager.purchasedVouchers.isEmpty {
+                            Text("🛒 Voucher has not been purchased yet")
+                                .foregroundColor(.gray)
+                                .padding()
+                        } else {
+                            List {
+                                ForEach(scoreManager.purchasedVouchers) { voucher in
+                                    Button {
+                                        selectedVoucher = voucher
+                                        showCodePopup = true
+                                    } label: {
+                                        HStack {
+                                            AsyncImage(url: voucher.imageUrl) { phase in
+                                                switch phase {
+                                                case .success(let image): image.resizable().scaledToFill()
+                                                case .failure: Image(systemName: "photo")
+                                                default: Color.gray.opacity(0.2)
                                                 }
-                                                .frame(width: 50, height: 40)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                                                VStack(alignment: .leading) {
-                                                    Text(voucher.title)
-                                                    Text(voucher.clinic)
-                                                        .font(.caption)
-                                                        .foregroundColor(.gray)
-                                                    if let code = voucher.code {
-                                                        Text("Code: \(code)")
-                                                            .font(.caption2)
-                                                            .foregroundColor(.green)
-                                                    }
-                                                    if voucher.isActivated {
-                                                        Text("✅ Activated")
-                                                            .font(.caption2)
-                                                            .foregroundColor(.blue)
-                                                    }
-                                                }
-
-                                                Spacer()
-                                                Text("-\(voucher.cost)")
-                                                    .foregroundColor(.red)
                                             }
-                                        }
-                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                            Button(role: .destructive) {
-                                                if let index = scoreManager.purchasedVouchers.firstIndex(of: voucher) {
-                                                    scoreManager.purchasedVouchers.remove(at: index)
-                                                    saveVouchers()
+                                            .frame(width: 50, height: 40)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                                            VStack(alignment: .leading) {
+                                                Text(voucher.title)
+                                                Text(voucher.clinic).font(.caption).foregroundColor(.gray)
+                                                if let code = voucher.code {
+                                                    Text("Code: \(code)").font(.caption2).foregroundColor(.green)
                                                 }
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
+                                                if voucher.isActivated {
+                                                    Text("✅ Activated").font(.caption2).foregroundColor(.blue)
+                                                }
                                             }
 
-                                            Button {
-                                                if let index = scoreManager.purchasedVouchers.firstIndex(of: voucher) {
-                                                    scoreManager.purchasedVouchers[index].isActivated.toggle()
-                                                    saveVouchers()
-                                                }
-                                            } label: {
-                                                Label(scoreManager.purchasedVouchers.first(where: { $0.id == voucher.id })?.isActivated == true ? "Deactivate" : "Activate", systemImage: "checkmark.circle")
-                                            }
-                                            .tint(.blue)
+                                            Spacer()
+                                            Text("-\(voucher.cost)").foregroundColor(.red)
                                         }
                                     }
-                                }
-                                .listStyle(PlainListStyle())
-                            }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            if let index = scoreManager.purchasedVouchers.firstIndex(of: voucher) {
+                                                scoreManager.purchasedVouchers.remove(at: index)
+                                                saveVouchers()
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
 
-                            Spacer()
+                                        Button {
+                                            if let index = scoreManager.purchasedVouchers.firstIndex(of: voucher) {
+                                                scoreManager.purchasedVouchers[index].isActivated.toggle()
+                                                saveVouchers()
+                                            }
+                                        } label: {
+                                            Label(voucher.isActivated ? "Deactivate" : "Activate", systemImage: "checkmark.circle")
+                                        }
+                                        .tint(.blue)
+                                    }
+                                }
+                            }
+                            .listStyle(PlainListStyle())
                         }
-                        .padding(.horizontal)
+
+                        Spacer()
                     }
+                    .padding(.horizontal)
                 }
-                .background(Color(.systemBackground).ignoresSafeArea())
             }
             .alert("Confirm Voucher Redemption?", isPresented: $showConfirm, actions: {
                 Button("Redeem Now", role: .destructive) {
                     if let voucher = selectedVoucher {
-                        _ = scoreManager.purchaseVoucher(voucher)
-                        saveVouchers()
+                        scoreManager.purchaseVoucher(voucher) { success in
+                            if success {
+                                // ✅ Avoid adding duplicate vouchers
+                                if !scoreManager.purchasedVouchers.contains(where: { $0.id == voucher.id }) {
+                                    scoreManager.purchasedVouchers.append(voucher)
+                                    saveVouchers()
+                                }
+                                // Clear selectedVoucher after purchase to avoid duplication
+                                selectedVoucher = nil
+                            } else {
+                                showInsufficientPoints = true
+                            }
+                        }
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("Cancel", role: .cancel) {
+                    selectedVoucher = nil
+                }
             }, message: {
                 Text("Do you want to redeem \"\(selectedVoucher?.title ?? "")\"?")
             })
-            .alert("Insufficient Coins", isPresented: $showInsufficientPoints, actions: {
+            .alert("Insufficient Coins", isPresented: $showInsufficientPoints) {
                 Button("OK", role: .cancel) {}
-            }, message: {
+            } message: {
                 Text("You don’t have enough coins to redeem this voucher.")
-            })
-            .alert("Voucher Code", isPresented: $showCodePopup, actions: {
+            }
+            .alert("Voucher Code", isPresented: $showCodePopup) {
                 Button("OK", role: .cancel) {}
-            }, message: {
+            } message: {
                 Text(selectedVoucher?.code ?? "Code not found")
-            })
+            }
             .onAppear(perform: loadVouchers)
         }
     }
@@ -262,19 +250,19 @@ struct VoucherView: View {
             scoreManager.purchasedVouchers = loaded
         }
     }
-}
 
-// MARK: - String Extension
-extension StringProtocol {
-    func chunked(_ size: Int, separator: Character = "-") -> String {
-        return stride(from: 0, to: self.count, by: size).map {
-            let start = self.index(self.startIndex, offsetBy: $0)
-            let end = self.index(start, offsetBy: size, limitedBy: self.endIndex) ?? self.endIndex
-            return String(self[start..<end])
-        }.joined(separator: String(separator))
+    private func checkFirestoreScore(completion: @escaping (Int) -> Void) {
+        guard !currentUserId.isEmpty else {
+            completion(0)
+            return
+        }
+
+        Firestore.firestore().collection("users").document(currentUserId).getDocument { doc, _ in
+            let score = doc?.data()?["score"] as? Int ?? 0
+            completion(score)
+        }
     }
 }
-
 struct VoucherView_Previews: PreviewProvider {
     static var previews: some View {
         VoucherView()

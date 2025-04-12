@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 // MARK: - Mate Model
 struct Mate: Identifiable, Codable, Equatable {
@@ -26,11 +27,14 @@ struct Mate: Identifiable, Codable, Equatable {
 struct MatesView: View {
     @EnvironmentObject var scoreManager: ScoreManager
     @AppStorage("purchasedMatesData") private var purchasedMatesData: Data = Data()
+    @AppStorage("currentUserId") private var currentUserId: String = ""
 
     @State private var selectedMate: Mate? = nil
     @State private var showConfirm = false
     @State private var showInsufficientPoints = false
     @State private var selectedTab = 0
+
+    @State private var purchasedMateIDs: Set<UUID> = []
 
     let mates: [Mate] = [
         Mate(name: "Mates A", cost: 1, imageUrl: URL(string: "https://yourdomain.com/a.png")!),
@@ -73,21 +77,21 @@ struct MatesView: View {
                                     .padding(.top, 20)
 
                                 LazyVGrid(columns: columns, spacing: 20) {
-                                    ForEach(mates.filter { mate in
-                                        !scoreManager.purchasedMates.contains(where: { $0.id == mate.id })
-                                    }) { mate in
+                                    ForEach(mates.filter { !purchasedMateIDs.contains($0.id) }) { mate in
                                         MateCard(mate: mate) {
-                                            if scoreManager.totalScore >= mate.cost {
-                                                selectedMate = mate
-                                                showConfirm = true
-                                            } else {
-                                                showInsufficientPoints = true
+                                            checkFirestoreScore { dbScore in
+                                                if dbScore >= mate.cost {
+                                                    selectedMate = mate
+                                                    showConfirm = true
+                                                } else {
+                                                    showInsufficientPoints = true
+                                                }
                                             }
                                         }
                                     }
                                 }
 
-                                if scoreManager.purchasedMates.isEmpty {
+                                if purchasedMateIDs.isEmpty {
                                     Text("🧸 You haven’t unlocked any mates yet.")
                                         .foregroundColor(.gray)
                                         .padding(.top, 30)
@@ -146,8 +150,16 @@ struct MatesView: View {
             .alert("Unlock Mate?", isPresented: $showConfirm, actions: {
                 Button("Unlock", role: .destructive) {
                     if let mate = selectedMate {
-                        if scoreManager.purchaseMate(mate) {
-                            saveMates()
+                        scoreManager.purchaseMate(mate) { success in
+                            if success {
+                                if !scoreManager.purchasedMates.contains(mate) {
+                                    scoreManager.purchasedMates.append(mate)
+                                    purchasedMateIDs.insert(mate.id)
+                                    saveMates()
+                                }
+                            } else {
+                                showInsufficientPoints = true
+                            }
                         }
                     }
                 }
@@ -169,12 +181,26 @@ struct MatesView: View {
     private func saveMates() {
         if let data = try? JSONEncoder().encode(scoreManager.purchasedMates) {
             purchasedMatesData = data
+            purchasedMateIDs = Set(scoreManager.purchasedMates.map { $0.id })
         }
     }
 
     private func loadMates() {
         if let loaded = try? JSONDecoder().decode([Mate].self, from: purchasedMatesData) {
             scoreManager.purchasedMates = loaded
+            purchasedMateIDs = Set(loaded.map { $0.id })
+        }
+    }
+
+    private func checkFirestoreScore(completion: @escaping (Int) -> Void) {
+        guard !currentUserId.isEmpty else {
+            completion(0)
+            return
+        }
+
+        Firestore.firestore().collection("users").document(currentUserId).getDocument { doc, _ in
+            let score = doc?.data()?["score"] as? Int ?? 0
+            completion(score)
         }
     }
 }

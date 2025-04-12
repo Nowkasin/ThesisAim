@@ -44,7 +44,7 @@ struct SleepScheduleView: View {
                     .padding(.top)
 
                 VStack(spacing: 16) {
-                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "Wake-Up", selection: $wakeUpTime)
+                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "Wake-up", selection: $wakeUpTime)
                     timePickerRow(icon: "moon.fill", color: .purple, label: "Bedtime", selection: $bedTime)
                 }
                 .padding()
@@ -146,7 +146,7 @@ struct SleepScheduleView: View {
         hasSetSleepSchedule = true
 
         alertsManager.setWakeUpAndBedTime(
-            wakeUp: DateComponents(hour: wakeUpHour + 1, minute: wakeUpMinute),
+            wakeUp: DateComponents(hour: wakeUpHour, minute: wakeUpMinute),
             bed: DateComponents(hour: bedHour, minute: bedMinute),
             interval: 1
         )
@@ -250,3 +250,4 @@ struct SleepScheduleView_Previews: PreviewProvider {
         SleepScheduleView()
     }
 }
+

@@ -104,29 +104,23 @@ class AlertsManager {
         let calendar = Calendar.current
         var current = calendar.date(from: DateComponents(hour: startHour, minute: startMinute))!
 
-        let end = calendar.date(from: DateComponents(hour: endHour, minute: endMinute))!
-        let crossesMidnight = end <= current
+        // ถ้า end อยู่ก่อน start → ข้ามวัน (บวก 1 วันให้ end)
+        var end = calendar.date(from: DateComponents(hour: endHour, minute: endMinute))!
+        if end <= current {
+            end = calendar.date(byAdding: .day, value: 1, to: end)!
+        }
 
-        repeat {
+        while current <= end {
             let components = calendar.dateComponents([.hour, .minute], from: current)
             times.append(components)
 
             guard let next = calendar.date(byAdding: .hour, value: interval, to: current) else { break }
             current = next
-
-            if !crossesMidnight && current > end {
-                break
-            } else if crossesMidnight {
-                let nextHour = calendar.component(.hour, from: current)
-                let nextMinute = calendar.component(.minute, from: current)
-                if nextHour == endHour && nextMinute > endMinute {
-                    break
-                }
-            }
-        } while true
+        }
 
         return times
     }
+
 
     public func removeAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()

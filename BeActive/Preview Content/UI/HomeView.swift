@@ -17,6 +17,7 @@ struct HomeView: View {
     @State private var userName: String = "Welcome"
     @State private var pushedScore: Int = 0
     @State private var showPushedScore: Bool = false
+    @State private var scoreRefreshTimer: Timer? = nil
 
     var firstName: String {
         userName.components(separatedBy: " ").first ?? userName
@@ -63,6 +64,10 @@ struct HomeView: View {
                 .onAppear {
                     updateScreenWidth()
                     fetchUserData()
+                    startScoreRefreshTimer()
+                }
+                .onDisappear {
+                    stopScoreRefreshTimer()
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     updateScreenWidth()
@@ -212,6 +217,18 @@ struct HomeView: View {
         }
     }
 
+    func startScoreRefreshTimer() {
+        stopScoreRefreshTimer()
+        scoreRefreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+            fetchUserData()
+        }
+    }
+
+    func stopScoreRefreshTimer() {
+        scoreRefreshTimer?.invalidate()
+        scoreRefreshTimer = nil
+    }
+
     func dynamicPadding(for width: CGFloat) -> CGFloat {
         return width > 600 ? 40 : 20
     }
@@ -316,4 +333,3 @@ extension View {
         }
     }
 }
-

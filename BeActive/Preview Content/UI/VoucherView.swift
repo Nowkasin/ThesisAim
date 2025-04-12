@@ -90,12 +90,14 @@ struct VoucherView: View {
     var body: some View {
         NavigationView {
             VStack {
-                HStack {
-                    Spacer()
-                    ScoreView()
-                        .padding(.trailing, 20)
-                        .padding(.top, 10)
-                }
+//                HStack {
+//                    Spacer()
+//                    ScoreView()
+//                        .padding(.trailing, 20)
+//                        .padding(.top, 10)
+//                }
+                
+                Spacer()
 
                 Picker("", selection: $selectedTab) {
                     Text("Shop").tag(0)

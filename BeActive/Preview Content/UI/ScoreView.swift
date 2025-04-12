@@ -14,11 +14,19 @@ struct ScoreView: View {
     @AppStorage("lastScoreUploadDate") private var lastScoreUploadDate: String = ""
 
     @State private var showAlert = false
+    @State private var showConfirmation = false
     @State private var alertMessage = ""
 
     var body: some View {
         Button(action: {
-            pushScoreToFirestore()
+            // Check first if already converted today
+            let today = formattedToday()
+            if lastScoreUploadDate == today {
+                alertMessage = "You’ve already converted today’s score to coins."
+                showAlert = true
+            } else {
+                showConfirmation = true
+            }
         }) {
             HStack(spacing: 4) {
                 Image(systemName: "star.circle")
@@ -33,8 +41,18 @@ struct ScoreView: View {
                     .cornerRadius(10)
             }
         }
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Score Upload"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        .alert("Score Converted", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
+        }
+        .alert("Are you sure?", isPresented: $showConfirmation) {
+            Button("Convert", role: .destructive) {
+                pushScoreToFirestore()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to convert your score? This action can only be done once per day.")
         }
     }
 
@@ -48,7 +66,7 @@ struct ScoreView: View {
         let today = formattedToday()
 
         if lastScoreUploadDate == today {
-            alertMessage = "You’ve already pushed today’s score."
+            alertMessage = "You’ve already converted today’s score to coins."
             showAlert = true
             return
         }
@@ -60,10 +78,10 @@ struct ScoreView: View {
             "score": FieldValue.increment(Int64(scoreManager.totalScore))
         ]) { error in
             if let error = error {
-                alertMessage = "Failed to upload score: \(error.localizedDescription)"
+                alertMessage = "Failed to convert score: \(error.localizedDescription)"
             } else {
                 lastScoreUploadDate = today
-                alertMessage = "Score successfully pushed to Firestore!"
+                alertMessage = "Score successfully converted to coins!"
             }
             showAlert = true
         }
@@ -82,5 +100,4 @@ struct ScoreView_Previews: PreviewProvider {
             .environmentObject(ScoreManager.shared)
     }
 }
-
 

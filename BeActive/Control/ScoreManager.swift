@@ -12,8 +12,9 @@ import FirebaseFirestore
 class ScoreManager: ObservableObject {
     static let shared = ScoreManager()
     
-    @Published var waterScore: Int = 0
+    @AppStorage("waterScore") var waterScore: Int = 0
     @Published var stepScore: Int = 0
+    @AppStorage("taskScore") var taskScore: Int = 0
     @Published var purchasedVouchers: [Voucher] = []
     @Published var purchasedMates: [Mate] = []
 
@@ -21,10 +22,10 @@ class ScoreManager: ObservableObject {
     @AppStorage("currentUserId") private var currentUserId: String = ""
 
     var totalScore: Int {
-        waterScore + stepScore
+        waterScore + stepScore + taskScore
     }
 
-    // ✅ Add score locally (no change)
+    // ✅ Add score locally (now persists waterScore and taskScore)
     func addWaterScore(_ score: Int) {
         waterScore += score
         print("Water Score updated to: \(waterScore)")
@@ -33,6 +34,11 @@ class ScoreManager: ObservableObject {
     func addStepScore(_ score: Int) {
         stepScore += score
         print("Step Score updated to: \(stepScore)")
+    }
+    
+    func addTaskScore(_ score: Int) {
+        taskScore += score
+        print("Task Score updated to: \(taskScore)")
     }
 
     // ❌ This local method is still used internally but no longer called directly when purchasing
@@ -134,4 +140,3 @@ class ScoreManager: ObservableObject {
         }
     }
 }
-

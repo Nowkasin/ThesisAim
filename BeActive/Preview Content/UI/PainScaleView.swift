@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct PainRecord: Identifiable {
-    let id = UUID()
+struct PainRecord: Identifiable, Codable {
+    let id: UUID
     let timestamp: Date
     let values: [String: Int]
 }
@@ -20,6 +20,8 @@ struct PainScaleView: View {
     @State private var backPain: Double = 0
     @State private var legPain: Double = 0
     @State private var footPain: Double = 0
+
+    @AppStorage("painHistoryData") private var painHistoryData: Data = Data()
 
     @State private var history: [PainRecord] = []
     @State private var showHistory = false
@@ -40,7 +42,6 @@ struct PainScaleView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
 
-                // ✅ Local image from assets
                 Image("PainScale")
                     .resizable()
                     .scaledToFit()
@@ -48,7 +49,6 @@ struct PainScaleView: View {
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                // 🧍 Sliders
                 painSlider(label: "Head", value: $headPain)
                 painSlider(label: "Arm", value: $armPain)
                 painSlider(label: "Shoulder", value: $shoulderPain)
@@ -56,7 +56,6 @@ struct PainScaleView: View {
                 painSlider(label: "Leg", value: $legPain)
                 painSlider(label: "Foot", value: $footPain)
 
-                // 💾 Save Button
                 Button(action: {
                     showSaveAlert = true
                 }) {
@@ -129,7 +128,6 @@ struct PainScaleView: View {
             Button("Save", role: .none, action: savePainData)
             Button("Cancel", role: .cancel) { }
         }
-
         .alert("Delete this record?", isPresented: $showDeleteAlert) {
             Button("Delete", role: .destructive) {
                 if let record = recordToDelete {
@@ -138,7 +136,6 @@ struct PainScaleView: View {
             }
             Button("Cancel", role: .cancel) { recordToDelete = nil }
         }
-
         .overlay(
             VStack(spacing: 10) {
                 if showSaveConfirmation {
@@ -166,6 +163,9 @@ struct PainScaleView: View {
             .padding(.top, 50)
         )
         .animation(.easeInOut, value: showSaveConfirmation || showDeleteConfirmation)
+        .onAppear {
+            loadHistory()
+        }
     }
 
     func painSlider(label: String, value: Binding<Double>) -> some View {
@@ -229,6 +229,7 @@ struct PainScaleView: View {
 
     func savePainData() {
         let newRecord = PainRecord(
+            id: UUID(),
             timestamp: Date(),
             values: [
                 "Head": Int(headPain),
@@ -240,6 +241,7 @@ struct PainScaleView: View {
             ]
         )
         history.append(newRecord)
+        saveHistory()
 
         withAnimation {
             showSaveConfirmation = true
@@ -254,6 +256,7 @@ struct PainScaleView: View {
 
     func deleteRecord(_ record: PainRecord) {
         history.removeAll { $0.id == record.id }
+        saveHistory()
 
         withAnimation {
             showDeleteConfirmation = true
@@ -263,6 +266,18 @@ struct PainScaleView: View {
             withAnimation {
                 showDeleteConfirmation = false
             }
+        }
+    }
+
+    func saveHistory() {
+        if let encoded = try? JSONEncoder().encode(history) {
+            painHistoryData = encoded
+        }
+    }
+
+    func loadHistory() {
+        if let decoded = try? JSONDecoder().decode([PainRecord].self, from: painHistoryData) {
+            history = decoded
         }
     }
 }

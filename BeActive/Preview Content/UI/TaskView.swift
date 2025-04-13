@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct TaskRecord: Identifiable {
-    let id = UUID()
+struct TaskRecord: Identifiable, Codable {
+    let id: UUID
     let mission: String
     let mate: String
     let duration: Int
@@ -17,12 +17,15 @@ struct TaskRecord: Identifiable {
 }
 
 struct TaskView: View {
+    @EnvironmentObject var scoreManager: ScoreManager
+
     @AppStorage("mission") private var mission: String = ""
     @AppStorage("selectedTime") private var selectedTime: Double = 1
     @AppStorage("isTaskStarted") private var isTaskStarted: Bool = false
     @AppStorage("timeRemaining") private var timeRemaining: Double = 0
     @AppStorage("taskStartTime") private var taskStartTime: Double = 0
     @AppStorage("selectedMate") private var selectedMate: String = "Bear"
+    @AppStorage("taskHistoryData") private var taskHistoryData: Data = Data()
 
     @State private var timer: Timer? = nil
     @State private var animateMateBounce = false
@@ -56,189 +59,199 @@ struct TaskView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                Text("\(mateEmoji) \(selectedMate) Mate")
-                    .font(.system(size: 30, weight: .heavy))
-                    .foregroundStyle(.blue)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    Text("\(mateEmoji) \(selectedMate) Mate")
+                        .font(.system(size: 30, weight: .heavy))
+                        .foregroundStyle(.blue)
 
-                AsyncImage(url: URL(string: imageUrl)) { image in
-                    image.resizable()
-                        .scaledToFit()
-                        .frame(height: 130)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .shadow(color: animateMateBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
-                        .scaleEffect(animateMateBounce ? 1.08 : 0.92)
-                        .offset(y: animateMateBounce ? -4 : 4)
-                        .animation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true), value: animateMateBounce)
-                        .onAppear { animateMateBounce = true }
-                } placeholder: {
-                    ProgressView()
-                }
+                    AsyncImage(url: URL(string: imageUrl)) { image in
+                        image.resizable()
+                            .scaledToFit()
+                            .frame(height: 130)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .shadow(color: animateMateBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
+                            .scaleEffect(animateMateBounce ? 1.08 : 0.92)
+                            .offset(y: animateMateBounce ? -4 : 4)
+                            .animation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true), value: animateMateBounce)
+                            .onAppear { animateMateBounce = true }
+                    } placeholder: {
+                        ProgressView()
+                    }
 
-                VStack(spacing: 12) {
-                    Text("What's your mission?")
-                        .font(.headline)
-                        .foregroundColor(.gray)
+                    VStack(spacing: 12) {
+                        Text("What's your mission?")
+                            .font(.headline)
+                            .foregroundColor(.gray)
 
-                    TextField("Type your goal...", text: $mission)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.3), lineWidth: 1))
-                        .disabled(isTaskStarted)
-                        .multilineTextAlignment(.center)
+                        TextField("Type your goal...", text: $mission)
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.3), lineWidth: 1))
+                            .disabled(isTaskStarted)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+
+                    VStack(spacing: 4) {
+                        Text("Set Timer")
+                            .font(.headline)
+                            .padding(.top)
+
+                        Slider(value: $selectedTime, in: 1...120, step: 1)
+                            .tint(.blue)
+                            .disabled(isTaskStarted)
+                            .padding(.horizontal)
+
+                        Text("\(Int(selectedTime)) minutes")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+
+                    if isTaskStarted {
+                        ProgressCircle(timeRemaining: timeRemaining, totalTime: selectedTime * 60)
+                            .frame(width: 180, height: 180)
+                            .padding(.top, 10)
+                    }
+
+                    Button(action: {
+                        if isTaskStarted {
+                            giveUpTask()
+                        } else {
+                            if mission.isEmpty {
+                                showMissingMissionAlert = true
+                            } else {
+                                startTask()
+                            }
+                        }
+                    }) {
+                        Text(isTaskStarted ? "Give Up" : "Start")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(isTaskStarted ? Color.red : Color.green)
+                            .cornerRadius(12)
+                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    }
+                    .padding(.horizontal)
+
+                    Button("Select Another Mate") {
+                        showMatePicker = true
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(isTaskStarted ? .gray : .blue)
+                    .disabled(isTaskStarted)
+
+                    if !taskHistory.isEmpty {
+                        Button {
+                            withAnimation {
+                                showTaskHistory.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "clock.arrow.circlepath")
+                                Text(showTaskHistory ? "Hide Task History" : "Show Task History")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                        }
+                    }
+
+                    if showTaskHistory {
+                        VStack(alignment: .leading, spacing: 16) {
+                            ForEach(taskHistory.reversed()) { record in
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack {
+                                        Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+
+                                        Spacer()
+
+                                        Button(role: .destructive) {
+                                            recordToDelete = record
+                                            showDeleteAlert = true
+                                        } label: {
+                                            Image(systemName: "trash")
+                                        }
+                                    }
+
+                                    Text("📝 Mission: \(record.mission)")
+                                    Text("🐾 Mate: \(emoji(for: record.mate)) \(record.mate)")
+                                    Text("⏱ Duration: \(record.duration) min")
+                                    Text("📊 Status: \(record.completed ? "Completed" : "Gave Up")")
+                                }
+                                .padding()
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(12)
+                            }
+                        }
                         .padding(.horizontal)
+                    }
                 }
-
-                VStack(spacing: 4) {
-                    Text("Set Timer")
+                .padding()
+            }
+            .sheet(isPresented: $showMatePicker) {
+                VStack(spacing: 16) {
+                    Text("Choose Your Mate")
                         .font(.headline)
                         .padding(.top)
 
-                    Slider(value: $selectedTime, in: 1...120, step: 1)
-                        .tint(.blue)
-                        .disabled(isTaskStarted) // ⛔ disable during countdown
-                        .padding(.horizontal)
-
-                    Text("\(Int(selectedTime)) minutes")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
-
-                if isTaskStarted {
-                    ProgressCircle(timeRemaining: timeRemaining, totalTime: selectedTime * 60)
-                        .frame(width: 180, height: 180)
-                        .padding(.top, 10)
-                }
-
-                Button(action: {
-                    if isTaskStarted {
-                        giveUpTask()
-                    } else {
-                        if mission.isEmpty {
-                            showMissingMissionAlert = true
-                        } else {
-                            startTask()
+                    ForEach(["Bear", "Cat", "Bunny", "Chick"], id: \.self) { mate in
+                        Button(action: {
+                            selectedMate = mate
+                            showMatePicker = false
+                        }) {
+                            Text("\(emoji(for: mate)) \(mate)")
+                                .font(.title2)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(10)
                         }
                     }
-                }) {
-                    Text(isTaskStarted ? "Give Up" : "Start")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(isTaskStarted ? Color.red : Color.green)
-                        .cornerRadius(12)
-                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                }
-                .padding(.horizontal)
 
-                Button("Select Another Mate") {
-                    showMatePicker = true
+                    Spacer()
                 }
-                .font(.subheadline)
-                .foregroundColor(isTaskStarted ? .gray : .blue)
-                .disabled(isTaskStarted)
-
-                if !taskHistory.isEmpty {
-                    Button {
-                        withAnimation {
-                            showTaskHistory.toggle()
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "clock.arrow.circlepath")
-                            Text(showTaskHistory ? "Hide Task History" : "Show Task History")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.blue)
+                .padding()
+            }
+            .alert("🚫 Mission Required", isPresented: $showMissingMissionAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Please enter your mission before starting.")
+            }
+            .alert("💡 Mission Abandoned", isPresented: $showGaveUpAlert) {
+                Button("OK") { }
+            } message: {
+                Text("You gave it your best — that’s what matters!")
+            }
+            .alert("🎉 Task Complete", isPresented: $showCompletedAlert) {
+                Button("OK") { }
+            } message: {
+                Text("Great job!")
+            }
+            .alert("Delete this task?", isPresented: $showDeleteAlert) {
+                Button("Delete", role: .destructive) {
+                    if let record = recordToDelete {
+                        taskHistory.removeAll { $0.id == record.id }
+                        saveTaskHistory()
                     }
                 }
-
-                if showTaskHistory {
-                    VStack(alignment: .leading, spacing: 16) {
-                        ForEach(taskHistory.reversed()) { record in
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-
-                                    Spacer()
-
-                                    Button(role: .destructive) {
-                                        recordToDelete = record
-                                        showDeleteAlert = true
-                                    } label: {
-                                        Image(systemName: "trash")
-                                    }
-                                }
-
-                                Text("📝 Mission: \(record.mission)")
-                                Text("🐾 Mate: \(emoji(for: record.mate)) \(record.mate)")
-                                Text("⏱ Duration: \(record.duration) min")
-                                Text("📊 Status: \(record.completed ? "Completed" : "Gave Up")")
-                            }
-                            .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal)
+                Button("Cancel", role: .cancel) {
+                    recordToDelete = nil
                 }
             }
-            .padding()
-        }
-        .sheet(isPresented: $showMatePicker) {
-            VStack(spacing: 16) {
-                Text("Choose Your Mate")
-                    .font(.headline)
-                    .padding(.top)
-
-                ForEach(["Bear", "Cat", "Bunny", "Chick"], id: \.self) { mate in
-                    Button(action: {
-                        selectedMate = mate
-                        showMatePicker = false
-                    }) {
-                        Text("\(emoji(for: mate)) \(mate)")
-                            .font(.title2)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(10)
-                    }
-                }
-
-                Spacer()
-            }
-            .padding()
-        }
-        .alert("🚫 Mission Required", isPresented: $showMissingMissionAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Please enter your mission before starting.")
-        }
-        .alert("💡 Mission Abandoned", isPresented: $showGaveUpAlert) {
-            Button("OK") { }
-        } message: {
-            Text("You gave it your best — that’s what matters!")
-        }
-        .alert("🎉 Task Complete", isPresented: $showCompletedAlert) {
-            Button("OK") { }
-        } message: {
-            Text("Great job!")
-        }
-        .alert("Delete this task?", isPresented: $showDeleteAlert) {
-            Button("Delete", role: .destructive) {
-                if let record = recordToDelete {
-                    taskHistory.removeAll { $0.id == record.id }
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                recordToDelete = nil
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(true)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(Color.clear, for: .navigationBar)
+            .onAppear {
+                checkIfTaskCompleted()
+                loadTaskHistory()
             }
         }
-        .onAppear { checkIfTaskCompleted() }
     }
 
     func startTask() {
@@ -271,13 +284,19 @@ struct TaskView: View {
         taskStartTime = 0
         timeRemaining = 0
 
-        taskHistory.append(TaskRecord(
+        let record = TaskRecord(
+            id: UUID(),
             mission: mission,
             mate: selectedMate,
             duration: Int(selectedTime),
             completed: true,
             timestamp: Date()
-        ))
+        )
+
+        taskHistory.append(record)
+        saveTaskHistory()
+
+        scoreManager.addTaskScore(10)
 
         withAnimation {
             showBadge = true
@@ -297,14 +316,19 @@ struct TaskView: View {
         taskStartTime = 0
         timeRemaining = 0
 
-        taskHistory.append(TaskRecord(
+        let record = TaskRecord(
+            id: UUID(),
             mission: mission,
             mate: selectedMate,
             duration: Int(selectedTime),
             completed: false,
             timestamp: Date()
-        ))
+        )
 
+        taskHistory.append(record)
+        saveTaskHistory()
+
+        scoreManager.addTaskScore(-20)
         showGaveUpAlert = true
     }
 
@@ -325,6 +349,18 @@ struct TaskView: View {
         case "Bunny": return "🐰"
         case "Chick": return "🐤"
         default: return "🐻"
+        }
+    }
+
+    func saveTaskHistory() {
+        if let encoded = try? JSONEncoder().encode(taskHistory) {
+            taskHistoryData = encoded
+        }
+    }
+
+    func loadTaskHistory() {
+        if let decoded = try? JSONDecoder().decode([TaskRecord].self, from: taskHistoryData) {
+            taskHistory = decoded
         }
     }
 }
@@ -362,11 +398,9 @@ struct ProgressCircle: View {
     }
 }
 
-
-
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
-        TaskView()
+        TaskView().environmentObject(ScoreManager.shared)
     }
 }
 

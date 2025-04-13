@@ -403,7 +403,8 @@ struct RegisterView: View {
             "sex": sex,
             "height": heightNum,
             "weight": weightNum,
-            "phone": phoneNumber
+            "phone": phoneNumber,
+            "score": 0
         ]
 
         db.collection("users").addDocument(data: userData) { error in

@@ -79,12 +79,12 @@ struct VoucherView: View {
     @State private var showCodePopup = false
 
     let vouchers: [Voucher] = [
-        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 3, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
-        Voucher(title: "Discount: ฿30", clinic: "ABC Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
-        Voucher(title: "Discount: ฿40", clinic: "XYZ Physical Center", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
-        Voucher(title: "Discount: ฿50", clinic: "EF Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
-        Voucher(title: "1 Free Treatment", clinic: "GH Clinic", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
-        Voucher(title: "Discount: ฿60", clinic: "Lightcare Physical Center", cost: 0, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
+        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
+        Voucher(title: "Discount: ฿30", clinic: "ABC Clinic", cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
+        Voucher(title: "Discount: ฿40", clinic: "XYZ Physical Center", cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
+        Voucher(title: "Discount: ฿50", clinic: "EF Clinic", cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
+        Voucher(title: "1 Free Treatment", clinic: "GH Clinic", cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
+        Voucher(title: "Discount: ฿60", clinic: "Lightcare Physical Center", cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
     ]
 
     var body: some View {

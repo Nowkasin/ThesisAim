@@ -336,7 +336,7 @@ struct WaterView: View {
 
             if schedule.allSatisfy({ $0.completed }) && !scoreGivenToday {
                 showCongratulations = true
-                scoreManager.addWaterScore(10)
+                scoreManager.addWaterScore(100)
                 scoreGivenToday = true
             }
         }

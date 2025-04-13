@@ -38,9 +38,11 @@ struct MatesView: View {
     @State private var purchasedMateIDs: Set<UUID> = []
 
     let mates: [Mate] = [
-        Mate(name: "Chick", cost: 0, imageUrl: URL(string: "https://media.tenor.com/FVjJHGfS4xsAAAAe/sparkle-hsr.png")!),
-        Mate(name: "Bunny", cost: 0, imageUrl: URL(string: "https://i.imgur.com/yFoGzFQ.png")!),
-        Mate(name: "Cat", cost: 0, imageUrl: URL(string: "https://i.imgur.com/Sd2yxVq.png")!)
+        Mate(name: "Chick", cost: 1000, imageUrl: URL(string: "https://i.imgur.com/ay4YRSm.png")!),
+        Mate(name: "Bunny", cost: 3000, imageUrl: URL(string: "https://i.imgur.com/if52U93.png")!),
+        Mate(name: "Dog", cost: 5000, imageUrl: URL(string: "https://i.imgur.com/RObtJjY.png")!),
+        Mate(name: "Cat", cost: 7000, imageUrl: URL(string: "https://i.imgur.com/5ym20Wl.png")!),
+        Mate(name: "Mocha", cost: 999999, imageUrl: URL(string: "https://i.imgur.com/EmIC3a0.png")!)
     ]
 
     let columns = [

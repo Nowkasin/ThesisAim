@@ -50,9 +50,11 @@ struct TaskView: View {
 
     var imageUrl: String {
         switch selectedMate {
-        case "Cat": return "https://i.imgur.com/Sd2yxVq.png"
-        case "Bunny": return "https://i.imgur.com/yFoGzFQ.png"
-        case "Chick": return "https://media.tenor.com/FVjJHGfS4xsAAAAe/sparkle-hsr.png"
+        case "Cat": return "https://i.imgur.com/5ym20Wl.png"
+        case "Bunny": return "https://i.imgur.com/if52U93.png"
+        case "Chick": return "https://i.imgur.com/ay4YRSm.png"
+        case "Dog": return "https://i.imgur.com/RObtJjY.png"
+        case "Mocha": return "https://i.imgur.com/sY0fdeH.png"
         default: return "https://i.imgur.com/TR7HwEa.png"
         }
     }
@@ -319,7 +321,7 @@ struct TaskView: View {
 
         taskHistory.append(record)
         saveTaskHistory()
-        scoreManager.addTaskScore(10)
+        scoreManager.addTaskScore(20)
 
         withAnimation { showBadge = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -345,7 +347,7 @@ struct TaskView: View {
 
         taskHistory.append(record)
         saveTaskHistory()
-        scoreManager.addTaskScore(-20)
+        scoreManager.addTaskScore(-100)
         showGaveUpAlert = true
     }
 
@@ -365,6 +367,8 @@ struct TaskView: View {
         case "Cat": return "🐱"
         case "Bunny": return "🐰"
         case "Chick": return "🐤"
+        case "Dog": return "🐶"
+        case "Mocha": return "🦈"
         default: return "🐻"
         }
     }

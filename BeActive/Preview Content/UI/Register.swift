@@ -407,10 +407,20 @@ struct RegisterView: View {
             "score": 0
         ]
 
-        db.collection("users").addDocument(data: userData) { error in
+        var newUserRef: DocumentReference? = nil
+        newUserRef = db.collection("users").addDocument(data: userData) { error in
             if let error = error {
                 errorMessage = "Failed to register: \(error.localizedDescription)"
-            } else {
+            } else if let userRef = newUserRef {
+                // ✅ Automatically unlock only "Bear"
+                userRef.collection("mates").document("Bear").setData([
+                    "unlocked": true
+                ]) { mateError in
+                    if let mateError = mateError {
+                        print("⚠️ Failed to unlock Bear: \(mateError.localizedDescription)")
+                    }
+                }
+
                 errorMessage = ""
                 showSuccessAlert = true
             }

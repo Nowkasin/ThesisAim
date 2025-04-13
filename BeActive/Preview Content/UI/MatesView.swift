@@ -32,17 +32,15 @@ struct MatesView: View {
     @State private var selectedMate: Mate? = nil
     @State private var showConfirm = false
     @State private var showInsufficientPoints = false
+    @State private var showAlreadyOwnedAlert = false
     @State private var selectedTab = 0
 
     @State private var purchasedMateIDs: Set<UUID> = []
 
     let mates: [Mate] = [
-        Mate(name: "Mates A", cost: 1, imageUrl: URL(string: "https://yourdomain.com/a.png")!),
-        Mate(name: "Mates B", cost: 2, imageUrl: URL(string: "https://yourdomain.com/b.png")!),
-        Mate(name: "Mates C", cost: 3, imageUrl: URL(string: "https://yourdomain.com/c.png")!),
-        Mate(name: "Mates D", cost: 4, imageUrl: URL(string: "https://yourdomain.com/d.png")!),
-        Mate(name: "Mates E", cost: 5, imageUrl: URL(string: "https://yourdomain.com/e.png")!),
-        Mate(name: "Mates F", cost: 6, imageUrl: URL(string: "https://yourdomain.com/f.png")!)
+        Mate(name: "Chick", cost: 0, imageUrl: URL(string: "https://media.tenor.com/FVjJHGfS4xsAAAAe/sparkle-hsr.png")!),
+        Mate(name: "Bunny", cost: 0, imageUrl: URL(string: "https://i.imgur.com/yFoGzFQ.png")!),
+        Mate(name: "Cat", cost: 0, imageUrl: URL(string: "https://i.imgur.com/Sd2yxVq.png")!)
     ]
 
     let columns = [
@@ -54,13 +52,6 @@ struct MatesView: View {
         NavigationView {
             ZStack(alignment: .topTrailing) {
                 VStack {
-//                    HStack {
-//                        Spacer()
-//                        ScoreView()
-//                            .padding(.trailing, 20)
-//                            .padding(.top, 10)
-//                    }
-                    
                     Spacer()
 
                     Picker("", selection: $selectedTab) {
@@ -79,21 +70,25 @@ struct MatesView: View {
                                     .padding(.top, 20)
 
                                 LazyVGrid(columns: columns, spacing: 20) {
-                                    ForEach(mates.filter { !purchasedMateIDs.contains($0.id) }) { mate in
+                                    ForEach(mates) { mate in
                                         MateCard(mate: mate) {
-                                            checkFirestoreScore { dbScore in
-                                                if dbScore >= mate.cost {
-                                                    selectedMate = mate
-                                                    showConfirm = true
-                                                } else {
-                                                    showInsufficientPoints = true
+                                            if isMateAlreadyUnlocked(mate) {
+                                                showAlreadyOwnedAlert = true
+                                            } else {
+                                                checkFirestoreScore { dbScore in
+                                                    if dbScore >= mate.cost {
+                                                        selectedMate = mate
+                                                        showConfirm = true
+                                                    } else {
+                                                        showInsufficientPoints = true
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
 
-                                if purchasedMateIDs.isEmpty {
+                                if scoreManager.purchasedMates.isEmpty {
                                     Text("🧸 You haven’t unlocked any mates yet.")
                                         .foregroundColor(.gray)
                                         .padding(.top, 30)
@@ -154,7 +149,8 @@ struct MatesView: View {
                     if let mate = selectedMate {
                         scoreManager.purchaseMate(mate) { success in
                             if success {
-                                if !scoreManager.purchasedMates.contains(mate) {
+                                saveMateToFirestore(mate: mate)
+                                if !isMateAlreadyUnlocked(mate) {
                                     scoreManager.purchasedMates.append(mate)
                                     purchasedMateIDs.insert(mate.id)
                                     saveMates()
@@ -174,10 +170,30 @@ struct MatesView: View {
             }, message: {
                 Text("You don’t have enough coins to unlock this mate.")
             })
+            .alert("Already Unlocked", isPresented: $showAlreadyOwnedAlert, actions: {
+                Button("OK", role: .cancel) {}
+            }, message: {
+                Text("You already have this mate. You can’t buy it again.")
+            })
             .onAppear {
                 loadMates()
             }
         }
+    }
+
+    private func isMateAlreadyUnlocked(_ mate: Mate) -> Bool {
+        return scoreManager.purchasedMates.contains { $0.name == mate.name }
+    }
+
+    private func saveMateToFirestore(mate: Mate) {
+        guard !currentUserId.isEmpty else { return }
+        let docRef = Firestore.firestore()
+            .collection("users")
+            .document(currentUserId)
+            .collection("mates")
+            .document(mate.name)
+
+        docRef.setData(["unlocked": true], merge: true)
     }
 
     private func saveMates() {

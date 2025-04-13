@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct TaskRecord: Identifiable, Codable {
     let id: UUID
@@ -26,6 +27,9 @@ struct TaskView: View {
     @AppStorage("taskStartTime") private var taskStartTime: Double = 0
     @AppStorage("selectedMate") private var selectedMate: String = "Bear"
     @AppStorage("taskHistoryData") private var taskHistoryData: Data = Data()
+    @AppStorage("currentUserId") private var currentUserId: String = ""
+
+    @State private var unlockedMates: [String] = ["Bear"]
 
     @State private var timer: Timer? = nil
     @State private var animateMateBounce = false
@@ -41,19 +45,14 @@ struct TaskView: View {
     @State private var showDeleteAlert = false
 
     var mateEmoji: String {
-        switch selectedMate {
-        case "Cat": return "🐱"
-        case "Bunny": return "🐰"
-        case "Chick": return "🐤"
-        default: return "🐻"
-        }
+        emoji(for: selectedMate)
     }
 
     var imageUrl: String {
         switch selectedMate {
         case "Cat": return "https://i.imgur.com/Sd2yxVq.png"
         case "Bunny": return "https://i.imgur.com/yFoGzFQ.png"
-        case "Chick": return "https://i.imgur.com/LvL5ntV.png"
+        case "Chick": return "https://media.tenor.com/FVjJHGfS4xsAAAAe/sparkle-hsr.png"
         default: return "https://i.imgur.com/TR7HwEa.png"
         }
     }
@@ -199,7 +198,7 @@ struct TaskView: View {
                         .font(.headline)
                         .padding(.top)
 
-                    ForEach(["Bear", "Cat", "Bunny", "Chick"], id: \.self) { mate in
+                    ForEach(unlockedMates, id: \.self) { mate in
                         Button(action: {
                             selectedMate = mate
                             showMatePicker = false
@@ -250,8 +249,33 @@ struct TaskView: View {
             .onAppear {
                 checkIfTaskCompleted()
                 loadTaskHistory()
+                loadUnlockedMates()
             }
         }
+    }
+
+    func loadUnlockedMates() {
+        var result: [String] = ["Bear"]
+        guard !currentUserId.isEmpty else {
+            unlockedMates = result
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(currentUserId)
+            .collection("mates")
+            .getDocuments { snapshot, _ in
+                snapshot?.documents.forEach { doc in
+                    if doc.data()["unlocked"] as? Bool == true {
+                        let mateName = doc.documentID
+                        if mateName != "Bear" {
+                            result.append(mateName)
+                        }
+                    }
+                }
+                unlockedMates = Array(Set(result))
+            }
     }
 
     func startTask() {
@@ -295,17 +319,11 @@ struct TaskView: View {
 
         taskHistory.append(record)
         saveTaskHistory()
-
         scoreManager.addTaskScore(10)
 
-        withAnimation {
-            showBadge = true
-        }
-
+        withAnimation { showBadge = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation {
-                showBadge = false
-            }
+            withAnimation { showBadge = false }
             showCompletedAlert = true
         }
     }
@@ -327,7 +345,6 @@ struct TaskView: View {
 
         taskHistory.append(record)
         saveTaskHistory()
-
         scoreManager.addTaskScore(-20)
         showGaveUpAlert = true
     }
@@ -397,7 +414,6 @@ struct ProgressCircle: View {
         return String(format: "%02d:%02d", minutes, secs)
     }
 }
-
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
         TaskView().environmentObject(ScoreManager.shared)

@@ -18,7 +18,7 @@ struct DistanceChartView: View {
             // ✅ Picker สำหรับเลือกช่วงเวลา
             Picker("ช่วงเวลา", selection: $selectedRange) {
                 ForEach(TimeRange.allCases, id: \.self) { range in
-                    Text(range.rawValue).tag(range)
+                    Text(range.localized).tag(range)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
@@ -26,7 +26,7 @@ struct DistanceChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(viewModel.averageDistance, specifier: "%.2f") กม.")
+                Text("\(viewModel.averageDistance, specifier: "%.2f") \(t("km", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)

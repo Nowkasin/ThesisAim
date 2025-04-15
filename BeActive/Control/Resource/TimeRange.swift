@@ -8,10 +8,14 @@
 import Foundation
 
 enum TimeRange: String, CaseIterable {
-    case today = "วัน"
-    case week = "สัปดาห์"
-    case month = "เดือน"
-    case sixMonths = "6 เดือน"
-    case year = "ปี"
+    case today = "today"
+    case week = "week"
+    case month = "month"
+    case sixMonths = "sixMonths"
+    case year = "year"
+    
+    var localized: String {
+           return t(self.rawValue, in: "Chart.Time")
+       }
 }
 

@@ -286,51 +286,55 @@ struct RegisterView: View {
     @State private var height = ""
     @State private var weight = ""
     @State private var phoneNumber = ""
-
+    
     @State private var errorMessage = ""
     @State private var isPasswordVisible = false
     @State private var showSuccessAlert = false
     @State private var showLoginScreen = false
-
+    
     private let passwordValidator = PasswordValidator()
-    let sexOptions = ["Male", "Female", "Other"]
-
+    let sexOptions = [
+        t("Male", in: "register_screen"),
+        t("Female", in: "register_screen"),
+        t("Other", in: "register_screen")
+    ]
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        Text("Register")
+                        Text(t("register", in: "register_screen"))
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.primary)
                             .padding(.top, 40)
                             .padding(.bottom, 30)
-
+                        
                         Group {
-                            CustomTextField(placeholder: "Full Name", text: $name)
-                            CustomTextField(placeholder: "E-mail Address", text: $email)
-                            CustomPasswordField(placeholder: "Password", text: $password, isPasswordVisible: $isPasswordVisible)
+                            CustomTextField(placeholder: t("first_name", in: "register_screen"), text: $name)
+                            CustomTextField(placeholder: t("e_mail", in: "register_screen"), text: $email)
+                            CustomPasswordField(placeholder: t("password", in: "register_screen"), text: $password, isPasswordVisible: $isPasswordVisible)
                                 .onChange(of: password) { newValue in
                                     validatePassword(newValue)
                                 }
-                            CustomTextField(placeholder: "Age", text: $age)
+                            CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age)
                             SexPickerView(sex: $sex, sexOptions: sexOptions)
-                            CustomTextField(placeholder: "Height (cm)", text: $height)
-                            CustomTextField(placeholder: "Weight (kg)", text: $weight)
-                            CustomTextField(placeholder: "Phone", text: $phoneNumber)
+                            CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height)
+                            CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight)
+                            CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber)
                         }
-
+                        
                         if !errorMessage.isEmpty {
                             Text(errorMessage)
                                 .foregroundColor(.red)
                                 .font(.caption)
                                 .padding(.top, 5)
                         }
-
+                        
                         Button(action: {
                             registerUser()
                         }) {
-                            Text("Sign Up")
+                            Text(t("sign_up", in: "register_screen"))
                                 .font(.system(size: 18, weight: .medium))
                                 .frame(maxWidth: .infinity, minHeight: 50)
                                 .background(Color.accentColor)
@@ -339,11 +343,11 @@ struct RegisterView: View {
                         }
                         .padding(.top, 30)
                         .padding(.bottom, 40)
-
+                        
                         HStack {
-                            Text("Already have an account?")
+                            Text(t("have a member?", in: "register_screen"))
                                 .foregroundColor(.primary)
-                            Button("Log In") {
+                            Button(t("log_in", in: "login_screen")) {
                                 showLoginScreen = true
                             }
                             .foregroundColor(.blue)
@@ -357,7 +361,7 @@ struct RegisterView: View {
                 .dismissKeyboardOnTap()
             }
             .background(Color(.systemBackground))
-            .alert("Registration Successful", isPresented: $showSuccessAlert) {
+            .alert(t("register", in: "register_screen"), isPresented: $showSuccessAlert) {
                 Button("OK") {
                     showLoginScreen = true
                 }
@@ -369,31 +373,31 @@ struct RegisterView: View {
             }
         }
     }
-
+    
     func registerUser() {
         guard !name.isEmpty, !email.isEmpty, !password.isEmpty, !age.isEmpty,
               !height.isEmpty, !weight.isEmpty, !phoneNumber.isEmpty, !sex.isEmpty else {
-            errorMessage = "Please fill in all fields."
+            errorMessage = t("fill_all_fields", in: "register_screen")
             return
         }
-
+        
         guard let ageNum = Int(age), let heightNum = Int(height), let weightNum = Int(weight) else {
             errorMessage = "Age, height, and weight must be valid numbers."
             return
         }
-
+        
         guard phoneNumber.count == 10, phoneNumber.allSatisfy({ $0.isNumber }) else {
             errorMessage = "Phone number must be exactly 10 digits."
             return
         }
-
+        
         guard passwordValidator.validatePassword(password) else {
             errorMessage = passwordValidator.errorMessage
             return
         }
-
+        
         let hashedPassword = hashPassword(password)
-
+        
         let db = Firestore.firestore()
         let userData: [String: Any] = [
             "name": name,
@@ -406,13 +410,12 @@ struct RegisterView: View {
             "phone": phoneNumber,
             "score": 0
         ]
-
+        
         var newUserRef: DocumentReference? = nil
         newUserRef = db.collection("users").addDocument(data: userData) { error in
             if let error = error {
                 errorMessage = "Failed to register: \(error.localizedDescription)"
             } else if let userRef = newUserRef {
-                // ✅ Automatically unlock only "Bear"
                 userRef.collection("mates").document("Bear").setData([
                     "unlocked": true
                 ]) { mateError in
@@ -420,13 +423,13 @@ struct RegisterView: View {
                         print("⚠️ Failed to unlock Bear: \(mateError.localizedDescription)")
                     }
                 }
-
+                
                 errorMessage = ""
                 showSuccessAlert = true
             }
         }
     }
-
+    
     private func validatePassword(_ password: String) {
         if !passwordValidator.validatePassword(password) {
             errorMessage = passwordValidator.errorMessage
@@ -434,7 +437,7 @@ struct RegisterView: View {
             errorMessage = ""
         }
     }
-
+    
     private func hashPassword(_ password: String) -> String {
         let data = Data(password.utf8)
         let hashed = SHA256.hash(data: data)
@@ -442,18 +445,19 @@ struct RegisterView: View {
     }
 }
 
+
 // MARK: - Minimal Text Field
 struct CustomTextField: View {
     var placeholder: String
     @Binding var text: String
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             TextField(placeholder, text: $text)
                 .font(.system(size: 16))
                 .padding(.vertical, 10)
                 .foregroundColor(.primary)
-
+            
             Divider()
                 .background(Color.gray.opacity(0.4))
         }
@@ -466,7 +470,7 @@ struct CustomPasswordField: View {
     var placeholder: String
     @Binding var text: String
     @Binding var isPasswordVisible: Bool
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -475,7 +479,7 @@ struct CustomPasswordField: View {
                 } else {
                     SecureField(placeholder, text: $text)
                 }
-
+                
                 Button(action: {
                     isPasswordVisible.toggle()
                 }) {
@@ -485,7 +489,7 @@ struct CustomPasswordField: View {
             }
             .font(.system(size: 16))
             .padding(.vertical, 10)
-
+            
             Divider()
                 .background(Color.gray.opacity(0.4))
         }
@@ -497,13 +501,13 @@ struct CustomPasswordField: View {
 struct SexPickerView: View {
     @Binding var sex: String
     let sexOptions: [String]
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Sex")
+            Text(t("Sex", in: "register_screen"))
                 .font(.system(size: 16))
                 .foregroundColor(.secondary)
-
+            
             Menu {
                 ForEach(sexOptions, id: \.self) { option in
                     Button(action: {
@@ -514,7 +518,7 @@ struct SexPickerView: View {
                 }
             } label: {
                 HStack {
-                    Text(sex.isEmpty ? "Select" : sex)
+                    Text(sex.isEmpty ? t("Select", in: "register_screen") : sex)
                         .foregroundColor(sex.isEmpty ? .gray : .primary)
                     Spacer()
                     Image(systemName: "chevron.down")
@@ -522,7 +526,7 @@ struct SexPickerView: View {
                 }
                 .padding(.vertical, 10)
             }
-
+            
             Divider()
                 .background(Color.gray.opacity(0.4))
         }

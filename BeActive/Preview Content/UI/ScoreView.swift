@@ -19,7 +19,6 @@ struct ScoreView: View {
 
     var body: some View {
         Button(action: {
-            // Check first if already converted today
             let today = formattedToday()
             if lastScoreUploadDate == today {
                 alertMessage = "You’ve already converted today’s score to coins."
@@ -33,6 +32,7 @@ struct ScoreView: View {
                     .resizable()
                     .frame(width: 20, height: 20)
                     .foregroundColor(.yellow)
+
                 Text("\(scoreManager.totalScore)")
                     .font(.headline)
                     .padding(8)
@@ -41,18 +41,18 @@ struct ScoreView: View {
                     .cornerRadius(10)
             }
         }
-        .alert("Score Converted", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
+        .alert(t("Score Converted", in: "Noti_Screen.SC"), isPresented: $showAlert) {
+            Button(t("OK", in: "Noti_Screen.SC"), role: .cancel) {}
         } message: {
-            Text(alertMessage)
+            Text(t(alertMessage, in: "Noti_Screen.SC"))
         }
-        .alert("Are you sure?", isPresented: $showConfirmation) {
-            Button("Convert", role: .destructive) {
+        .alert(t("Are you sure?", in: "Noti_Screen.SC"), isPresented: $showConfirmation) {
+            Button(t("Convert", in: "Noti_Screen.SC"), role: .destructive) {
                 pushScoreToFirestore()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(t("Cancel", in: "Noti_Screen.SC"), role: .cancel) {}
         } message: {
-            Text("Are you sure you want to convert your score? This action can only be done once per day.")
+            Text(t("Are you sure you want to convert your score? This action can only be done once per day.", in: "Noti_Screen.SC"))
         }
     }
 

@@ -18,7 +18,7 @@ struct StepChartView: View {
             // ✅ Picker สำหรับเลือกช่วงเวลา
             Picker("ช่วงเวลา", selection: $selectedRange) {
                 ForEach(TimeRange.allCases, id: \.self) { range in
-                    Text(range.rawValue).tag(range)
+                    Text(range.localized).tag(range)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
@@ -26,7 +26,7 @@ struct StepChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(viewModel.averageSteps, specifier: "%.0f") ก้าว")
+                Text("\(viewModel.averageSteps, specifier: "%.0f") \(t("steps", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)
@@ -45,7 +45,7 @@ struct StepChartView: View {
 
             Spacer()
         }
-        .navigationTitle(activity.titleKey)
+        .navigationTitle(t(activity.titleKey, in: "Chart.UI"))
         .background(Color(.systemBackground))
         .onAppear {
             viewModel.fetchStepCount(for: selectedRange)

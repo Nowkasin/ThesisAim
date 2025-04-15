@@ -36,7 +36,7 @@ struct PainScaleView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
-                Text("Pain Scale")
+                Text(t("Pain Scale", in: "Pain_screen"))
                     .font(.system(size: 36, weight: .bold))
                     .foregroundColor(.pink)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -49,17 +49,17 @@ struct PainScaleView: View {
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                painSlider(label: "Head", value: $headPain)
-                painSlider(label: "Arm", value: $armPain)
-                painSlider(label: "Shoulder", value: $shoulderPain)
-                painSlider(label: "Back", value: $backPain)
-                painSlider(label: "Leg", value: $legPain)
-                painSlider(label: "Foot", value: $footPain)
+                painSlider(label: t("Head", in: "Pain_screen"), value: $headPain)
+                painSlider(label: t("Arm", in: "Pain_screen"), value: $armPain)
+                painSlider(label: t("Shoulder", in: "Pain_screen"), value: $shoulderPain)
+                painSlider(label: t("Back", in: "Pain_screen"), value: $backPain)
+                painSlider(label: t("Leg", in: "Pain_screen"), value: $legPain)
+                painSlider(label: t("Foot", in: "Pain_screen"), value: $footPain)
 
                 Button(action: {
                     showSaveAlert = true
                 }) {
-                    Text("Save")
+                    Text(t("Save", in: "Pain_screen"))
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -78,7 +78,8 @@ struct PainScaleView: View {
                     }) {
                         HStack {
                             Image(systemName: "clock.arrow.circlepath")
-                            Text(showHistory ? "Hide History" : "Show History")
+                            Text(showHistory ? t("Hide History", in: "Pain_screen") : t("Show History", in: "Pain_screen"))
+
                         }
                         .font(.headline)
                         .foregroundColor(.blue)
@@ -124,22 +125,24 @@ struct PainScaleView: View {
             }
         }
         .background(Color(.systemBackground))
-        .alert("Save Pain Scale?", isPresented: $showSaveAlert) {
-            Button("Save", role: .none, action: savePainData)
-            Button("Cancel", role: .cancel) { }
+        .alert(t("Save Pain Scale?", in: "Pain_screen"), isPresented: $showSaveAlert) {
+            Button(t("Save", in: "Pain_screen"), role: .none, action: savePainData)
+            Button(t("Cancel", in: "Mate_screen"), role: .cancel) { }
         }
-        .alert("Delete this record?", isPresented: $showDeleteAlert) {
-            Button("Delete", role: .destructive) {
+
+        .alert(t("Delete this record?", in: "Pain_screen"), isPresented: $showDeleteAlert) {
+            Button(t("Delete", in: "Pain_screen"), role: .destructive) {
                 if let record = recordToDelete {
                     deleteRecord(record)
                 }
             }
-            Button("Cancel", role: .cancel) { recordToDelete = nil }
+            Button(t("Cancel", in: "Mate_screen"), role: .cancel) { recordToDelete = nil }
         }
+
         .overlay(
             VStack(spacing: 10) {
                 if showSaveConfirmation {
-                    Text("Pain Scale Saved!")
+                    Text(t("Pain Scale Saved!", in: "Pain_screen"))
                         .font(.subheadline)
                         .padding()
                         .background(Color.green.opacity(0.9))
@@ -149,7 +152,7 @@ struct PainScaleView: View {
                 }
 
                 if showDeleteConfirmation {
-                    Text("Record Deleted")
+                    Text(t("Record Deleted", in: "Pain_screen"))
                         .font(.subheadline)
                         .padding()
                         .background(Color.red.opacity(0.9))
@@ -232,14 +235,15 @@ struct PainScaleView: View {
             id: UUID(),
             timestamp: Date(),
             values: [
-                "Head": Int(headPain),
-                "Arm": Int(armPain),
-                "Shoulder": Int(shoulderPain),
-                "Back": Int(backPain),
-                "Leg": Int(legPain),
-                "Foot": Int(footPain)
+                t("Head", in: "Pain_screen"): Int(headPain),
+                t("Arm", in: "Pain_screen"): Int(armPain),
+                t("Shoulder", in: "Pain_screen"): Int(shoulderPain),
+                t("Back", in: "Pain_screen"): Int(backPain),
+                t("Leg", in: "Pain_screen"): Int(legPain),
+                t("Foot", in: "Pain_screen"): Int(footPain)
             ]
         )
+
         history.append(newRecord)
         saveHistory()
 
@@ -290,6 +294,3 @@ struct PainScaleView_Previews: PreviewProvider {
         }
     }
 }
-
-
-

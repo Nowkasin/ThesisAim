@@ -57,8 +57,8 @@ struct MatesView: View {
                     Spacer()
 
                     Picker("", selection: $selectedTab) {
-                        Text("Shop").tag(0)
-                        Text("History").tag(1)
+                        Text(t("Shop", in: "Mate_screen")).tag(0)
+                        Text(t("History", in: "Mate_screen")).tag(1)
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .padding(.horizontal)
@@ -66,8 +66,7 @@ struct MatesView: View {
                     if selectedTab == 0 {
                         ScrollView {
                             VStack(spacing: 20) {
-                                Text("Mates Shop")
-                                    .font(.system(size: 32, weight: .bold))
+                                Text(t("Mates Shop", in: "Mate_screen")).font(.system(size: 32, weight: .bold))
                                     .foregroundColor(.primary)
                                     .padding(.top, 20)
 
@@ -91,7 +90,7 @@ struct MatesView: View {
                                 }
 
                                 if scoreManager.purchasedMates.isEmpty {
-                                    Text("🧸 You haven’t unlocked any mates yet.")
+                                    Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
                                         .foregroundColor(.gray)
                                         .padding(.top, 30)
                                 }
@@ -101,12 +100,12 @@ struct MatesView: View {
                         }
                     } else {
                         VStack(spacing: 20) {
-                            Text("Unlocked Mates")
+                            Text(t("Unlocked Mates", in: "Mate_screen"))
                                 .font(.largeTitle)
                                 .padding(.top)
 
                             if scoreManager.purchasedMates.isEmpty {
-                                Text("🧸 You haven’t unlocked any mates yet.")
+                                Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
                                     .foregroundColor(.gray)
                                     .padding()
                             } else {
@@ -128,7 +127,7 @@ struct MatesView: View {
                                         VStack(alignment: .leading) {
                                             Text(mate.name)
                                                 .font(.headline)
-                                            Text("-\(mate.cost) Coins")
+                                            Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
                                                 .font(.subheadline)
                                                 .foregroundColor(.red)
                                         }
@@ -146,8 +145,8 @@ struct MatesView: View {
                 }
                 .background(Color(.systemBackground).ignoresSafeArea())
             }
-            .alert("Unlock Mate?", isPresented: $showConfirm, actions: {
-                Button("Unlock", role: .destructive) {
+            .alert(t("Unlock Mate?", in: "Mate_screen"), isPresented: $showConfirm, actions: {
+                Button(t("Unlock", in: "Mate_screen"), role: .destructive) {
                     if let mate = selectedMate {
                         scoreManager.purchaseMate(mate) { success in
                             if success {
@@ -163,19 +162,20 @@ struct MatesView: View {
                         }
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(t("Cancel", in: "Mate_screen"), role: .cancel) {}
+                }, message: {
+                    Text("Do you want to unlock \"\(selectedMate?.name ?? "")\" for \(selectedMate?.cost ?? 0) coins?")
+                })
+            .alert(t("Insufficient Coins", in: "Mate_screen"), isPresented: $showInsufficientPoints, actions: {
+                Button(t("OK", in: "Mate_screen"), role: .cancel) {}
             }, message: {
-                Text("Do you want to unlock \"\(selectedMate?.name ?? "")\" for \(selectedMate?.cost ?? 0) coins?")
+                Text(t("You don’t have enough coins to unlock this mate.", in: "Mate_screen"))
             })
-            .alert("Insufficient Coins", isPresented: $showInsufficientPoints, actions: {
-                Button("OK", role: .cancel) {}
+
+            .alert(t("Already Unlocked", in: "Mate_screen"), isPresented: $showAlreadyOwnedAlert, actions: {
+                Button(t("OK", in: "Mate_screen"), role: .cancel) {}
             }, message: {
-                Text("You don’t have enough coins to unlock this mate.")
-            })
-            .alert("Already Unlocked", isPresented: $showAlreadyOwnedAlert, actions: {
-                Button("OK", role: .cancel) {}
-            }, message: {
-                Text("You already have this mate. You can’t buy it again.")
+                Text(t("You already have this mate. You can’t buy it again.", in: "Mate_screen"))
             })
             .onAppear {
                 loadMates()
@@ -255,7 +255,7 @@ struct MateCard: View {
                     .font(.headline)
                     .foregroundColor(.black)
 
-                Text("\(mate.cost) Coins")
+                Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.black)

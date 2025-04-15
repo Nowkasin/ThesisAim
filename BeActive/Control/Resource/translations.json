@@ -2,10 +2,12 @@
     "en" : {
         "login_screen": {
             "log_in": "Log In",
-            "e_mail": "E-mail Address",
+            "e_mail": "Email",
             "password": "Password",
             "no_account_yet": "No account yet?",
-            "register": "Register"
+            "register": "Register",
+            "Login Failed" : "Login Failed",
+            "ok": "ok"
         },
         "register_screen": {
             "register": "Register",
@@ -15,7 +17,16 @@
             "phone_number": "Phone Number",
             "password": "Password",
             "sign_up": "Sign Up",
-            "fill_all_fields": "Please fill all fields."
+            "fill_all_fields": "Please fill all fields.",
+            "Age" : "Age",
+            "Height (cm)" : "Height (cm)",
+            "Weight (kg)" : "Weight (kg)",
+            "Sex" : "Sex",
+            "Select" : "Select",
+            "Male" : "Male",
+            "Female" : "Female",
+            "Other" : "Other",
+            "have a member?" : "Already have an account?"
         },
         "home_screen": {
             "Reminders": "Reminders",
@@ -37,7 +48,15 @@
             "Don't forget to drink water!": "Don't forget to drink water!",
             "Congratulations!": "Congratulations!",
             "You have completed your daily water schedule!": "You have completed your daily water schedule!",
-            "ml": "ml"
+            "ml": "ml",
+            "Total Water Intake" : "Total Water Intake",
+            "Add Time Slot" : "Add Time Slot",
+            "Time" : "Time",
+            "Add Slot" : "Add Slot",
+            "Your Time Slots" : "Your Time Slots",
+            "No slots added." : "No slots added.",
+            "Customize Schedule" : "Customize Schedule",
+            "Done" : "Done"
         },
         "Chart_screen": {
             "Today Steps": "Today Steps",
@@ -63,15 +82,216 @@
             "Message" : "Message",
             "How to use": "How to use",
             "Water Notification" : "Water Notification"
+        },
+        "Noti_Screen":{
+            "WaterNoti":{
+                "title" : "Drink water now!",
+                "body" : "Time to drink some water!"
+            },
+            "WalkNoti":{
+                "title" : "Walk Now!",
+                "body" : "You've been sitting for more than 1 hour. Get up and walk!"
+            },
+            "HeartNoti":{
+                "title" : "🚨 High heart rate!",
+                "body" : "Your heart beats too fast without movement. Please rest or check your health."
+            },
+            "SC": {
+                "Score Converted": "Score Converted",
+                "You’ve already converted today’s score to coins.": "You’ve already converted today’s score to coins.",
+                "OK": "OK",
+                "Are you sure?": "Are you sure?",
+                "Convert": "Convert",
+                "Cancel": "Cancel",
+                "Are you sure you want to convert your score? This action can only be done once per day.": "Are you sure you want to convert your score? This action can only be done once per day.",
+                "User not logged in.": "User not logged in.",
+                "Failed to convert score:": "Failed to convert score:",
+                "Score successfully converted to coins!": "Score successfully converted to coins!",
+                "score": "score"
+            }
+        },
+        "Mate_screen":{
+            "Shop" : "Shop",
+            "History" : "History",
+            "Mates Shop" : "Mates Shop",
+            "Unlock Mate?" : "Unlock Mate?",
+            "Unlock" : "Unlock",
+            "Cancel" : "Cancel",
+            "Insufficient Coins" : "Insufficient Coins",
+            "You don’t have enough coins to unlock this mate." : "You don’t have enough coins to unlock this mate.",
+            "Already Unlocked" : "Already Unlocked",
+            "You already have this mate. You can’t buy it again." : "You already have this mate. You can’t buy it again.",
+            "Unlocked Mates" : "Unlocked Mates",
+            "🧸 You haven’t unlocked any mates yet." : "🧸 You haven’t unlocked any mates yet.",
+            "Coins" : "Coins",
+            "Unlocked Mate?" : "Unlocked Mate?"
+        },
+        "Pain_screen" : {
+            "Pain Scale" : "Pain Scale",
+            "Head" : "Head",
+            "Arm" : "Arm",
+            "Shoulder" : "Shoulder",
+            "Back" : "Back",
+            "Leg" : "Leg",
+            "Foot" : "Foot",
+            "Save" : "Save",
+            "Hide History" : "Hide History",
+            "Show History" : "Show History",
+            "Save Pain Scale?" : "Save Pain Scale?",
+            "Delete this record?" : "Delete this record?",
+            "Pain Scale Saved!" : "Pain Scale Saved!",
+            "Record Deleted" : "Record Deleted",
+            "Delete" : "Delete"
+        },
+        "Profile_screen" : {
+            "Personal Information" : "Personal Information",
+            "Physical Information" : "Physical Information",
+            "Full Name" : "Full Name",
+            "Edit Profile" : "Edit Profile",
+            "User Information" : "User Information" ,
+            "Email" : "Email",
+            "Phone" : "Phone",
+            "Sex" : "Sex",
+            "Height" : "Height",
+            "Health Stats" : "Health Stats",
+            "Heart Rate" : "Heart Rate",
+            "Steps" : "Steps",
+            "Calories" : "Calories",
+            "Distance" : "Distance",
+            "Log Out" : "Log Out",
+            "cm" : "cm",
+            "kg" : "kg",
+            "Save Changes" : "Save Changes"
+        },
+        "Sleep_screen": {
+            "title": "Sleep Schedule",
+            "wake_up": "Wake-up",
+            "bedtime": "Bedtime",
+            "save": "Save",
+            "saved": "Schedule Saved",
+            "history": "Schedule History",
+            "saved_on": "Saved on"
+        },
+        "Language_screen" : {
+            "Select Language" : "Select Language",
+            "TH" : "Thai",
+            "EN" : "English"
+        },
+        "Task_screen": {
+            "your_mate": "Mate",
+            "mission_label": "What's your mission?",
+            "mission_placeholder": "Type your goal...",
+            "set_timer": "Set Timer",
+            "minutes_unit": "minutes",
+            "start": "Start",
+            "give_up": "Give Up",
+            "select_mate": "Select Another Mate",
+            "show_history": "Show Task History",
+            "hide_history": "Hide Task History",
+            "mission": "Mission",
+            "mate": "Mate",
+            "duration": "Duration",
+            "status": "Status",
+            "completed": "Completed",
+            "gave_up": "Gave Up",
+            "choose_mate": "Choose Your Mate",
+            "mission_required_title": "🚫 Mission Required",
+            "mission_required_message": "Please enter your mission before starting.",
+            "gave_up_title": "💡 Mission Abandoned",
+            "gave_up_message": "You gave it your best — that’s what matters!",
+            "completed_title": "🎉 Task Complete",
+            "completed_message": "Great job!",
+            "delete_title": "Delete this task?",
+            "delete": "Delete",
+            "cancel": "Cancel"
+        },
+        "Voucher_screen": {
+            "Voucher Shop": "Voucher Shop",
+            "Voucher History": "Voucher History",
+            "🛒 Voucher has not been purchased yet": "🛒 Voucher has not been purchased yet",
+            "Confirm Voucher Redemption?": "Confirm Voucher Redemption?",
+            "Redeem Now": "Redeem Now",
+            "Cancel": "Cancel",
+            "Do you want to redeem": "Do you want to redeem",
+            "Insufficient Coins": "Insufficient Coins",
+            "You don’t have enough coins to redeem this voucher.": "You don’t have enough coins to redeem this voucher.",
+            "Voucher Code": "Voucher Code",
+            "Code not found": "Code not found",
+            "Activate": "Activate",
+            "Deactivate": "Deactivate",
+            "cost_format": "%d Coins",
+            "Coupon": {
+                "Discount": "Discount",
+                "free_treatment": "1 Free Treatment"
+            },
+            "Clinic": {
+                "SWU Physical Therapy": "SWU Physical Therapy",
+                "ABC Clinic": "ABC Clinic",
+                "XYZ Physical Center": "XYZ Physical Center",
+                "EF Clinic": "EF Clinic",
+                "GH Clinic": "GH Clinic",
+                "Lightcare Physical Center": "Lightcare Physical Center"
+            }
+        },
+        "Chart": {
+            "Time": {
+                "today" : "Today",
+                "week" : "Week",
+                "month" : "Month",
+                "sixMonths" : "6 Month",
+                "year" : "Year"
+            },
+            "Summary": {
+                "Average": "Average",
+                "Goal": "Goal",
+                "kcal": "kcal",
+                "steps": "steps",
+                "BPM": "BPM",
+                "km": "km"
+            }
+        },
+        "Month": {
+            "January": "January",
+            "February": "February",
+            "March": "March",
+            "April": "April",
+            "May": "May",
+            "June": "June",
+            "July": "July",
+            "August": "August",
+            "September": "September",
+            "October": "October",
+            "November": "November",
+            "December": "December",
+            
+            "Jan": "Jan",
+            "Feb": "Feb",
+            "Mar": "Mar",
+            "Apr": "Apr",
+            "May": "May",
+            "Jun": "Jun",
+            "Jul": "Jul",
+            "Aug": "Aug",
+            "Sep": "Sep",
+            "Oct": "Oct",
+            "Nov": "Nov",
+            "Dec": "Dec"
+        },
+        "MainTab_screen" : {
+            "Home" : "Home",
+            "Profile" : "Profile",
+            "Pain Scale" : "Pain Scale"
         }
     },
     "th": {
         "login_screen": {
             "log_in": "เข้าสู่ระบบ",
-            "e_mail": "ที่อยู่อีเมล",
+            "e_mail": "อีเมล",
             "password": "รหัสผ่าน",
             "no_account_yet": "ยังไม่มีบัญชีใช่หรือไม่?",
-            "register": "สมัครสมาชิก"
+            "register": "สมัครสมาชิก",
+            "Login Failed" : "เข้าสู่ระบบล้มเหลว",
+            "ok": "ตกลง"
         },
         "register_screen": {
             "register": "สมัครสมาชิก",
@@ -81,7 +301,16 @@
             "phone_number": "เบอร์โทรศัพท์",
             "password": "รหัสผ่าน",
             "sign_up": "สมัคร",
-            "fill_all_fields": "กรุณากรอกข้อมูลให้ครบถ้วน"
+            "fill_all_fields": "กรุณากรอกข้อมูลให้ครบถ้วน",
+            "Age" : "อายุ",
+            "Height (cm)" : "ส่วนสูง (ซม.)",
+            "Weight (kg)" : "น้ำหนัก (กก.)",
+            "Sex" : "เพศ",
+            "Select" : "เลือก",
+            "Male" : "ผู้ชาย",
+            "Female" : "ผู้หญิง",
+            "Other" : "อื่นๆ",
+            "have a member?" : "มีสมาชิกอยู่แล้ว?"
         },
         "home_screen": {
             "Reminders": "แจ้งเตือน",
@@ -111,7 +340,15 @@
             "Don't forget to drink water!": "อย่าลืมดื่มน้ำ!",
             "Congratulations!": "ขอแสดงความยินดี!",
             "You have completed your daily water schedule!": "คุณได้ทำตามแผนการดื่มน้ำในแต่ละวันสำเร็จ!",
-            "ml": "มิลลิลิตร"
+            "ml": "มิลลิลิตร",
+            "Total Water Intake" : "ปริมาณน้ำที่ต้องดื่มทั้งหมด",
+            "Add Time Slot" : "เพิ่มสล็อตเวลา",
+            "Time" : "เวลา",
+            "Add Slot" : "เพิ่มสล็อต",
+            "Your Time Slots" : "สล็อตเวลาของคุณ",
+            "No slots added." : "ไม่มีสล็อตเวลาเพิ่ม",
+            "Customize Schedule" : "ปรับตารางเวลา",
+            "Done" : "เสร็จ"
         },
         "Chart_screen": {
             "Today Steps": "การเดินวันนี้",
@@ -137,7 +374,206 @@
             "Message" : "ข้อความ",
             "How to use": "วิธีใช้งาน",
             "Water Notification" : "การแจ้งเตือนน้ำ"
+        },
+        "Noti_Screen":{
+            "WaterNoti":{
+                "title" : "ดื่มน้ำได้แล้ว!",
+                "body" : "ถึงเวลาดื่มน้ำแล้วนะ!"
+            },
+            "WalkNoti":{
+                "title" : "เดินได้แล้ว!",
+                "body" : "คุณนั่งนานเกิน 1 ชั่วโมง ลุกขึ้นเดินได้แล้ว!"
+            },
+            "HeartNoti":{
+                "title" : "🚨 อัตราการเต้นของหัวใจสูง!",
+                "body" : "หัวใจของคุณเต้นเร็วเกินไปโดยไม่มีการเคลื่อนไหว โปรดพักหรือตรวจสอบสุขภาพของคุณ"
+            },
+            "SC": {
+                "Score Converted": "คะแนนถูกบันทึกแล้ว",
+                "You’ve already converted today’s score to coins.": "คุณได้บันทึกคะแนนของวันนี้เป็นเหรียญไปแล้ว",
+                "OK": "ตกลง",
+                "Are you sure?": "คุณแน่ใจหรือไม่?",
+                "Convert": "บันทึกคะแนน",
+                "Cancel": "ยกเลิก",
+                "Are you sure you want to convert your score? This action can only be done once per day.": "คุณแน่ใจหรือไม่ว่าต้องการบันทึกคะแนน? การกระทำนี้ทำได้เพียงวันละครั้ง",
+                "User not logged in.": "ผู้ใช้ยังไม่ได้เข้าสู่ระบบ",
+                "Failed to convert score:": "ไม่สามารถบันทึกคะแนนได้:",
+                "Score successfully converted to coins!": "บันทึกคะแนนเป็นเหรียญสำเร็จแล้ว!",
+                "score": "คะแนน"
+            }
+        },
+        "Mate_screen":{
+            "Shop" : "ร้านค้า",
+            "History" : "ประวัติ",
+            "Mates Shop" : "ร้านสัตว์เลี้ยง",
+            "Unlock Mate?" : "ปลดล็อคสัตว์เลี้ยง",
+            "Unlock" : "ปลดล็อค",
+            "Cancel" : "ยกเลิก",
+            "Insufficient Coins" : "เหรียญไม่เพียงพอ",
+            "You don’t have enough coins to unlock this mate." : "คุณไม่มีเหรียญพอที่จะปลดล็อคสัตว์เลี้ยง",
+            "Already Unlocked" : "ปลดล็อคแล้ว",
+            "You already have this mate. You can’t buy it again." : "คุณมีสัตว์เลี้ยงแล้ว คุณไม่สามารถซื้อได้อีก",
+            "Unlocked Mates" : "ปลดล็อคสัตว์เลี้ยง",
+            "🧸 You haven’t unlocked any mates yet." : "🧸 คุณยังไม่ได้ปลดล็อคสัตว์เลี้ยง",
+            "Coins" : "เหรียญ",
+            "Unlocked Mate?" : "ปลดล็อคสัตว์เลี้ยง?"
+        },
+        "Pain_screen" : {
+            "Pain Scale" : "ระดับความเจ็บปวด",
+            "Head" : "ศีรษะ",
+            "Arm" : "แขน",
+            "Shoulder" : "ไหล่",
+            "Back" : "หลัง",
+            "Leg" : "ขา",
+            "Foot" : "เท้า",
+            "Save" : "บันทึก",
+            "Hide History" : "ซ่อนประวัติ",
+            "Show History" : "แสดงประวัติ",
+            "Save Pain Scale?" : "บันทึกระดับความเจ็บปวด?",
+            "Delete this record?" : "ลบบันทึก",
+            "Pain Scale Saved!" : "บันทึกระดับความเจ็บปวด!",
+            "Record Deleted" : "ลบบันทึก",
+            "Delete" : "ลบ"
+        },
+        "Profile_screen" : {
+            "Personal Information" : "ข้อมูลส่วนตัว",
+            "Physical Information" : "ข้อมูลทางกายภาพ",
+            "Full Name" : "ชื่อ-สกุล",
+            "Edit Profile" : "แก้ไขโปรไฟล์",
+            "User Information" : "ข้อมูลผู้ใช้" ,
+            "Email" : "อีเมล์",
+            "Phone" : "โทรศัพท์",
+            "Sex" : "เพศ",
+            "Height" : "ส่วนสูง",
+            "Health Stats" : "ข้อมูลสุขภาพ",
+            "Heart Rate" : "อัตราการเต้นหัวใจ",
+            "Steps" : "จำนวนก้าว",
+            "Calories" : "เคลอรี่",
+            "Distance" : "ระยะทาง",
+            "Log Out" : "ล็อคเอ้าท์",
+            "cm" : "ซม.",
+            "kg" : "กก.",
+            "Save Changes" : "บันทึกการเปลี่ยนแปลง"
+        },
+        "Sleep_screen": {
+            "title": "ตารางการนอน",
+            "wake_up": "เวลาตื่น",
+            "bedtime": "เวลานอน",
+            "save": "บันทึก",
+            "saved": "บันทึกแล้ว",
+            "history": "ประวัติการตั้งเวลา",
+            "saved_on": "บันทึกเมื่อ"
+        },
+        "Language_screen" : {
+            "Select Language" : "เลือกภาษา",
+            "TH" : "ภาษาไทย",
+            "EN" : "ภาษาอังกฤษ"
+        },
+        "Task_screen": {
+            "your_mate": "เพื่อนร่วมภารกิจ",
+            "mission_label": "ภารกิจของคุณคืออะไร?",
+            "mission_placeholder": "พิมพ์เป้าหมายของคุณ...",
+            "set_timer": "ตั้งเวลา",
+            "minutes_unit": "นาที",
+            "start": "เริ่ม",
+            "give_up": "ยอมแพ้",
+            "select_mate": "เลือกเพื่อนตัวอื่น",
+            "show_history": "แสดงประวัติภารกิจ",
+            "hide_history": "ซ่อนประวัติภารกิจ",
+            "mission": "ภารกิจ",
+            "mate": "เพื่อน",
+            "duration": "ระยะเวลา",
+            "status": "สถานะ",
+            "completed": "สำเร็จ",
+            "gave_up": "ยอมแพ้",
+            "choose_mate": "เลือกเพื่อนของคุณ",
+            "mission_required_title": "🚫 จำเป็นต้องมีภารกิจ",
+            "mission_required_message": "กรุณาใส่ภารกิจก่อนเริ่มต้น",
+            "gave_up_title": "💡 ยกเลิกภารกิจ",
+            "gave_up_message": "คุณพยายามอย่างดีที่สุดแล้ว — นั่นคือสิ่งที่สำคัญ!",
+            "completed_title": "🎉 ภารกิจสำเร็จ",
+            "completed_message": "เยี่ยมมาก!",
+            "delete_title": "ลบภารกิจนี้?",
+            "delete": "ลบ",
+            "cancel": "ยกเลิก"
+        },
+        "Voucher_screen": {
+            "Voucher Shop": "ร้านบัตรกำนัล",
+            "Voucher History": "ประวัติบัตรกำนัล",
+            "🛒 Voucher has not been purchased yet": "🛒 ยังไม่มีการซื้อบัตรกำนัล",
+            "Confirm Voucher Redemption?": "ยืนยันการแลกบัตรกำนัล?",
+            "Redeem Now": "แลกเลย",
+            "Cancel": "ยกเลิก",
+            "Do you want to redeem": "คุณต้องการแลก",
+            "Insufficient Coins": "เหรียญไม่เพียงพอ",
+            "You don’t have enough coins to redeem this voucher.": "คุณไม่มีเหรียญเพียงพอในการแลกบัตรกำนัลนี้",
+            "Voucher Code": "โค้ดบัตรกำนัล",
+            "Code not found": "ไม่พบโค้ด",
+            "Activate": "เปิดใช้งาน",
+            "Deactivate": "ปิดใช้งาน",
+            "cost_format": "%d เหรียญ",
+            "Coupon": {
+                "Discount": "ส่วนลด",
+                "free_treatment": "ฟรี 1 ครั้ง"
+            },
             
+            "Clinic": {
+                "SWU Physical Therapy": "คลินิกกายภาพบำบัด มศว",
+                "ABC Clinic": "คลินิกเอบีซี",
+                "XYZ Physical Center": "ศูนย์กายภาพ XYZ",
+                "EF Clinic": "คลินิกอีเอฟ",
+                "GH Clinic": "คลินิกจีเอช",
+                "Lightcare Physical Center": "ศูนย์กายภาพไลท์แคร์"
+            }
+        },
+        "Chart": {
+            "Time": {
+                "today" : "วันนี้",
+                "week" : "สัปดาห์นี้",
+                "month" : "เดือนนี้",
+                "sixMonths" : "6 เดือน",
+                "year" : "ปี"
+            },
+            "Summary": {
+                "Average": "เฉลี่ย",
+                "Goal": "เป้าหมาย",
+                "kcal": "กิโลแคลอรี",
+                "steps": "ก้าว",
+                "BPM": "ครั้ง/นาที",
+                "km": "กิโลเมตร"
+            }
+        },
+        "Month" : {
+            "January": "มกราคม",
+            "February": "กุมภาพันธ์",
+            "March": "มีนาคม",
+            "April": "เมษายน",
+            "May": "พฤษภาคม",
+            "June": "มิถุนายน",
+            "July": "กรกฎาคม",
+            "August": "สิงหาคม",
+            "September": "กันยายน",
+            "October": "ตุลาคม",
+            "November": "พฤศจิกายน",
+            "December": "ธันวาคม",
+            
+            "Jan": "ม.ค.",
+            "Feb": "ก.พ.",
+            "Mar": "มี.ค.",
+            "Apr": "เม.ย.",
+            "May": "พ.ค.",
+            "Jun": "มิ.ย.",
+            "Jul": "ก.ค.",
+            "Aug": "ส.ค.",
+            "Sep": "ก.ย.",
+            "Oct": "ต.ค.",
+            "Nov": "พ.ย.",
+            "Dec": "ธ.ค."
+        },
+        "MainTab_screen" : {
+            "Home" : "หน้าหลัก",
+            "Profile" : "โปรไฟล์",
+            "Pain Scale" : "ความเจ็บปวด"
         }
     }
 }

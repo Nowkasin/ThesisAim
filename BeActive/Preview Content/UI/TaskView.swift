@@ -63,7 +63,7 @@ struct TaskView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    Text("\(mateEmoji) \(selectedMate) Mate")
+                    Text("\(mateEmoji) \(selectedMate) \(t("your_mate", in: "Task_screen"))")
                         .font(.system(size: 30, weight: .heavy))
                         .foregroundStyle(.blue)
 
@@ -82,11 +82,11 @@ struct TaskView: View {
                     }
 
                     VStack(spacing: 12) {
-                        Text("What's your mission?")
+                        Text(t("mission_label", in: "Task_screen"))
                             .font(.headline)
                             .foregroundColor(.gray)
 
-                        TextField("Type your goal...", text: $mission)
+                        TextField(t("mission_placeholder", in: "Task_screen"), text: $mission)
                             .padding()
                             .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.3), lineWidth: 1))
@@ -96,7 +96,7 @@ struct TaskView: View {
                     }
 
                     VStack(spacing: 4) {
-                        Text("Set Timer")
+                        Text(t("set_timer", in: "Task_screen"))
                             .font(.headline)
                             .padding(.top)
 
@@ -105,7 +105,7 @@ struct TaskView: View {
                             .disabled(isTaskStarted)
                             .padding(.horizontal)
 
-                        Text("\(Int(selectedTime)) minutes")
+                        Text("\(Int(selectedTime)) \(t("minutes_unit", in: "Task_screen"))")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }
@@ -127,7 +127,7 @@ struct TaskView: View {
                             }
                         }
                     }) {
-                        Text(isTaskStarted ? "Give Up" : "Start")
+                        Text(isTaskStarted ? t("give_up", in: "Task_screen") : t("start", in: "Task_screen"))
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -138,7 +138,7 @@ struct TaskView: View {
                     }
                     .padding(.horizontal)
 
-                    Button("Select Another Mate") {
+                    Button(t("select_mate", in: "Task_screen")) {
                         showMatePicker = true
                     }
                     .font(.subheadline)
@@ -153,7 +153,7 @@ struct TaskView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "clock.arrow.circlepath")
-                                Text(showTaskHistory ? "Hide Task History" : "Show Task History")
+                                Text(showTaskHistory ? t("hide_history", in: "Task_screen") : t("show_history", in: "Task_screen"))
                             }
                             .font(.headline)
                             .foregroundColor(.blue)
@@ -179,10 +179,10 @@ struct TaskView: View {
                                         }
                                     }
 
-                                    Text("📝 Mission: \(record.mission)")
-                                    Text("🐾 Mate: \(emoji(for: record.mate)) \(record.mate)")
-                                    Text("⏱ Duration: \(record.duration) min")
-                                    Text("📊 Status: \(record.completed ? "Completed" : "Gave Up")")
+                                    Text("📝 \(t("mission", in: "Task_screen")): \(record.mission)")
+                                    Text("🐾 \(t("mate", in: "Task_screen")): \(emoji(for: record.mate)) \(record.mate)")
+                                    Text("⏱ \(t("duration", in: "Task_screen")): \(record.duration) \(t("minutes_unit", in: "Task_screen"))")
+                                    Text("📊 \(t("status", in: "Task_screen")): \(record.completed ? t("completed", in: "Task_screen") : t("gave_up", in: "Task_screen"))")
                                 }
                                 .padding()
                                 .background(Color(.secondarySystemBackground))
@@ -196,7 +196,7 @@ struct TaskView: View {
             }
             .sheet(isPresented: $showMatePicker) {
                 VStack(spacing: 16) {
-                    Text("Choose Your Mate")
+                    Text(t("choose_mate", in: "Task_screen"))
                         .font(.headline)
                         .padding(.top)
 
@@ -218,29 +218,29 @@ struct TaskView: View {
                 }
                 .padding()
             }
-            .alert("🚫 Mission Required", isPresented: $showMissingMissionAlert) {
+            .alert(t("mission_required_title", in: "Task_screen"), isPresented: $showMissingMissionAlert) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text("Please enter your mission before starting.")
+                Text(t("mission_required_message", in: "Task_screen"))
             }
-            .alert("💡 Mission Abandoned", isPresented: $showGaveUpAlert) {
+            .alert(t("gave_up_title", in: "Task_screen"), isPresented: $showGaveUpAlert) {
                 Button("OK") { }
             } message: {
-                Text("You gave it your best — that’s what matters!")
+                Text(t("gave_up_message", in: "Task_screen"))
             }
-            .alert("🎉 Task Complete", isPresented: $showCompletedAlert) {
+            .alert(t("completed_title", in: "Task_screen"), isPresented: $showCompletedAlert) {
                 Button("OK") { }
             } message: {
-                Text("Great job!")
+                Text(t("completed_message", in: "Task_screen"))
             }
-            .alert("Delete this task?", isPresented: $showDeleteAlert) {
-                Button("Delete", role: .destructive) {
+            .alert(t("delete_title", in: "Task_screen"), isPresented: $showDeleteAlert) {
+                Button(t("delete", in: "Task_screen"), role: .destructive) {
                     if let record = recordToDelete {
                         taskHistory.removeAll { $0.id == record.id }
                         saveTaskHistory()
                     }
                 }
-                Button("Cancel", role: .cancel) {
+                Button(t("cancel", in: "Task_screen"), role: .cancel) {
                     recordToDelete = nil
                 }
             }
@@ -423,10 +423,3 @@ struct TaskView_Previews: PreviewProvider {
         TaskView().environmentObject(ScoreManager.shared)
     }
 }
-
-
-
-
-
-
-

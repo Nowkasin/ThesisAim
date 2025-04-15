@@ -195,30 +195,39 @@ class DistanceViewModel: ObservableObject {
 
     func dateRangeText(for range: TimeRange) -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en") // ใช้ชื่อเดือนอังกฤษเพื่อให้แปลได้
         formatter.dateStyle = .medium
         let now = Date()
         let calendar = Calendar.current
 
         switch range {
         case .today:
-            return formatter.string(from: now)
+            return translatedDate(from: now, formatter: formatter)
+
         case .week:
             if let start = calendar.date(byAdding: .day, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                return "\(translatedDate(from: start, formatter: formatter)) - \(translatedDate(from: now, formatter: formatter))"
             }
+
         case .month:
-            formatter.dateFormat = "MMMM yyyy"
-            return formatter.string(from: now)
+            formatter.dateFormat = "MMM yyyy" // ใช้รูปแบบเดือนเต็ม เช่น April 2025
+            return translatedDate(from: now, formatter: formatter)
+
+
         case .sixMonths:
             if let start = calendar.date(byAdding: .month, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                formatter.dateFormat = "MMM yyyy"
+                return "\(translatedDate(from: start, formatter: formatter)) - \(translatedDate(from: now, formatter: formatter))"
             }
+
         case .year:
             if let start = calendar.date(byAdding: .year, value: -1, to: now) {
                 formatter.dateFormat = "MMM yyyy"
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                return "\(translatedDate(from: start, formatter: formatter)) - \(translatedDate(from: now, formatter: formatter))"
             }
         }
+
         return ""
     }
+
 }

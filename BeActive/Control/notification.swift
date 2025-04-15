@@ -51,8 +51,8 @@ class AlertsManager {
 
         for (index, time) in notificationTimes.enumerated() {
             let content = UNMutableNotificationContent()
-            content.title = "ดื่มน้ำได้แล้ว!"
-            content.body = "ถึงเวลาดื่มน้ำแล้วนะ!"
+            content.title = t("title", in: "Noti_Screen.WaterNoti")
+                   content.body = t("body", in: "Noti_Screen.WaterNoti")
             content.sound = .default
 
             let trigger = UNCalendarNotificationTrigger(dateMatching: time, repeats: true)
@@ -130,8 +130,8 @@ class AlertsManager {
     func triggerMoveAlert() {
         if !isAlertActive {
             let content = UNMutableNotificationContent()
-            content.title = "เดินได้แล้ว!"
-            content.body = "คุณนั่งนานเกิน 1 ชั่วโมง ลุกขึ้นเดินได้แล้ว!"
+            content.title = t("title", in: "Noti_Screen.WalkNoti")
+            content.body = t("body", in: "Noti_Screen.WalkNoti")
             content.sound = .default
 
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true)
@@ -161,8 +161,8 @@ class AlertsManager {
         isHeartRateAlertActive = true
 
         let content = UNMutableNotificationContent()
-        content.title = "🚨 อัตราการเต้นของหัวใจสูง!"
-        content.body = "หัวใจของคุณเต้นเร็วเกินไปโดยไม่มีการเคลื่อนไหว โปรดพักหรือตรวจสอบสุขภาพของคุณ"
+        content.title = t("title", in: "Noti_Screen.HeartNoti")
+        content.body = t("body", in: "Noti_Screen.HeartNoti")
         content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)

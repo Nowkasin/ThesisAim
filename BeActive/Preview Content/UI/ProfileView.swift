@@ -41,7 +41,7 @@ struct ProfileView: View {
                         HStack {
                             Image(systemName: "pencil")
                                 .font(.system(size: 16, weight: .medium))
-                            Text("Edit Profile")
+                            Text(t("Edit Profile", in: "Profile_screen"))
                                 .font(.system(size: 16, weight: .medium))
                         }
                         .foregroundColor(.primary)
@@ -62,23 +62,32 @@ struct ProfileView: View {
                         )
                     }
 
-                    InfoCard(title: "User Information", icon: "person.fill") {
-                        UserInfoRow(icon: "envelope.fill", title: "Email", value: userEmail)
+                    InfoCard(title: t("User Information", in: "Profile_screen"), icon: "person.fill") {
+                        UserInfoRow(icon: "envelope.fill", title: t("Email", in: "Profile_screen"), value: userEmail)
                         if let height = userHeight {
-                            UserInfoRow(icon: "ruler.fill", title: "Height", value: "\(height) cm")
+                            UserInfoRow(
+                                icon: "ruler.fill",
+                                title: t("Height", in: "register_screen"),
+                                value: "\(height) \(t("cm", in: "Profile_screen"))"
+                            )
                         }
-                        UserInfoRow(icon: "phone.fill", title: "Phone", value: userPhone)
-                        UserInfoRow(icon: "person.fill", title: "Sex", value: userSex)
+                        UserInfoRow(icon: "phone.fill", title: t("Phone", in: "Profile_screen"), value: userPhone)
+                        UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"), value: userSex)
+
                         if let weight = userWeight {
-                            UserInfoRow(icon: "scalemass.fill", title: "Weight", value: "\(weight) kg")
+                            UserInfoRow(
+                                icon: "scalemass.fill",
+                                title: t("Weight", in: "Profile_screen"),
+                                value: "\(weight) \(t("kg", in: "Profile_screen"))"
+                            )
                         }
                     }
 
-                    InfoCard(title: "Health Stats", icon: "heart.fill") {
-                        HealthStatView(icon: "heart.fill", color: .red, title: "Heart Rate", value: localHealthStats.heartRate)
-                        HealthStatView(icon: "figure.walk", color: .green, title: "Steps", value: localHealthStats.stepCount)
-                        HealthStatView(icon: "flame.fill", color: .orange, title: "Calories", value: localHealthStats.caloriesBurned)
-                        HealthStatView(icon: "figure.walk.circle", color: .blue, title: "Distance", value: localHealthStats.distance)
+                    InfoCard(title: t("Health Stats", in: "Profile_screen"), icon: "heart.fill") {
+                        HealthStatView(icon: "heart.fill", color: .red, title: t("Heart Rate", in: "Profile_screen"), value: localHealthStats.heartRate)
+                        HealthStatView(icon: "figure.walk", color: .green, title: t("Steps", in: "Profile_screen"), value: localHealthStats.stepCount)
+                        HealthStatView(icon: "flame.fill", color: .orange, title: t("Calories", in: "Profile_screen"), value: localHealthStats.caloriesBurned)
+                        HealthStatView(icon: "figure.walk.circle", color: .blue, title: t("Distance", in: "Profile_screen"), value: localHealthStats.distance)
                     }
 
                     Button(action: {
@@ -89,7 +98,7 @@ struct ProfileView: View {
                             Image(systemName: "arrow.right.circle.fill")
                                 .foregroundColor(.white)
                                 .font(.title2)
-                            Text("Log Out")
+                            Text(t("Log Out", in: "Profile_screen"))
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(5)
@@ -173,22 +182,22 @@ struct EditProfileView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Personal Information")) {
-                    LabeledTextField(label: "Full Name", text: $userName)
-                    LabeledTextField(label: "Email Address", text: $userEmail)
-                    LabeledTextField(label: "Phone Number", text: $userPhone)
+                Section(header: Text(t("Personal Information", in: "Profile_screen"))) {
+                    LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $userName)
+                    LabeledTextField(label: t("Email", in: "Profile_screen"), text: $userEmail)
+                    LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $userPhone)
                 }
 
-                Section(header: Text("Physical Information")) {
-                    LabeledNumberField(label: "Age", value: $userAge)
-                    LabeledNumberField(label: "Height (cm)", value: $userHeight)
-                    LabeledNumberField(label: "Weight (kg)", value: $userWeight)
+                Section(header: Text(t("Physical Information", in: "Profile_screen"))) {
+                    LabeledNumberField(label: t("Age", in: "register_screen"), value: $userAge)
+                    LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $userHeight)
+                    LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $userWeight)
 
-                    Picker("Sex", selection: $userSex) {
-                        Text("Male").tag("Male")
-                        Text("Female").tag("Female")
-                        Text("Other").tag("Other")
-                    }
+                    Picker(t("Sex", in: "register_screen"), selection: $userSex) {
+                            Text(t("Male", in: "register_screen")).tag("Male")
+                            Text(t("Female", in: "register_screen")).tag("Female")
+                            Text(t("Other", in: "register_screen")).tag("Other")
+                        }
                     .pickerStyle(SegmentedPickerStyle())
                 }
 
@@ -196,7 +205,7 @@ struct EditProfileView: View {
                     Button(action: {
                         saveUserData()
                     }) {
-                        Text("Save Changes")
+                        Text(t("Save Changes", in: "Profile_screen"))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -205,8 +214,8 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .navigationTitle("Edit Profile")
-            .navigationBarItems(trailing: Button("Cancel") {
+            .navigationTitle(t("Edit Profile", in: "Profile_screen"))
+            .navigationBarItems(trailing: Button(t("Cancel", in: "Mate_screen")) {
                 presentationMode.wrappedValue.dismiss()
             })
         }

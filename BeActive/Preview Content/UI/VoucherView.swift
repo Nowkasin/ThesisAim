@@ -54,7 +54,8 @@ struct VoucherCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(voucher.title).font(.headline).foregroundColor(.primary)
                     Text(voucher.clinic).font(.subheadline).foregroundColor(.blue)
-                    Text("\(voucher.cost) Coins").font(.subheadline).fontWeight(.semibold).foregroundColor(.primary)
+                    Text(String(format: t("cost_format", in: "Voucher_screen"), voucher.cost))
+.font(.subheadline).fontWeight(.semibold).foregroundColor(.primary)
                 }
                 Spacer()
             }
@@ -79,12 +80,12 @@ struct VoucherView: View {
     @State private var showCodePopup = false
 
     let vouchers: [Voucher] = [
-        Voucher(title: "Discount: ฿20", clinic: "SWU Physical Therapy", cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
-        Voucher(title: "Discount: ฿30", clinic: "ABC Clinic", cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
-        Voucher(title: "Discount: ฿40", clinic: "XYZ Physical Center", cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
-        Voucher(title: "Discount: ฿50", clinic: "EF Clinic", cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
-        Voucher(title: "1 Free Treatment", clinic: "GH Clinic", cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
-        Voucher(title: "Discount: ฿60", clinic: "Lightcare Physical Center", cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
+        Voucher(title: "\(t("Discount", in: "Voucher_screen.Coupon")): ฿20", clinic: t("SWU Physical Therapy", in: "Voucher_screen.Clinic"), cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=1")!, code: "DEMO-1111-2222-3333"),
+        Voucher(title: "\(t("Discount", in: "Voucher_screen.Coupon")): ฿30", clinic: t("ABC Clinic", in: "Voucher_screen.Clinic"), cost: 1000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=2")!, code: "CODE-AAAA-BBBB-CCCC"),
+        Voucher(title: "\(t("Discount", in: "Voucher_screen.Coupon")): ฿40", clinic: t("XYZ Physical Center", in: "Voucher_screen.Clinic"), cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=3")!, code: "PROMO-1234-5678-9012"),
+        Voucher(title: "\(t("Discount", in: "Voucher_screen.Coupon")): ฿50", clinic: t("EF Clinic", in: "Voucher_screen.Clinic"), cost: 2000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=4")!, code: "VIP-4455-6677-8899"),
+        Voucher(title: t("free_treatment", in: "Voucher_screen.Coupon"), clinic: t("GH Clinic", in: "Voucher_screen.Clinic"), cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=5")!, code: "FREE-0000-0000-0000"),
+        Voucher(title: "\(t("Discount", in: "Voucher_screen.Coupon")): ฿60", clinic: t("Lightcare Physical Center", in: "Voucher_screen.Clinic"), cost: 3000, imageUrl: URL(string: "https://via.placeholder.com/100x80?text=6")!, code: "SALE-9999-8888-7777")
     ]
 
     var body: some View {
@@ -100,8 +101,8 @@ struct VoucherView: View {
                 Spacer()
 
                 Picker("", selection: $selectedTab) {
-                    Text("Shop").tag(0)
-                    Text("History").tag(1)
+                    Text(t("Shop", in: "Mate_screen")).tag(0)
+                    Text(t("History", in: "Mate_screen")).tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(.horizontal)
@@ -109,7 +110,7 @@ struct VoucherView: View {
                 if selectedTab == 0 {
                     ScrollView {
                         VStack(spacing: 20) {
-                            Text("Voucher Shop")
+                            Text(t("Voucher Shop", in: "Voucher_screen"))
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.pink)
                                 .padding(.top, 20)
@@ -134,10 +135,10 @@ struct VoucherView: View {
                     }
                 } else {
                     VStack(spacing: 15) {
-                        Text("Voucher History").font(.largeTitle).padding(.top)
+                        Text(t("Voucher History", in: "Voucher_screen")).font(.largeTitle).padding(.top)
 
                         if scoreManager.purchasedVouchers.isEmpty {
-                            Text("🛒 Voucher has not been purchased yet")
+                            Text(t("🛒 Voucher has not been purchased yet", in: "Voucher_screen"))
                                 .foregroundColor(.gray)
                                 .padding()
                         } else {
@@ -162,10 +163,10 @@ struct VoucherView: View {
                                                 Text(voucher.title)
                                                 Text(voucher.clinic).font(.caption).foregroundColor(.gray)
                                                 if let code = voucher.code {
-                                                    Text("Code: \(code)").font(.caption2).foregroundColor(.green)
+                                                    Text(t("Code", in: "Voucher_screen") + ": \(code)").font(.caption2).foregroundColor(.green)
                                                 }
                                                 if voucher.isActivated {
-                                                    Text("✅ Activated").font(.caption2).foregroundColor(.blue)
+                                                    Text(t("Activated", in: "Voucher_screen")).font(.caption2).foregroundColor(.blue)
                                                 }
                                             }
 
@@ -180,7 +181,7 @@ struct VoucherView: View {
                                                 saveVouchers()
                                             }
                                         } label: {
-                                            Label("Delete", systemImage: "trash")
+                                            Label(t("Delete", in: "Pain_screen"), systemImage: "trash")
                                         }
 
                                         Button {
@@ -189,7 +190,7 @@ struct VoucherView: View {
                                                 saveVouchers()
                                             }
                                         } label: {
-                                            Label(voucher.isActivated ? "Deactivate" : "Activate", systemImage: "checkmark.circle")
+                                            Label(voucher.isActivated ? t("Deactivate", in: "Voucher_screen") : t("Activate", in: "Voucher_screen"), systemImage: "checkmark.circle")
                                         }
                                         .tint(.blue)
                                     }
@@ -203,8 +204,8 @@ struct VoucherView: View {
                     .padding(.horizontal)
                 }
             }
-            .alert("Confirm Voucher Redemption?", isPresented: $showConfirm, actions: {
-                Button("Redeem Now", role: .destructive) {
+            .alert(t("Confirm Voucher Redemption?", in: "Voucher_screen"), isPresented: $showConfirm, actions: {
+                Button(t("Redeem Now", in: "Voucher_screen"), role: .destructive)  {
                     if let voucher = selectedVoucher {
                         scoreManager.purchaseVoucher(voucher) { success in
                             if success {
@@ -221,21 +222,21 @@ struct VoucherView: View {
                         }
                     }
                 }
-                Button("Cancel", role: .cancel) {
+                Button(t("Cancel", in: "Voucher_screen"), role: .cancel) {
                     selectedVoucher = nil
                 }
-            }, message: {
-                Text("Do you want to redeem \"\(selectedVoucher?.title ?? "")\"?")
+            },  message: {
+                Text(t("Do you want to redeem", in: "Voucher_screen") + " \"\(selectedVoucher?.title ?? "")\"?")
             })
-            .alert("Insufficient Coins", isPresented: $showInsufficientPoints) {
-                Button("OK", role: .cancel) {}
+            .alert(t("Insufficient Coins", in: "Voucher_screen"), isPresented: $showInsufficientPoints) {
+                Button(t("OK", in: "home_screen"), role: .cancel) {}
             } message: {
-                Text("You don’t have enough coins to redeem this voucher.")
+                Text(t("You don’t have enough coins to redeem this voucher.", in: "Voucher_screen"))
             }
-            .alert("Voucher Code", isPresented: $showCodePopup) {
-                Button("OK", role: .cancel) {}
+            .alert(t("Voucher Code", in: "Voucher_screen"), isPresented: $showCodePopup) {
+                Button(t("OK", in: "Voucher_screen"), role: .cancel) {}
             } message: {
-                Text(selectedVoucher?.code ?? "Code not found")
+                Text(selectedVoucher?.code ?? t("Code not found", in: "Voucher_screen"))
             }
             .onAppear(perform: loadVouchers)
         }

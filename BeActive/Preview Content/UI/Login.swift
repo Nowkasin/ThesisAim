@@ -98,14 +98,14 @@ struct Login: View {
         VStack(alignment: .leading) {
             Spacer().frame(height: 60)
 
-            Text("Log In")
+            Text(t("log_in", in: "login_screen"))
                 .font(.system(size: 36, weight: .bold))
                 .foregroundColor(.primary)
                 .padding(.leading, 20)
                 .padding(.bottom, 40)
 
             VStack(alignment: .leading) {
-                TextField("E-mail Address", text: $email)
+                TextField(t("e_mail", in: "login_screen"), text: $email)
                     .padding(.bottom, 10)
                     .foregroundColor(.primary)
                 Rectangle()
@@ -116,7 +116,7 @@ struct Login: View {
             .padding(.bottom, 20)
 
             VStack(alignment: .leading) {
-                SecureField("Password", text: $password)
+                SecureField(t("password", in: "login_screen"), text: $password)
                     .padding(.bottom, 10)
                 Rectangle()
                     .frame(height: 1)
@@ -126,9 +126,9 @@ struct Login: View {
 
             HStack {
                 Spacer()
-                Text("No account yet?")
+                Text(t("no_account_yet", in: "login_screen"))
                     .foregroundColor(.secondary)
-                Button("Register") {
+                Button(t("register", in: "login_screen")) {
                     showRegisterScreen = true
                 }
                 .foregroundColor(.blue)
@@ -142,7 +142,7 @@ struct Login: View {
             Spacer()
 
             Button(action: handleLogin) {
-                Text("Log In")
+                Text(t("log_in", in: "login_screen"))
                     .font(.system(size: 18, weight: .medium))
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color.accentColor)
@@ -155,8 +155,13 @@ struct Login: View {
         .background(Color(.systemBackground).ignoresSafeArea())
         .hideKeyboardOnTap()
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text(t("login_failed", in: "login_screen")),
+                message: Text(alertMessage),
+                dismissButton: .default(Text(t("ok", in: "login_screen")))
+            )
         }
+
     }
 
     func handleLogin() {

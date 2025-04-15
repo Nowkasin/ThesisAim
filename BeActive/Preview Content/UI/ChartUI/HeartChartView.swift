@@ -18,7 +18,7 @@ struct HeartChartView: View {
             // ✅ Picker สำหรับเลือกช่วงเวลา
             Picker("ช่วงเวลา", selection: $selectedRange) {
                 ForEach(TimeRange.allCases, id: \.self) { range in
-                    Text(range.rawValue).tag(range)
+                    Text(range.localized).tag(range)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
@@ -28,12 +28,12 @@ struct HeartChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(Int(viewModel.heartRateRange.min)) - \(Int(viewModel.heartRateRange.max)) BPM")
+                Text("\(Int(viewModel.heartRateRange.min)) - \(Int(viewModel.heartRateRange.max)) \(t("BPM", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)
 
-                Text("Avg: \(Int(viewModel.averageBPM)) BPM")
+                Text("\(t("Average", in: "Chart.Summary")): \(Int(viewModel.averageBPM)) \(t("BPM", in: "Chart.Summary"))")
                     .font(.headline)
                     .foregroundColor(.primary)
 
@@ -51,7 +51,7 @@ struct HeartChartView: View {
 
             Spacer()
         }
-        .navigationTitle(activity.titleKey)
+        .navigationTitle(t(activity.titleKey, in: "Chart.UI"))
         .background(Color(.systemBackground))
         .onAppear {
             viewModel.fetchHeartRate(for: selectedRange)
@@ -61,6 +61,7 @@ struct HeartChartView: View {
         }
     }
 }
+
 
 #Preview {
     HeartChartView(

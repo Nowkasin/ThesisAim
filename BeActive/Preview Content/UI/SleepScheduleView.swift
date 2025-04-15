@@ -16,7 +16,6 @@ struct SleepSchedule: Identifiable, Codable {
     let savedDate: Date
 }
 
-
 struct SleepScheduleView: View {
     @State private var wakeUpTime = Date()
     @State private var bedTime = Date()
@@ -38,14 +37,14 @@ struct SleepScheduleView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
-                Text("Sleep Schedule")
+                Text(t("title", in: "Sleep_screen"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.top)
 
                 VStack(spacing: 16) {
-                    timePickerRow(icon: "sunrise.fill", color: .orange, label: "Wake-up", selection: $wakeUpTime)
-                    timePickerRow(icon: "moon.fill", color: .purple, label: "Bedtime", selection: $bedTime)
+                    timePickerRow(icon: "sunrise.fill", color: .orange, label: t("wake_up", in: "Sleep_screen"), selection: $wakeUpTime)
+                    timePickerRow(icon: "moon.fill", color: .purple, label: t("bedtime", in: "Sleep_screen"), selection: $bedTime)
                 }
                 .padding()
                 .background(Color(.systemGray6))
@@ -53,7 +52,7 @@ struct SleepScheduleView: View {
                 .padding(.horizontal)
 
                 Button(action: saveSettings) {
-                    Text(hasSetSleepSchedule ? "Schedule Saved" : "Save")
+                    Text(hasSetSleepSchedule ? t("saved", in: "Sleep_screen") : t("save", in: "Sleep_screen"))
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(hasSetSleepSchedule ? Color.gray.opacity(0.4) : Color.blue)
@@ -66,7 +65,7 @@ struct SleepScheduleView: View {
 
                 if !savedSchedules.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Schedule History")
+                        Text(t("history", in: "Sleep_screen"))
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .padding(.horizontal)
@@ -76,7 +75,7 @@ struct SleepScheduleView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("⏰ \(formattedTime(hour: schedule.wakeUpHour, minute: schedule.wakeUpMinute)) | 🌙 \(formattedTime(hour: schedule.bedHour, minute: schedule.bedMinute))")
                                         .fontWeight(.medium)
-                                    Text("Saved on \(formattedDate(schedule.savedDate))")
+                                    Text("\(t("saved_on", in: "Sleep_screen")) \(formattedDate(schedule.savedDate))")
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
@@ -105,7 +104,6 @@ struct SleepScheduleView: View {
         }
     }
 
-    // MARK: - Subview for Time Picker
     func timePickerRow(icon: String, color: Color, label: String, selection: Binding<Date>) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -122,7 +120,6 @@ struct SleepScheduleView: View {
         .padding(.vertical, 6)
     }
 
-    // MARK: - Other functions (ไม่เปลี่ยน)
     func saveSettings() {
         guard !hasSetSleepSchedule else {
             print("⚠️ You’ve already set a time. Please delete it before setting a new one.")

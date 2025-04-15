@@ -219,28 +219,41 @@ class StepCountViewModel: ObservableObject {
 
     func dateRangeText(for range: TimeRange) -> String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "en") // เพื่อให้ชื่อเดือนเป็นอังกฤษก่อน แล้วค่อยแปล
         let now = Date()
         let calendar = Calendar.current
 
         switch range {
         case .today:
-            return formatter.string(from: now)
+            formatter.dateStyle = .medium
+            return translatedDate(from: now, formatter: formatter)
+
         case .week:
             if let start = calendar.date(byAdding: .day, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                formatter.dateStyle = .medium
+                let startStr = translatedDate(from: start, formatter: formatter)
+                let endStr = translatedDate(from: now, formatter: formatter)
+                return "\(startStr) - \(endStr)"
             }
+
         case .month:
-            formatter.dateFormat = "MMMM yyyy"
-            return formatter.string(from: now)
+            formatter.dateFormat = "MMM yyyy"
+            return translatedDate(from: now, formatter: formatter)
+
         case .sixMonths:
             if let start = calendar.date(byAdding: .month, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                formatter.dateFormat = "MMM yyyy"
+                let startStr = translatedDate(from: start, formatter: formatter)
+                let endStr = translatedDate(from: now, formatter: formatter)
+                return "\(startStr) - \(endStr)"
             }
+
         case .year:
             if let start = calendar.date(byAdding: .year, value: -1, to: now) {
                 formatter.dateFormat = "MMM yyyy"
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                let startStr = translatedDate(from: start, formatter: formatter)
+                let endStr = translatedDate(from: now, formatter: formatter)
+                return "\(startStr) - \(endStr)"
             }
         }
         return ""

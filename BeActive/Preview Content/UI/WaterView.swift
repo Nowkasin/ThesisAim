@@ -201,11 +201,10 @@ struct WaterView: View {
                 ScrollView {
                     VStack {
                         VStack(spacing: 16) {
-                            Text("Water to Drink")
+                            Text(t("Water to Drink", in: "Water_screen"))
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.blue)
-
-                            Text("Don't forget to drink water!")
+                            Text(t("Don't forget to drink water!", in: "Water_screen"))
                                 .font(.system(size: 18))
                                 .foregroundColor(.primary)
                         }
@@ -225,7 +224,7 @@ struct WaterView: View {
                                 .animation(.easeInOut, value: waterIntake)
 
                             VStack {
-                                Text("\(waterIntake) / \(totalWaterIntake) ml")
+                                Text("\(waterIntake) / \(totalWaterIntake) \(t("ml", in: "Water_screen"))")
                                     .font(.system(size: 18))
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
@@ -245,7 +244,7 @@ struct WaterView: View {
                                     Text(item.time)
                                         .font(.system(size: 18, weight: .medium))
                                     Spacer()
-                                    Text("\(item.amount) ml")
+                                    Text("\(item.amount) \(t("ml", in: "Water_screen"))")
                                         .foregroundColor(.gray)
                                     Button(action: {
                                         toggleCompletion(for: item)
@@ -266,7 +265,7 @@ struct WaterView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "gearshape")
                                     .font(.system(size: 16, weight: .medium))
-                                Text("Customize Schedule")
+                                Text(t("Customize Schedule", in: "Water_screen"))
                                     .font(.system(size: 16, weight: .medium))
                             }
                             .padding(.horizontal, 16)
@@ -311,9 +310,10 @@ struct WaterView: View {
                 }
                 .alert(isPresented: $showCongratulations) {
                     Alert(
-                        title: Text("Congratulations!"),
-                        message: Text("You have completed your daily water schedule!"),
-                        dismissButton: .default(Text("OK"))
+                        title:
+                            Text(t("Congratulations!", in: "Water_screen")),
+                        message: Text(t("You have completed your daily water schedule!", in: "Water_screen")),
+                        dismissButton: .default(Text(t("OK", in: "home_screen")))
                     )
                 }
             }
@@ -439,25 +439,25 @@ struct ScheduleSettingsSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Total Water Intake")) {
-                    Text("\(totalIntake) ml")
+                Section(header: Text(t("Total Water Intake", in: "Water_screen"))) {
+                    Text("\(totalIntake) \(t("ml", in: "Water_screen"))")
                         .foregroundColor(.gray)
                 }
 
-                Section(header: Text("Add Time Slot")) {
-                    DatePicker("Time", selection: $selectedTime, displayedComponents: .hourAndMinute)
+                Section(header: Text(t("Add Time Slot", in: "Water_screen"))) {
+                    DatePicker(t("Time", in: "Water_screen"), selection: $selectedTime, displayedComponents: .hourAndMinute)
                         .labelsHidden()
                         .datePickerStyle(WheelDatePickerStyle())
 
-                    Picker("Amount", selection: $selectedAmount) {
+                    Picker(t("Amount", in: "Water_screen"), selection: $selectedAmount) {
                         ForEach(Array(stride(from: 100, through: 1000, by: 50)), id: \.self) { amount in
-                            Text("\(amount) ml").tag(amount)
+                            Text("\(amount) \(t("ml", in: "Water_screen"))").tag(amount)
                         }
                     }
                     .pickerStyle(WheelPickerStyle())
                     .frame(height: 100)
 
-                    Button("Add Slot") {
+                    Button(t("Add Slot", in: "Water_screen")) {
                         let formatter = DateFormatter()
                         formatter.dateFormat = "HH:mm"
                         let newItem = ScheduleItem(
@@ -472,16 +472,16 @@ struct ScheduleSettingsSheet: View {
                     }
                 }
 
-                Section(header: Text("Your Time Slots")) {
+                Section(header: Text(t("Your Time Slots", in: "Water_screen"))) {
                     if schedule.isEmpty {
-                        Text("No slots added.")
+                        Text(t("No slots added.", in: "Water_screen"))
                             .foregroundColor(.gray)
                     } else {
                         ForEach(schedule) { item in
                             HStack {
                                 Text(item.time)
                                 Spacer()
-                                Text("\(item.amount) ml")
+                                Text("\(item.amount) \(t("ml", in: "Water_screen"))")
                             }
                         }
                         .onDelete { indexSet in
@@ -499,11 +499,11 @@ struct ScheduleSettingsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Customize Schedule")
+            .navigationTitle(t("Customize Schedule", in: "Water_screen"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                    Button(t("Done", in: "Water_screen")) {
                         onSave()
                         dismiss()
                     }
@@ -512,6 +512,7 @@ struct ScheduleSettingsSheet: View {
         }
     }
 }
+
 
 #Preview {
     WaterView()

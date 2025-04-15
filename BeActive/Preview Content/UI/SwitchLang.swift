@@ -44,7 +44,7 @@ struct SwitchLang: View {
                     language.setLanguage("th")
                     isShowing = false
                 }) {
-                    Text("ภาษาไทย")
+                    Text(t("TH", in: "Language_screen"))
                         .font(.body)
                         .foregroundColor(.white)
                         .padding()
@@ -58,7 +58,7 @@ struct SwitchLang: View {
                     language.setLanguage("en")
                     isShowing = false
                 }) {
-                    Text("English")
+                    Text(t("EN", in: "Language_screen"))
                         .font(.body)
                         .foregroundColor(.white)
                         .padding()

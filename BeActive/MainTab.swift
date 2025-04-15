@@ -11,7 +11,7 @@ struct MainTab: View {
     @EnvironmentObject var manager: HealthManager
     @StateObject private var healthData = HealthDataManager()
     @State private var selectedTab = 0
-    @State private var homeRefreshID = UUID() // ✅ ใช้ UUID เพื่อรีโหลด HomeView พร้อม Animation
+    @State private var homeRefreshID = UUID()
 
     init() {
         let appearance = UITabBarAppearance()
@@ -20,65 +20,59 @@ struct MainTab: View {
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
-    
+
     var body: some View {
         Group {
             if DeviceHelper.isTablet {
                 VStack(spacing: 0) {
                     ZStack {
-                        Color.white.edgesIgnoringSafeArea(.all) // ✅ ป้องกันพื้นหลังดำ
+                        Color.white.edgesIgnoringSafeArea(.all)
                         switch selectedTab {
                         case 0:
                             HomeView()
                                 .id(homeRefreshID)
                                 .transition(.opacity.combined(with: .scale))
-                                .onAppear { print("✅ HomeView Loaded") }
                         case 1:
                             ProfileView()
-                                .environmentObject(healthData) // ✅ ใช้ EnvironmentObject เพื่อลดการรีเรนเดอร์ซ้ำ
-                                .transition(.identity) // ✅ ป้องกัน Animation ไม่ให้กระพริบ
-                                .onAppear { print("✅ ProfileView Loaded") }
+                                .environmentObject(healthData)
+                                .transition(.identity)
                         case 2:
                             PainScaleView()
                                 .transition(.move(edge: .trailing))
-                                .onAppear { print("✅ ContentView Loaded") }
                         default:
                             HomeView()
                                 .id(homeRefreshID)
-                                .transition(.opacity.combined(with: .scale))
                         }
                     }
-                    .animation(.easeInOut(duration: 0.3)) // ✅ ใช้ Animation ตอนเปลี่ยนแท็บ
+                    .animation(.easeInOut(duration: 0.3))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
-                    // ✅ CustomTabBar สำหรับ iPad
+
                     CustomTabBar(selectedTab: $selectedTab, homeRefreshID: $homeRefreshID)
                         .frame(height: 60)
                         .background(Color(red: 0.7, green: 0.9, blue: 1.0))
                 }
             } else {
-                // ✅ ใช้ TabView สำหรับ iPhone
                 TabView(selection: $selectedTab) {
                     HomeView()
                         .id(homeRefreshID)
                         .tabItem {
                             Image(systemName: "house.fill")
-                            Text("Home")
+                            Text(t("Home", in: "MainTab_screen"))
                         }
                         .tag(0)
 
                     ProfileView()
-                        .environmentObject(healthData) // ✅ ใช้ EnvironmentObject เพื่อลดการรีเรนเดอร์ซ้ำ
+                        .environmentObject(healthData)
                         .tabItem {
                             Image(systemName: "person.crop.circle")
-                            Text("Profile")
+                            Text(t("Profile", in: "MainTab_screen"))
                         }
                         .tag(1)
 
                     PainScaleView()
                         .tabItem {
                             Image(systemName: "quotelevel")
-                            Text("Pain Scale")
+                            Text(t("Pain Scale", in: "MainTab_screen"))
                         }
                         .tag(2)
                 }
@@ -89,7 +83,6 @@ struct MainTab: View {
     }
 }
 
-// ✅ CustomTabBar สำหรับ iPad พร้อม Animation
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
     @Binding var homeRefreshID: UUID
@@ -97,11 +90,11 @@ struct CustomTabBar: View {
     var body: some View {
         HStack {
             Spacer()
-            TabBarItem(title: "Home", icon: "house.fill", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 0)
+            TabBarItem(title: t("Home", in: "MainTab_screen"), icon: "house.fill", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 0)
             Spacer()
-            TabBarItem(title: "Profile", icon: "person.crop.circle", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 1)
+            TabBarItem(title: t("Profile", in: "MainTab_screen"), icon: "person.crop.circle", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 1)
             Spacer()
-            TabBarItem(title: "Content", icon: "person", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 2)
+            TabBarItem(title: t("Pain Scale", in: "MainTab_screen"), icon: "quotelevel", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 2)
             Spacer()
         }
         .frame(height: 60)
@@ -110,7 +103,6 @@ struct CustomTabBar: View {
     }
 }
 
-// ✅ ปรับให้ Home มี Animation เมื่อกดปุ่ม Home ซ้ำ
 struct TabBarItem: View {
     let title: String
     let icon: String
@@ -137,7 +129,6 @@ struct TabBarItem: View {
     }
 }
 
-// ✅ Preview
 struct MainTab_Previews: PreviewProvider {
     static var previews: some View {
         MainTab()
@@ -146,4 +137,3 @@ struct MainTab_Previews: PreviewProvider {
             .previewLayout(.sizeThatFits)
     }
 }
-

@@ -200,33 +200,42 @@ class CalorieViewModel: ObservableObject {
     }
 
     func dateRangeText(for range: TimeRange) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
         let now = Date()
         let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en") // ใช้ "en" เพื่อให้ได้ชื่อเดือนภาษาอังกฤษก่อน
 
         switch range {
         case .today:
-            return formatter.string(from: now)
+            dateFormatter.dateFormat = "d MMM yyyy"
+            return translatedDate(from: now, formatter: dateFormatter)
 
         case .week:
             if let start = calendar.date(byAdding: .day, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                dateFormatter.dateFormat = "d MMM"
+                let startStr = translatedDate(from: start, formatter: dateFormatter)
+                let endStr = translatedDate(from: now, formatter: dateFormatter)
+                return "\(startStr) – \(endStr)"
             }
 
         case .month:
-            formatter.dateFormat = "MMMM yyyy"
-            return formatter.string(from: now)
+            dateFormatter.dateFormat = "MMM yyyy"
+            return translatedDate(from: now, formatter: dateFormatter)
 
         case .sixMonths:
             if let start = calendar.date(byAdding: .month, value: -6, to: now) {
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                dateFormatter.dateFormat = "MMM yyyy"
+                let startStr = translatedDate(from: start, formatter: dateFormatter)
+                let endStr = translatedDate(from: now, formatter: dateFormatter)
+                return "\(startStr) – \(endStr)"
             }
 
         case .year:
             if let start = calendar.date(byAdding: .year, value: -1, to: now) {
-                formatter.dateFormat = "MMM yyyy"
-                return "\(formatter.string(from: start)) - \(formatter.string(from: now))"
+                dateFormatter.dateFormat = "MMM yyyy"
+                let startStr = translatedDate(from: start, formatter: dateFormatter)
+                let endStr = translatedDate(from: now, formatter: dateFormatter)
+                return "\(startStr) – \(endStr)"
             }
         }
         return ""

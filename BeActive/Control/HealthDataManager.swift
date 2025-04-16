@@ -63,7 +63,8 @@ class HealthDataManager: ObservableObject {
         return await withCheckedContinuation { continuation in
             let query = HKStatisticsQuery(quantityType: caloriesType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
                 let value = result?.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0
-                continuation.resume(returning: "\(Int(value)) kcal")
+                let kcalText = t("kcal", in: "Chart.Summary")
+                continuation.resume(returning: "\(Int(value)) \(kcalText)")
             }
             healthStore.execute(query)
         }
@@ -74,9 +75,16 @@ class HealthDataManager: ObservableObject {
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
 
         return await withCheckedContinuation { continuation in
-            let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: 1, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { _, samples, _ in
-                let value = (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: HKUnit(from: "count/min")) ?? 0
-                continuation.resume(returning: "\(Int(value)) BPM")
+            let query = HKSampleQuery(
+                sampleType: heartRateType,
+                predicate: predicate,
+                limit: 1,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]
+            ) { _, samples, _ in
+                let value = (samples?.first as? HKQuantitySample)?
+                    .quantity.doubleValue(for: HKUnit(from: "count/min")) ?? 0
+                let bpmText = t("BPM", in: "Chart.Summary")
+                continuation.resume(returning: "\(Int(value)) \(bpmText)")
             }
             healthStore.execute(query)
         }
@@ -87,9 +95,14 @@ class HealthDataManager: ObservableObject {
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
 
         return await withCheckedContinuation { continuation in
-            let query = HKStatisticsQuery(quantityType: distanceType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
+            let query = HKStatisticsQuery(
+                quantityType: distanceType,
+                quantitySamplePredicate: predicate,
+                options: .cumulativeSum
+            ) { _, result, _ in
                 let value = (result?.sumQuantity()?.doubleValue(for: .meter()) ?? 0) / 1000
-                continuation.resume(returning: String(format: "%.2f km", value))
+                let kmText = t("km", in: "Chart.Summary")
+                continuation.resume(returning: String(format: "%.2f %@", value, kmText))
             }
             healthStore.execute(query)
         }

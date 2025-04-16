@@ -161,7 +161,13 @@
             "Log Out" : "Log Out",
             "cm" : "cm",
             "kg" : "kg",
-            "Save Changes" : "Save Changes"
+            "Save Changes" : "Save Changes",
+            "Weight" :  "Weight",
+            "SEX" : {
+                "Male": "Male",
+                "Female": "Female",
+                "Other": "Other"
+            }
         },
         "Sleep_screen": {
             "title": "Sleep Schedule",
@@ -441,7 +447,7 @@
             "Full Name" : "ชื่อ-สกุล",
             "Edit Profile" : "แก้ไขโปรไฟล์",
             "User Information" : "ข้อมูลผู้ใช้" ,
-            "Email" : "อีเมล์",
+            "Email" : "อีเมล",
             "Phone" : "โทรศัพท์",
             "Sex" : "เพศ",
             "Height" : "ส่วนสูง",
@@ -453,7 +459,13 @@
             "Log Out" : "ล็อคเอ้าท์",
             "cm" : "ซม.",
             "kg" : "กก.",
-            "Save Changes" : "บันทึกการเปลี่ยนแปลง"
+            "Save Changes" : "บันทึกการเปลี่ยนแปลง",
+            "Weight" :  "น้ำหนัก",
+            "SEX" : {
+                "Male": "ผู้ชาย",
+                "Female": "ผู้หญิง",
+                "Other": "อื่นๆ"
+            }
         },
         "Sleep_screen": {
             "title": "ตารางการนอน",

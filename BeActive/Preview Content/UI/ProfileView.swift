@@ -67,12 +67,12 @@ struct ProfileView: View {
                         if let height = userHeight {
                             UserInfoRow(
                                 icon: "ruler.fill",
-                                title: t("Height", in: "register_screen"),
+                                title: t("Height", in: "Profile_screen"),
                                 value: "\(height) \(t("cm", in: "Profile_screen"))"
                             )
                         }
                         UserInfoRow(icon: "phone.fill", title: t("Phone", in: "Profile_screen"), value: userPhone)
-                        UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"), value: userSex)
+                        UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"),  value: t(userSex, in: "Profile_screen.SEX"))
 
                         if let weight = userWeight {
                             UserInfoRow(
@@ -267,7 +267,7 @@ struct ProfileHeader: View {
                 .foregroundColor(.primary)
 
             if let age = userAge {
-                Text("Age: \(age)")
+                Text("\(t("Age", in: "register_screen")): \(age)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }

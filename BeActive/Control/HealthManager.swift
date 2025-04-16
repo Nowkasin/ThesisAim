@@ -387,11 +387,12 @@ class HealthManager: ObservableObject {
     }
 
     private func setMockHeartRateActivity() {
-        setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
+        setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 \(t("BPM", in: "Chart.Summary"))", image: "heart.fill", tintColor: .gray, amount: "0 \(t("BPM", in: "Chart.Summary"))")
     }
 
     private func setMockDistanceActivity() {
-        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "0")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 \(t("km", in: "Chart.Summary"))"
+            , image: "figure.walk.circle", tintColor: .gray, amount: "0 \(t("km", in: "Chart.Summary"))")
     }
 
     

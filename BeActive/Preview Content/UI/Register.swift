@@ -291,7 +291,9 @@ struct RegisterView: View {
     @State private var isPasswordVisible = false
     @State private var showSuccessAlert = false
     @State private var showLoginScreen = false
-    
+    @State private var isPressed = false
+    @State private var appear = false
+
     private let passwordValidator = PasswordValidator()
     let sexOptions = [
         t("Male", in: "register_screen"),
@@ -309,6 +311,10 @@ struct RegisterView: View {
                             .foregroundColor(.primary)
                             .padding(.top, 40)
                             .padding(.bottom, 30)
+                            .opacity(appear ? 1 : 0)
+                            .offset(y: appear ? 0 : 20)
+                            .animation(.easeOut(duration: 0.6), value: appear)
+
                         
                         Group {
                             CustomTextField(placeholder: t("first_name", in: "register_screen"), text: $name)
@@ -340,7 +346,14 @@ struct RegisterView: View {
                                 .background(Color.accentColor)
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
+                                .scaleEffect(isPressed ? 0.96 : 1.0)
+                                .animation(.spring(), value: isPressed)
                         }
+                        .simultaneousGesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { _ in isPressed = true }
+                                .onEnded { _ in isPressed = false }
+                        )
                         .padding(.top, 30)
                         .padding(.bottom, 40)
                         
@@ -357,13 +370,18 @@ struct RegisterView: View {
                     }
                     .padding(.horizontal, 30)
                 }
+                .onAppear {
+                    appear = true
+                }
                 .ignoresSafeArea(.keyboard)
                 .dismissKeyboardOnTap()
             }
             .background(Color(.systemBackground))
             .alert(t("register", in: "register_screen"), isPresented: $showSuccessAlert) {
                 Button("OK") {
-                    showLoginScreen = true
+                    withAnimation {
+                        showLoginScreen = true
+                    }
                 }
             } message: {
                 Text("You have successfully registered.")

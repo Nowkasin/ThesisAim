@@ -7,7 +7,8 @@
             "no_account_yet": "No account yet?",
             "register": "Register",
             "Login Failed" : "Login Failed",
-            "ok": "ok"
+            "ok": "ok",
+            "logging_in": "Logging in..."
         },
         "register_screen": {
             "register": "Register",
@@ -297,7 +298,8 @@
             "no_account_yet": "ยังไม่มีบัญชีใช่หรือไม่?",
             "register": "สมัครสมาชิก",
             "Login Failed" : "เข้าสู่ระบบล้มเหลว",
-            "ok": "ตกลง"
+            "ok": "ตกลง",
+            "logging_in": "กำลังเข้าสู่ระบบ..."
         },
         "register_screen": {
             "register": "สมัครสมาชิก",

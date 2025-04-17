@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import Kingfisher
 
 struct TaskRecord: Identifiable, Codable {
     let id: UUID
@@ -28,6 +29,7 @@ struct TaskView: View {
     @AppStorage("selectedMate") private var selectedMate: String = "Bear"
     @AppStorage("taskHistoryData") private var taskHistoryData: Data = Data()
     @AppStorage("currentUserId") private var currentUserId: String = ""
+    @AppStorage("unlockedMatesData") private var unlockedMatesData: Data = Data()
 
     @State private var unlockedMates: [String] = ["Bear"]
 
@@ -67,19 +69,19 @@ struct TaskView: View {
                         .font(.system(size: 30, weight: .heavy))
                         .foregroundStyle(.blue)
 
-                    AsyncImage(url: URL(string: imageUrl)) { image in
-                        image.resizable()
-                            .scaledToFit()
-                            .frame(height: 130)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .shadow(color: animateMateBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
-                            .scaleEffect(animateMateBounce ? 1.08 : 0.92)
-                            .offset(y: animateMateBounce ? -4 : 4)
-                            .animation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true), value: animateMateBounce)
-                            .onAppear { animateMateBounce = true }
-                    } placeholder: {
-                        ProgressView()
-                    }
+                    KFImage(URL(string: imageUrl))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 130)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(color: animateMateBounce ? .yellow.opacity(0.6) : .clear, radius: 20)
+                        .scaleEffect(animateMateBounce ? 1.08 : 0.92)
+                        .offset(y: animateMateBounce ? -4 : 4)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true)) {
+                                animateMateBounce = true
+                            }
+                        }
 
                     VStack(spacing: 12) {
                         Text(t("mission_label", in: "Task_screen"))
@@ -258,12 +260,23 @@ struct TaskView: View {
         }
     }
 
-    func loadUnlockedMates() {
-        var result: [String] = ["Bear"]
-        guard !currentUserId.isEmpty else {
-            unlockedMates = result
-            return
+    func saveUnlockedMatesToStorage(_ mates: [String]) {
+        if let data = try? JSONEncoder().encode(mates) {
+            unlockedMatesData = data
         }
+    }
+
+    func loadUnlockedMatesFromStorage() {
+        if let loaded = try? JSONDecoder().decode([String].self, from: unlockedMatesData) {
+            unlockedMates = loaded
+        }
+    }
+
+    func loadUnlockedMates() {
+        loadUnlockedMatesFromStorage()
+
+        guard !currentUserId.isEmpty else { return }
+        var result: [String] = ["Bear"]
 
         Firestore.firestore()
             .collection("users")
@@ -278,7 +291,9 @@ struct TaskView: View {
                         }
                     }
                 }
-                unlockedMates = Array(Set(result))
+                let unique = Array(Set(result))
+                unlockedMates = unique
+                saveUnlockedMatesToStorage(unique)
             }
     }
 
@@ -386,6 +401,7 @@ struct TaskView: View {
             taskHistory = decoded
         }
     }
+
     func checkForNewTaskDay() {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -404,7 +420,6 @@ struct TaskView: View {
         }
     }
 }
-
 
 struct ProgressCircle: View {
     var timeRemaining: Double
@@ -438,6 +453,7 @@ struct ProgressCircle: View {
         return String(format: "%02d:%02d", minutes, secs)
     }
 }
+
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
         TaskView().environmentObject(ScoreManager.shared)

@@ -112,6 +112,7 @@ struct ProfileView: View {
                     }
                 }
                 .padding(.top)
+                Spacer()
             }
         }
         .onAppear {

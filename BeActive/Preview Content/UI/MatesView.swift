@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import Kingfisher
 
 // MARK: - Mate Model
 struct Mate: Identifiable, Codable, Equatable {
@@ -66,7 +67,8 @@ struct MatesView: View {
                     if selectedTab == 0 {
                         ScrollView {
                             VStack(spacing: 20) {
-                                Text(t("Mates Shop", in: "Mate_screen")).font(.system(size: 32, weight: .bold))
+                                Text(t("Mates Shop", in: "Mate_screen"))
+                                    .font(.system(size: 32, weight: .bold))
                                     .foregroundColor(.primary)
                                     .padding(.top, 20)
 
@@ -111,18 +113,11 @@ struct MatesView: View {
                             } else {
                                 List(scoreManager.purchasedMates) { mate in
                                     HStack(spacing: 15) {
-                                        AsyncImage(url: mate.imageUrl) { phase in
-                                            switch phase {
-                                            case .success(let image):
-                                                image.resizable().scaledToFill()
-                                            case .failure:
-                                                Image(systemName: "photo")
-                                            default:
-                                                Color.gray.opacity(0.2)
-                                            }
-                                        }
-                                        .frame(width: 50, height: 50)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        KFImage(mate.imageUrl)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 50, height: 50)
+                                            .clipShape(RoundedRectangle(cornerRadius: 10))
 
                                         VStack(alignment: .leading) {
                                             Text(mate.name)
@@ -148,36 +143,37 @@ struct MatesView: View {
             .alert(t("Unlock Mate?", in: "Mate_screen"), isPresented: $showConfirm, actions: {
                 Button(t("Unlock", in: "Mate_screen"), role: .destructive) {
                     if let mate = selectedMate {
-                        scoreManager.purchaseMate(mate) { success in
-                            if success {
-                                saveMateToFirestore(mate: mate)
-                                if !isMateAlreadyUnlocked(mate) {
+                        if isMateAlreadyUnlocked(mate) {
+                            showAlreadyOwnedAlert = true
+                        } else {
+                            scoreManager.purchaseMate(mate) { success in
+                                if success {
+                                    saveMateToFirestore(mate: mate)
                                     scoreManager.purchasedMates.append(mate)
                                     purchasedMateIDs.insert(mate.id)
                                     saveMates()
+                                } else {
+                                    showInsufficientPoints = true
                                 }
-                            } else {
-                                showInsufficientPoints = true
                             }
                         }
                     }
                 }
                 Button(t("Cancel", in: "Mate_screen"), role: .cancel) {}
-                }, message: {
-                    Text(
-                        String(
-                            format: t("Do you want to unlock %@ for %d coins?", in: "Mate_screen"),
-                            selectedMate?.name ?? "",
-                            selectedMate?.cost ?? 0
-                        )
+            }, message: {
+                Text(
+                    String(
+                        format: t("Do you want to unlock %@ for %d coins?", in: "Mate_screen"),
+                        selectedMate?.name ?? "",
+                        selectedMate?.cost ?? 0
                     )
-                })
+                )
+            })
             .alert(t("Insufficient Coins", in: "Mate_screen"), isPresented: $showInsufficientPoints, actions: {
                 Button(t("OK", in: "Mate_screen"), role: .cancel) {}
             }, message: {
                 Text(t("You don’t have enough coins to unlock this mate.", in: "Mate_screen"))
             })
-
             .alert(t("Already Unlocked", in: "Mate_screen"), isPresented: $showAlreadyOwnedAlert, actions: {
                 Button(t("OK", in: "Mate_screen"), role: .cancel) {}
             }, message: {
@@ -185,12 +181,15 @@ struct MatesView: View {
             })
             .onAppear {
                 loadMates()
+                fetchUnlockedMatesFromFirestore()
             }
         }
     }
 
     private func isMateAlreadyUnlocked(_ mate: Mate) -> Bool {
-        return scoreManager.purchasedMates.contains { $0.name == mate.name }
+        let result = scoreManager.purchasedMates.contains { $0.name == mate.name }
+        print("🔍 Checking if '\(mate.name)' is unlocked: \(result)")
+        return result
     }
 
     private func saveMateToFirestore(mate: Mate) {
@@ -218,6 +217,36 @@ struct MatesView: View {
         }
     }
 
+    private func fetchUnlockedMatesFromFirestore() {
+        guard !currentUserId.isEmpty else { return }
+
+        let userMatesRef = Firestore.firestore()
+            .collection("users")
+            .document(currentUserId)
+            .collection("mates")
+
+        userMatesRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("❌ Error fetching mates: \(error.localizedDescription)")
+                return
+            }
+
+            guard let documents = snapshot?.documents else { return }
+
+            let unlockedNames = documents
+                .filter { ($0.data()["unlocked"] as? Bool) == true }
+                .map { $0.documentID }
+
+            let unlockedMates = mates.filter { unlockedNames.contains($0.name) }
+
+            DispatchQueue.main.async {
+                scoreManager.purchasedMates = unlockedMates
+                purchasedMateIDs = Set(unlockedMates.map { $0.id })
+                saveMates()
+            }
+        }
+    }
+
     private func checkFirestoreScore(completion: @escaping (Int) -> Void) {
         guard !currentUserId.isEmpty else {
             completion(0)
@@ -239,23 +268,11 @@ struct MateCard: View {
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 10) {
-                AsyncImage(url: mate.imageUrl) { phase in
-                    switch phase {
-                    case .empty:
-                        Color.gray.opacity(0.2)
-                    case .success(let image):
-                        image.resizable().scaledToFit()
-                    case .failure:
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.gray)
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-                .frame(width: 100, height: 100)
-                .cornerRadius(15)
+                KFImage(mate.imageUrl)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .cornerRadius(15)
 
                 Text(mate.name)
                     .font(.headline)

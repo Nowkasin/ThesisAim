@@ -202,6 +202,8 @@ struct HomeView: View {
 
                     ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .magicMint, icon: Image(systemName: "cart"))
                         .navigate(to: MatesView())
+                    
+                    Spacer()
                 }
             }
             .padding(.horizontal)

@@ -15,7 +15,7 @@ class Language: ObservableObject {
     
     init() {
         loadTranslations()
-        currentLanguage = UserDefaults.standard.string(forKey: "AppLanguage") ?? "th"
+        currentLanguage = UserDefaults.standard.string(forKey: "AppLanguage") ?? "en"
     }
     
     func loadTranslations() {

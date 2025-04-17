@@ -15,6 +15,8 @@ class ScoreManager: ObservableObject {
     @AppStorage("waterScore") var waterScore: Int = 0
     @Published var stepScore: Int = 0
     @AppStorage("taskScore") var taskScore: Int = 0
+    @AppStorage("lastTaskScoreResetDate") private var lastTaskScoreResetDate: String = ""
+
     @Published var purchasedVouchers: [Voucher] = []
     @Published var purchasedMates: [Mate] = []
 
@@ -35,10 +37,23 @@ class ScoreManager: ObservableObject {
         stepScore += score
         print("Step Score updated to: \(stepScore)")
     }
-    
+
     func addTaskScore(_ score: Int) {
         taskScore += score
         print("Task Score updated to: \(taskScore)")
+    }
+
+    /// ✅ Call this once per day in .onAppear of TaskView to ensure score starts fresh daily
+    func resetTaskScoreIfNewDay() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+
+        if lastTaskScoreResetDate != today {
+            taskScore = 0
+            lastTaskScoreResetDate = today
+            print("✅ Task score reset for a new day.")
+        }
     }
 
     // ❌ This local method is still used internally but no longer called directly when purchasing

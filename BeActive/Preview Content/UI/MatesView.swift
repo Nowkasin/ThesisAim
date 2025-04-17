@@ -127,7 +127,7 @@ struct MatesView: View {
                                         VStack(alignment: .leading) {
                                             Text(mate.name)
                                                 .font(.headline)
-                                            Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
+                                            Text("-\(mate.cost) \(t("Coins", in: "Mate_screen"))")
                                                 .font(.subheadline)
                                                 .foregroundColor(.red)
                                         }
@@ -164,7 +164,13 @@ struct MatesView: View {
                 }
                 Button(t("Cancel", in: "Mate_screen"), role: .cancel) {}
                 }, message: {
-                    Text("Do you want to unlock \"\(selectedMate?.name ?? "")\" for \(selectedMate?.cost ?? 0) coins?")
+                    Text(
+                        String(
+                            format: t("Do you want to unlock %@ for %d coins?", in: "Mate_screen"),
+                            selectedMate?.name ?? "",
+                            selectedMate?.cost ?? 0
+                        )
+                    )
                 })
             .alert(t("Insufficient Coins", in: "Mate_screen"), isPresented: $showInsufficientPoints, actions: {
                 Button(t("OK", in: "Mate_screen"), role: .cancel) {}

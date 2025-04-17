@@ -179,7 +179,7 @@ struct Login: View {
             .hideKeyboardOnTap()
             .alert(isPresented: $showAlert) {
                 Alert(
-                    title: Text(t("login_failed", in: "login_screen")),
+                    title: Text(t("Login Failed", in: "login_screen")),
                     message: Text(alertMessage),
                     dismissButton: .default(Text(t("ok", in: "login_screen")))
                 )
@@ -250,7 +250,7 @@ struct Login: View {
                 }
             }
 
-            alertMessage = "Incorrect Email or Password."
+            alertMessage = t("Incorrect Email or Password.", in: "login_screen")
             showAlert = true
         }
     }

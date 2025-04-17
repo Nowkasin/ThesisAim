@@ -19,7 +19,7 @@ struct TaskRecord: Identifiable, Codable {
 
 struct TaskView: View {
     @EnvironmentObject var scoreManager: ScoreManager
-
+    @AppStorage("lastTaskOpenedDate") private var lastTaskOpenedDate: String?
     @AppStorage("mission") private var mission: String = ""
     @AppStorage("selectedTime") private var selectedTime: Double = 1
     @AppStorage("isTaskStarted") private var isTaskStarted: Bool = false
@@ -63,7 +63,7 @@ struct TaskView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    Text("\(mateEmoji) \(selectedMate) \(t("your_mate", in: "Task_screen"))")
+                    Text("\(mateEmoji) \(selectedMate) Mate")
                         .font(.system(size: 30, weight: .heavy))
                         .foregroundStyle(.blue)
 
@@ -252,6 +252,8 @@ struct TaskView: View {
                 checkIfTaskCompleted()
                 loadTaskHistory()
                 loadUnlockedMates()
+                checkForNewTaskDay()
+                scoreManager.resetTaskScoreIfNewDay()
             }
         }
     }
@@ -384,7 +386,25 @@ struct TaskView: View {
             taskHistory = decoded
         }
     }
+    func checkForNewTaskDay() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+
+        let isNewDay = lastTaskOpenedDate == nil || lastTaskOpenedDate != today
+        lastTaskOpenedDate = today
+
+        if isNewDay {
+            mission = ""
+            selectedTime = 1
+            isTaskStarted = false
+            timeRemaining = 0
+            taskStartTime = 0
+            showBadge = false
+        }
+    }
 }
+
 
 struct ProgressCircle: View {
     var timeRemaining: Double

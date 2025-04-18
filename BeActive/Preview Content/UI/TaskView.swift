@@ -53,10 +53,25 @@ struct TaskView: View {
     var imageUrl: String {
         switch selectedMate {
         case "Cat": return "https://i.imgur.com/5ym20Wl.png"
+        case "Happy Cat": return "https://i.imgur.com/0JJOJbK.png"
+        case "Lovely Cat": return "https://i.imgur.com/TRIDeEw.png"
+            
         case "Bunny": return "https://i.imgur.com/if52U93.png"
+        case "Happy Bunny": return "https://i.imgur.com/ZZlNIjX.png"
+        case "Lovely Bunny": return "https://i.imgur.com/VLvp9Qm.png"
+            
         case "Chick": return "https://i.imgur.com/ay4YRSm.png"
+        case "Happy Chick": return "https://i.imgur.com/YBn2oFH.png"
+        case "Lovely Chick": return "https://i.imgur.com/YPFM2Bu.png"
+            
         case "Dog": return "https://i.imgur.com/RObtJjY.png"
+        case "Happy Dog": return "https://i.imgur.com/YiEE02e.png"
+        case "Lovely Dog": return "https://i.imgur.com/y3ocZ22.png"
+            
         case "Mocha": return "https://i.imgur.com/sY0fdeH.png"
+        case "Happy Bear": return "https://i.imgur.com/mTEiOqd.png"
+        case "Lovely Bear": return "https://i.imgur.com/OT2vJPe.png"
+            
         default: return "https://i.imgur.com/TR7HwEa.png"
         }
     }
@@ -197,28 +212,30 @@ struct TaskView: View {
                 .padding()
             }
             .sheet(isPresented: $showMatePicker) {
-                VStack(spacing: 16) {
-                    Text(t("choose_mate", in: "Task_screen"))
-                        .font(.headline)
-                        .padding(.top)
+                ScrollView {
+                    VStack(spacing: 16) {
+                        Text(t("choose_mate", in: "Task_screen"))
+                            .font(.headline)
+                            .padding(.top)
 
-                    ForEach(unlockedMates, id: \.self) { mate in
-                        Button(action: {
-                            selectedMate = mate
-                            showMatePicker = false
-                        }) {
-                            Text("\(emoji(for: mate)) \(mate)")
-                                .font(.title2)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(10)
+                        ForEach(unlockedMates, id: \.self) { mate in
+                            Button(action: {
+                                selectedMate = mate
+                                showMatePicker = false
+                            }) {
+                                Text("\(emoji(for: mate)) \(mate)")
+                                    .font(.title2)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.blue.opacity(0.1))
+                                    .cornerRadius(10)
+                            }
                         }
-                    }
 
-                    Spacer()
+                        Spacer(minLength: 40)
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .alert(t("mission_required_title", in: "Task_screen"), isPresented: $showMissingMissionAlert) {
                 Button("OK", role: .cancel) { }
@@ -291,7 +308,7 @@ struct TaskView: View {
                         }
                     }
                 }
-                let unique = Array(Set(result))
+                let unique = Array(Set(result)).sorted()
                 unlockedMates = unique
                 saveUnlockedMatesToStorage(unique)
             }
@@ -382,10 +399,20 @@ struct TaskView: View {
     func emoji(for mate: String) -> String {
         switch mate {
         case "Cat": return "🐱"
+        case "Happy Cat": return "😸"
+        case "Lovely Cat": return "😻"
         case "Bunny": return "🐰"
+        case "Happy Bunny": return "🐇"
+        case "Lovely Bunny": return "🥕"
         case "Chick": return "🐤"
+        case "Happy Chick": return "🐣"
+        case "Lovely Chick": return "🐥"
         case "Dog": return "🐶"
+        case "Happy Dog": return "🦴"
+        case "Lovely Dog": return "🐾"
         case "Mocha": return "🦈"
+        case "Happy Bear": return "🐻‍❄️"
+        case "Lovely Bear": return "🧸"
         default: return "🐻"
         }
     }

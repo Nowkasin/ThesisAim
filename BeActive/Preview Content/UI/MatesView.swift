@@ -39,10 +39,20 @@ struct MatesView: View {
     @State private var purchasedMateIDs: Set<UUID> = []
 
     let mates: [Mate] = [
+        Mate(name: "Happy Bear", cost: 1500, imageUrl: URL(string: "https://i.imgur.com/mTEiOqd.png")!),
+        Mate(name: "Lovely Bear", cost: 2500, imageUrl: URL(string: "https://i.imgur.com/OT2vJPe.png")!),
         Mate(name: "Chick", cost: 1000, imageUrl: URL(string: "https://i.imgur.com/ay4YRSm.png")!),
+        Mate(name: "Happy Chick", cost: 3000, imageUrl: URL(string: "https://i.imgur.com/YBn2oFH.png")!),
+        Mate(name: "Lovely Chick", cost: 5000, imageUrl: URL(string: "https://i.imgur.com/YPFM2Bu.png")!),
         Mate(name: "Bunny", cost: 3000, imageUrl: URL(string: "https://i.imgur.com/if52U93.png")!),
+        Mate(name: "Happy Bunny", cost: 5000, imageUrl: URL(string: "https://i.imgur.com/ZZlNIjX.png")!),
+        Mate(name: "Lovely Bunny", cost: 7000, imageUrl: URL(string: "https://i.imgur.com/VLvp9Qm.png")!),
         Mate(name: "Dog", cost: 5000, imageUrl: URL(string: "https://i.imgur.com/RObtJjY.png")!),
+        Mate(name: "Happy Dog", cost: 7000, imageUrl: URL(string: "https://i.imgur.com/YiEE02e.png")!),
+        Mate(name: "Lovely Dog", cost: 9000, imageUrl: URL(string: "https://i.imgur.com/y3ocZ22.png")!),
         Mate(name: "Cat", cost: 7000, imageUrl: URL(string: "https://i.imgur.com/5ym20Wl.png")!),
+        Mate(name: "Happy Cat", cost: 9000, imageUrl: URL(string: "https://i.imgur.com/0JJOJbK.png")!),
+        Mate(name: "Lovely Cat", cost: 11000, imageUrl: URL(string: "https://i.imgur.com/TRIDeEw.png")!),
         Mate(name: "Mocha", cost: 999999, imageUrl: URL(string: "https://i.imgur.com/EmIC3a0.png")!)
     ]
 

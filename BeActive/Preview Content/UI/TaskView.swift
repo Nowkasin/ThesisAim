@@ -321,9 +321,16 @@ struct TaskView: View {
         startTimer()
     }
 
+//    func startTimer() {
+//        timer?.invalidate()
+//        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+//            updateTimeRemaining()
+//        }
+//    }
+    
     func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             updateTimeRemaining()
         }
     }
@@ -385,14 +392,29 @@ struct TaskView: View {
         showGaveUpAlert = true
     }
 
+//    func checkIfTaskCompleted() {
+//        if isTaskStarted {
+//            updateTimeRemaining()
+//            if timeRemaining <= 0 {
+//                completeTask()
+//            } else {
+//                startTimer()
+//            }
+//        }
+//    }
+    
     func checkIfTaskCompleted() {
-        if isTaskStarted {
-            updateTimeRemaining()
-            if timeRemaining <= 0 {
-                completeTask()
-            } else {
-                startTimer()
-            }
+        guard isTaskStarted else { return }
+
+        // Calculate immediately to avoid stale UI
+        let elapsed = Date().timeIntervalSince1970 - taskStartTime
+        let remaining = (selectedTime * 60) - elapsed
+        timeRemaining = max(remaining, 0)
+
+        if timeRemaining <= 0 {
+            completeTask()
+        } else {
+            startTimer()
         }
     }
 
@@ -466,7 +488,7 @@ struct ProgressCircle: View {
                     style: StrokeStyle(lineWidth: 15, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.5), value: timeRemaining)
+                .animation(.linear(duration: 1), value: timeRemaining)
 
             Text(formatTime(timeRemaining))
                 .font(.system(size: 32, weight: .bold))

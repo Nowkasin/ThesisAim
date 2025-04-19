@@ -26,7 +26,7 @@ struct DistanceChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(viewModel.averageDistance, specifier: "%.2f") \(t("km", in: "Chart.Summary"))")
+                Text("\(viewModel.averageDistance, specifier: "%.2f") \(t("KM", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)

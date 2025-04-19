@@ -13,4 +13,5 @@ extension Color {
     static let pastelBlue = Color(red: 194/255, green: 241/255, blue: 255/255)
     static let salmonPink = Color(red: 255/255, green: 160/255, blue: 162/255)
     static let magicMint = Color(red: 182/255, green: 254/255, blue: 234/255)
+    static let pastelOrange = Color(red: 254/255, green: 201/255, blue: 143/255)
 }

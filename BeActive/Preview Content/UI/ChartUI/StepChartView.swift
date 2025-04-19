@@ -26,7 +26,7 @@ struct StepChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(viewModel.averageSteps, specifier: "%.0f") \(t("steps", in: "Chart.Summary"))")
+                Text("\(viewModel.averageSteps, specifier: "%.0f") \(t("Steps", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)

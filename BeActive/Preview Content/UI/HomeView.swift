@@ -65,6 +65,7 @@ struct HomeView: View {
                     updateScreenWidth()
                     fetchUserData()
                     startScoreRefreshTimer()
+                    ScoreManager.shared.resetTotalScoreIfNewDay()
                 }
                 .onDisappear {
                     stopScoreRefreshTimer()
@@ -196,6 +197,9 @@ struct HomeView: View {
 
                     ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"))
                         .navigate(to: WaterView())
+                    
+                    ReminderSection(title: t("Breathing Technique", in: "home_screen"), color: .pastelOrange, icon: Image(systemName: "wind"))
+                        .navigate(to: BreathingView())
 
                     ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .salmonPink, icon: Image(systemName: "ticket.fill"))
                         .navigate(to: VoucherView())

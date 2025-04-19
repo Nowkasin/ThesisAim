@@ -29,7 +29,7 @@ struct CalChartView: View {
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(viewModel.averageCalories, specifier: "%.0f") \(t("kcal", in: "Chart.Summary"))")
+                Text("\(viewModel.averageCalories, specifier: "%.0f") \(t("Kcal", in: "Chart.Summary"))")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.primary)

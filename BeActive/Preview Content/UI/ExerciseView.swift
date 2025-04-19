@@ -6,9 +6,9 @@
 
 
 import SwiftUI
-import SafariServices
+import WebKit
 
-struct Exercise: Identifiable {
+struct Exercise: Identifiable, Codable {
     let id = UUID()
     let title: String
     let duration: String
@@ -16,22 +16,39 @@ struct Exercise: Identifiable {
     var isFavorite: Bool
 }
 
+struct Article: Identifiable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let url: String
+}
+
+class FavoriteManager {
+    private let key = "favoriteExercises"
+
+    func loadFavorites() -> Set<String> {
+        let titles = UserDefaults.standard.stringArray(forKey: key) ?? []
+        return Set(titles)
+    }
+
+    func saveFavorites(_ favorites: Set<String>) {
+        UserDefaults.standard.set(Array(favorites), forKey: key)
+    }
+}
+
 struct ExerciseView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var selectedURL: IdentifiableURL?
+    @State private var selectedEmbedURL: IdentifiableURL?
+    private let favoriteManager = FavoriteManager()
 
-    private var exercises: [Exercise] = [
-        Exercise(title: t("Back Exercise", in: "Ex_screen"), duration: "10 " + t("Minutes", in: "Ex_screen"), videoURL: "https://youtu.be/4BYVwq2wv0Q", isFavorite: false),
-        Exercise(title: t("Neck Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/neck-exercise", isFavorite: false),
-        Exercise(title: t("Arm Exercise", in: "Ex_screen"), duration: "7 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/arm-exercise", isFavorite: false),
-        Exercise(title: t("Shoulder Exercise", in: "Ex_screen"), duration: "5 " + t("Minutes", in: "Ex_screen"), videoURL: "https://www.example.com/shoulder-exercise", isFavorite: false)
+    private var articles: [Article] = [
+        Article(title: "Stretch to Reduce Pain", description: "Easy office stretches to relieve tension in your neck and back.", url: "https://www.example.com/stretch-tips"),
+        Article(title: "Perfect Posture", description: "Tips for improving posture while working at a desk.", url: "https://www.example.com/posture-tips"),
+        Article(title: "Break Time Ideas", description: "Simple routines to do during work breaks to keep your body active.", url: "https://www.example.com/break-ideas"),
+        Article(title: "Why Move More?", description: "Health benefits of standing up and walking during work.", url: "https://www.example.com/why-move")
     ]
 
-    @State private var exerciseStates: [Exercise]
-
-    init() {
-        _exerciseStates = State(initialValue: exercises)
-    }
+    @State private var exerciseStates: [Exercise] = []
 
     var body: some View {
         GeometryReader { geometry in
@@ -79,7 +96,14 @@ struct ExerciseView: View {
 
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: cardSpacing) {
                             ForEach($exerciseStates) { $exercise in
-                                ExerciseCard(exercise: $exercise, selectedURL: $selectedURL, cardHeight: cardHeight)
+                                ExerciseCard(
+                                    exercise: $exercise,
+                                    selectedEmbedURL: $selectedEmbedURL,
+                                    cardHeight: cardHeight,
+                                    onFavoriteToggle: { title in
+                                        toggleFavorite(for: title)
+                                    }
+                                )
                             }
                         }
                         .padding(.horizontal, padding)
@@ -90,13 +114,12 @@ struct ExerciseView: View {
                             .padding(.horizontal, padding)
 
                         VStack(spacing: 15) {
-                            ForEach(0..<4) { _ in
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(Color.primary.opacity(0.1))
-                                    .frame(height: 100)
-                                    .onTapGesture {
-                                        print("Go to Tips")
+                            ForEach(articles) { article in
+                                ArticleCard(article: article) {
+                                    if let url = URL(string: article.url) {
+                                        UIApplication.shared.open(url)
                                     }
+                                }
                             }
                         }
                         .padding(.horizontal, padding)
@@ -104,24 +127,70 @@ struct ExerciseView: View {
                         Spacer().frame(height: 30)
                     }
                 }
-                .sheet(item: $selectedURL) { identifiableURL in
-                    SafariView(url: identifiableURL.url)
+                .sheet(item: $selectedEmbedURL) { item in
+                    WebViewPlayer(embedURL: item.url)
+                        .ignoresSafeArea()
                 }
             }
         }
+        .onAppear {
+            loadExercises()
+        }
         .navigationBarHidden(true)
+    }
+
+    private func loadExercises() {
+        let savedFavorites = favoriteManager.loadFavorites()
+        exerciseStates = [
+            Exercise(
+                title: t("Back Exercise", in: "Ex_screen"),
+                duration: "10 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/g43xYk4VAjU",
+                isFavorite: savedFavorites.contains(t("Back Exercise", in: "Ex_screen"))
+            ),
+            Exercise(
+                title: t("Neck Exercise", in: "Ex_screen"),
+                duration: "5 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/8JNDtye2CB0?si=_ZdNl7uAGXTkpm-0",
+                isFavorite: savedFavorites.contains(t("Neck Exercise", in: "Ex_screen"))
+            ),
+            Exercise(
+                title: t("Arm Exercise", in: "Ex_screen"),
+                duration: "7 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/TSrfB7JIzxY",
+                isFavorite: savedFavorites.contains(t("Arm Exercise", in: "Ex_screen"))
+            ),
+            Exercise(
+                title: t("Shoulder Exercise", in: "Ex_screen"),
+                duration: "5 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/2VuLBYrgG94",
+                isFavorite: savedFavorites.contains(t("Shoulder Exercise", in: "Ex_screen"))
+            )
+        ]
+    }
+
+    private func toggleFavorite(for title: String) {
+        var favorites = favoriteManager.loadFavorites()
+        if favorites.contains(title) {
+            favorites.remove(title)
+        } else {
+            favorites.insert(title)
+        }
+        favoriteManager.saveFavorites(favorites)
     }
 }
 
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
-    @Binding var selectedURL: IdentifiableURL?
+    @Binding var selectedEmbedURL: IdentifiableURL?
     var cardHeight: CGFloat
+    var onFavoriteToggle: ((String) -> Void)? = nil
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
+                .shadow(radius: 3)
 
             VStack {
                 HStack {
@@ -129,8 +198,11 @@ struct ExerciseCard: View {
                     Image(systemName: exercise.isFavorite ? "star.fill" : "star")
                         .foregroundColor(exercise.isFavorite ? Color.yellow : .purple)
                         .padding()
+                        .scaleEffect(exercise.isFavorite ? 1.2 : 1)
+                        .animation(.spring(), value: exercise.isFavorite)
                         .onTapGesture {
                             exercise.isFavorite.toggle()
+                            onFavoriteToggle?(exercise.title)
                         }
                 }
 
@@ -164,28 +236,55 @@ struct ExerciseCard: View {
         .padding(.bottom, 10)
         .onTapGesture {
             if let url = URL(string: exercise.videoURL) {
-                selectedURL = IdentifiableURL(url: url)
+                selectedEmbedURL = IdentifiableURL(url: url)
             }
         }
     }
 }
 
-// SafariView to open links inside the app
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
+struct ArticleCard: View {
+    var article: Article
+    var onTap: () -> Void
 
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        SFSafariViewController(url: url)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(article.title)
+                .font(.headline)
+                .foregroundColor(.primary)
+            Text(article.description)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+        }
+        .padding()
+        .frame(height: 100)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.primary.opacity(0.05))
+        .cornerRadius(15)
+        .onTapGesture {
+            onTap()
+        }
+    }
+}
+
+struct WebViewPlayer: UIViewRepresentable {
+    let embedURL: URL
+
+    func makeUIView(context: Context) -> WKWebView {
+        WKWebView()
     }
 
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        let request = URLRequest(url: embedURL)
+        uiView.scrollView.isScrollEnabled = false
+        uiView.load(request)
+    }
 }
 
 struct IdentifiableURL: Identifiable {
     let id = UUID()
     let url: URL
 }
-
 
 struct ExerciseView_Previews: PreviewProvider {
     static var previews: some View {

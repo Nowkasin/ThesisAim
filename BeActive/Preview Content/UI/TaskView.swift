@@ -30,6 +30,7 @@ struct TaskView: View {
     @AppStorage("taskHistoryData") private var taskHistoryData: Data = Data()
     @AppStorage("currentUserId") private var currentUserId: String = ""
     @AppStorage("unlockedMatesData") private var unlockedMatesData: Data = Data()
+    @AppStorage("taskJustCompleted") private var taskJustCompleted: Bool = false
 
     @State private var unlockedMates: [String] = ["Bear"]
 
@@ -316,6 +317,7 @@ struct TaskView: View {
 
     func startTask() {
         isTaskStarted = true
+        taskJustCompleted = false // ✅ Reset to allow scoring
         taskStartTime = Date().timeIntervalSince1970
         timeRemaining = selectedTime * 60
         startTimer()
@@ -346,6 +348,12 @@ struct TaskView: View {
     }
 
     func completeTask() {
+        guard !taskJustCompleted else {
+            print("⚠️ Task already completed — skipping duplicate.")
+            return
+        }
+        taskJustCompleted = true // ✅ Mark task as rewarded
+
         timer?.invalidate()
         isTaskStarted = false
         taskStartTime = 0

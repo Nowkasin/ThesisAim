@@ -18,7 +18,7 @@ struct BreathingTechnique: Identifiable, Equatable, Hashable {
 struct BreathingView: View {
     @State private var selectedTechnique: BreathingTechnique
     @State private var currentPhase = 0
-    @State private var instructionText = "Ready?"
+    @State private var instructionText = t("Ready?", in: "breath_screen")
     @State private var phaseTimeLeft = 0
     @State private var totalTimeLeft = 0
     @State private var isBreathing = false
@@ -49,10 +49,10 @@ struct BreathingView: View {
 
             VStack(spacing: 20) {
                 VStack(spacing: 4) {
-                    Text(selectedTechnique.name)
+                    Text(t(selectedTechnique.name, in: "breath_screen"))
                         .font(.title.bold())
 
-                    Text(selectedTechnique.description)
+                    Text(t(selectedTechnique.description, in: "breath_screen"))
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }
@@ -71,10 +71,10 @@ struct BreathingView: View {
                         .shadow(radius: 4)
 
                     VStack(spacing: 4) {
-                        Text(emojiForCurrentPhase() + " " + instructionText)
-                            .font(.title3.weight(.medium))
+                        Text(emojiForCurrentPhase() + " " + t(instructionText, in: "breath_screen"))
+                            .font(.callout.weight(.medium))
                             .foregroundColor(.teal)
-
+                        
                         if isBreathing {
                             Text("\(phaseTimeLeft)s")
                                 .font(.subheadline)
@@ -86,7 +86,7 @@ struct BreathingView: View {
 
                 // ✅ Total time moved below breathing circle
                 if isBreathing {
-                    Text("Total Remaining: \(totalTimeLeft)s")
+                    Text("\(t("Total Remaining", in: "breath_screen")): \(totalTimeLeft)\(t(" s", in: "breath_screen"))")
                         .font(.footnote)
                         .foregroundColor(.gray)
                         .padding(.top, 24)
@@ -101,7 +101,7 @@ struct BreathingView: View {
                     }
                 } label: {
                     HStack {
-                        Text(selectedTechnique.name)
+                        Text(t(selectedTechnique.name, in: "breath_screen"))
                             .foregroundColor(.primary)
                         Spacer()
                         Image(systemName: "chevron.up")
@@ -134,7 +134,7 @@ struct BreathingView: View {
         }
         .sheet(isPresented: $showTechniqueSheet) {
             VStack(spacing: 12) {
-                Text("Choose Technique")
+                Text(t("Choose Technique", in: "breath_screen"))
                     .font(.headline)
                     .padding(.top)
 
@@ -144,7 +144,7 @@ struct BreathingView: View {
                         showTechniqueSheet = false
                     }) {
                         HStack {
-                            Text(technique.name)
+                            Text(t(technique.name, in: "breath_screen"))
                                 .foregroundColor(.primary)
                             Spacer()
                             if selectedTechnique == technique {
@@ -178,7 +178,7 @@ struct BreathingView: View {
         isBreathing = false
         timer?.invalidate()
         timer = nil
-        instructionText = "Ready?"
+        instructionText = t("Ready?", in: "breath_screen")
         phaseTimeLeft = 0
         totalTimeLeft = 0
         circleScale = 1.0

@@ -8,7 +8,8 @@
             "register": "Register",
             "Login Failed" : "Login Failed",
             "ok": "ok",
-            "logging_in": "Logging in..."
+            "logging_in": "Logging in...",
+            "Incorrect Email or Password.": "Incorrect Email or Password."
         },
         "register_screen": {
             "register": "Register",
@@ -41,8 +42,20 @@
             "Notification permission error:" : "Notification permission error:",
             "Notification permission granted:": "Notification permission granted:",
             "Error triggering notification:": "Error triggering notification:",
-            "Today Activities": "Today Activities"
+            "Today Activities": "Today Activities",
+            "Breathing Technique": "Breathing Technique",
+            "Hey, Good to see you!": "Hey, Good to see you!",
+            "Khun": "Khun"
             
+        },
+        "Date": {
+          "Monday": "Monday",
+          "Tuesday": "Tuesday",
+          "Wednesday": "Wednesday",
+          "Thursday": "Thursday",
+          "Friday": "Friday",
+          "Saturday": "Saturday",
+          "Sunday": "Sunday"
         },
         "Water_screen": {
             "Water to Drink": "Water to Drink",
@@ -66,6 +79,27 @@
             "Today's Distance": "Today's Distance",
             "Amount": "Amount",
             "Goal": "Goal"
+        },
+        "breath_screen": {
+          "Box Breathing": "Box Breathing",
+          "4-7-8 Breathing": "4-7-8 Breathing",
+          "Deep Breathing": "Deep Breathing",
+          "Relax & Reset": "Relax & Reset",
+          "Energy Boost": "Energy Boost",
+
+          "Balance & calm": "Balance & calm",
+          "Sleep better": "Sleep better",
+          "Stay relaxed": "Stay relaxed",
+          "Relieve tension": "Relieve tension",
+          "Quick recharge": "Quick recharge",
+
+          "Ready?": "Ready?",
+          "Choose Technique": "Choose Technique",
+          "Inhale": "Inhale",
+          "Exhale": "Exhale",
+          "Hold": "Hold",
+          "Total Remaining": "Total Remaining",
+          " s": " s"
         },
         "Ex_screen": {
             "Back Exercise": "Back Exercise",
@@ -125,6 +159,7 @@
             "Unlocked Mates" : "Unlocked Mates",
             "🧸 You haven’t unlocked any mates yet." : "🧸 You haven’t unlocked any mates yet.",
             "Coins" : "Coins",
+            "Do you want to unlock %@ for %d coins?": "Do you want to unlock %@ for %d coins?",
             "Unlocked Mate?" : "Unlocked Mate?"
         },
         "Pain_screen" : {
@@ -334,7 +369,9 @@
             "Notification permission error:" : "พบข้อผิดพลาดในการอนุญาตการแจ้งเตือน:",
             "Notification permission granted:": "ได้รับอนุญาติให้แจ้งเตือน:",
             "Error triggering notification:": "เกิดข้อผิดพลาดในการแจ้งเตือน:",
-            "Today Activities": "เป้าหมายในวันนี้"
+            "Today Activities": "เป้าหมายในวันนี้",
+            "Hey, Good to see you!": "สวัดดี! ดีใจที่ได้เจอนะ",
+            "Khun": "คุณ"
         },
         "Date": {
             "Monday": "วันจันทร์",
@@ -485,6 +522,27 @@
             "Select Language" : "เลือกภาษา",
             "TH" : "ภาษาไทย",
             "EN" : "ภาษาอังกฤษ"
+        },
+        "breath_screen": {
+          "Box Breathing": "การหายใจแบบกล่อง",
+          "4-7-8 Breathing": "การหายใจแบบ 4-7-8",
+          "Deep Breathing": "การหายใจลึก",
+          "Relax & Reset": "ผ่อนคลายและรีเซ็ต",
+          "Energy Boost": "เพิ่มพลัง",
+
+          "Balance & calm": "สร้างความสงบอย่างสมดุล",
+          "Sleep better": "ช่วยให้นอนหลับดีขึ้น",
+          "Stay relaxed": "ช่วยให้ผ่อนคลายอย่างต่อเนื่อง",
+          "Relieve tension": "บรรเทาความเครียด",
+          "Quick recharge": "เติมพลังทันใจ",
+
+          "Ready?": "พร้อมไหม?",
+          "Choose Technique": "เลือกเทคนิคการหายใจ",
+          "Inhale": "หายใจเข้า",
+          "Exhale": "หายใจออก",
+          "Hold": "กลั้นหายใจ",
+          "Total Remaining": "เวลาทั้งหมดที่เหลือ",
+          " s": " วินาที"
         },
         "Task_screen": {
             "mission_label": "ภารกิจของคุณคืออะไร?",

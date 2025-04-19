@@ -24,7 +24,10 @@ struct HomeView: View {
     }
 
     var welcomeArray: [String] {
-        ["Hey, Good to see you!", "Khun \(firstName)"]
+        [
+            t("Hey, Good to see you!", in: "home_screen"),
+            t("Khun", in: "home_screen") + " \(firstName)"
+        ]
     }
 
     @State private var currentIndex = 0

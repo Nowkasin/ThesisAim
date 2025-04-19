@@ -9,6 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 import CryptoKit
+import Kingfisher
 
 struct SplashScreen: View {
     @Binding var isActive: Bool
@@ -19,39 +20,18 @@ struct SplashScreen: View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            AsyncImage(url: imageUrl) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                        .opacity(isFadedIn ? 1 : 0)
-                        .scaleEffect(isActive ? 2 : 1)
-                        .animation(.easeInOut(duration: 3), value: isActive)
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: 1.5)) {
-                                isFadedIn = true
-                            }
-                        }
-                case .failure:
-                    Image(systemName: "xmark.octagon")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                        .foregroundColor(.red)
-                        .opacity(isFadedIn ? 1 : 0)
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: 1.5)) {
-                                isFadedIn = true
-                            }
-                        }
-                @unknown default:
-                    EmptyView()
+            KFImage(imageUrl)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 300, height: 300)
+                .opacity(isFadedIn ? 1 : 0)
+                .scaleEffect(isActive ? 2 : 1)
+                .animation(.easeInOut(duration: 3), value: isActive)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.5)) {
+                        isFadedIn = true
+                    }
                 }
-            }
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {

@@ -99,6 +99,8 @@
           "Exhale": "Exhale",
           "Hold": "Hold",
           "Total Remaining": "Total Remaining",
+          "Start Now": "Start Now",
+          "Stop": "Stop",
           " s": " s"
         },
         "Ex_screen": {
@@ -542,6 +544,8 @@
           "Exhale": "หายใจออก",
           "Hold": "กลั้นหายใจ",
           "Total Remaining": "เวลาทั้งหมดที่เหลือ",
+          "Start Now": "เริ่มเลย",
+          "Stop": "หยุด",
           " s": " วินาที"
         },
         "Task_screen": {

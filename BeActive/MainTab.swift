@@ -86,16 +86,27 @@ struct TabBarItem: View {
             if selectedTab == tag && tag == 0 {
                 homeRefreshID = UUID()
             } else {
-                selectedTab = tag
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    selectedTab = tag
+                }
             }
         }) {
-            VStack {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                Text(title)
-                    .font(.system(size: 12, weight: .medium))
+            ZStack {
+                if selectedTab == tag {
+                    Capsule()
+                        .fill(Color.cyan.opacity(0.2))
+                        .frame(width: 75, height: 36)
+                }
+
+                VStack(spacing: 2) {
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .semibold))
+                    Text(title)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .frame(width: 70, height: 36)
             }
-            .foregroundColor(selectedTab == tag ? .blue : .gray)
+            .foregroundColor(selectedTab == tag ? Color.cyan : .gray)
         }
     }
 }

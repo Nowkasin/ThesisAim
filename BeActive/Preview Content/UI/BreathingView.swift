@@ -118,11 +118,11 @@ struct BreathingView: View {
                 Button(action: {
                     isBreathing ? stopBreathing() : startBreathing()
                 }) {
-                    Text(isBreathing ? "Stop" : "Start Now")
+                    Text(isBreathing ? t("Stop", in: "breath_screen") : t("Start Now", in: "breath_screen"))
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isBreathing ? Color.red : Color.teal)
+                        .background(isBreathing ? Color.red : Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(16)
                         .shadow(radius: 6)

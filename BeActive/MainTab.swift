@@ -12,6 +12,8 @@ struct MainTab: View {
     @StateObject private var healthData = HealthDataManager()
     @State private var selectedTab = 0
     @State private var homeRefreshID = UUID()
+    @State private var languageUpdateTrigger = false
+    @ObservedObject var language = Language.shared
 
     init() {
         let appearance = UITabBarAppearance()
@@ -45,12 +47,16 @@ struct MainTab: View {
                     .padding(.bottom, 20)
             }
         )
+        .onReceive(language.objectWillChange) { _ in
+            languageUpdateTrigger.toggle()
+        }
     }
 }
 
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
     @Binding var homeRefreshID: UUID
+    @ObservedObject var language = Language.shared
 
     var body: some View {
         HStack {

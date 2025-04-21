@@ -142,6 +142,7 @@ struct MatesView: View {
                                     }
                                 }
                                 .listStyle(PlainListStyle())
+                                Color.clear.frame(height: 60)
                             }
 
                             Spacer()

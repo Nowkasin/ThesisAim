@@ -22,64 +22,29 @@ struct MainTab: View {
     }
 
     var body: some View {
-        Group {
-            if DeviceHelper.isTablet {
-                VStack(spacing: 0) {
-                    ZStack {
-                        Color.white.edgesIgnoringSafeArea(.all)
-                        switch selectedTab {
-                        case 0:
-                            HomeView()
-                                .id(homeRefreshID)
-                                .transition(.opacity.combined(with: .scale))
-                        case 1:
-                            ProfileView()
-                                .environmentObject(healthData)
-                                .transition(.identity)
-                        case 2:
-                            PainScaleView()
-                                .transition(.move(edge: .trailing))
-                        default:
-                            HomeView()
-                                .id(homeRefreshID)
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.3))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                    CustomTabBar(selectedTab: $selectedTab, homeRefreshID: $homeRefreshID)
-                        .frame(height: 60)
-                        .background(Color(red: 0.7, green: 0.9, blue: 1.0))
-                }
-            } else {
-                TabView(selection: $selectedTab) {
-                    HomeView()
-                        .id(homeRefreshID)
-                        .tabItem {
-                            Image(systemName: "house.fill")
-                            Text(t("Home", in: "MainTab_screen"))
-                        }
-                        .tag(0)
-
-                    ProfileView()
-                        .environmentObject(healthData)
-                        .tabItem {
-                            Image(systemName: "person.crop.circle")
-                            Text(t("Profile", in: "MainTab_screen"))
-                        }
-                        .tag(1)
-
-                    PainScaleView()
-                        .tabItem {
-                            Image(systemName: "quotelevel")
-                            Text(t("Pain Scale", in: "MainTab_screen"))
-                        }
-                        .tag(2)
-                }
-                .accentColor(.blue)
+        ZStack {
+            switch selectedTab {
+            case 0:
+                HomeView().id(homeRefreshID)
+            case 1:
+                ProfileView().environmentObject(healthData)
+            case 2:
+                PainScaleView()
+            default:
+                HomeView().id(homeRefreshID)
             }
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Color.clear.frame(height: 80)
+        }
+        .overlay(
+            VStack {
+                Spacer()
+                CustomTabBar(selectedTab: $selectedTab, homeRefreshID: $homeRefreshID)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
+            }
+        )
     }
 }
 
@@ -89,17 +54,17 @@ struct CustomTabBar: View {
 
     var body: some View {
         HStack {
-            Spacer()
             TabBarItem(title: t("Home", in: "MainTab_screen"), icon: "house.fill", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 0)
             Spacer()
             TabBarItem(title: t("Profile", in: "MainTab_screen"), icon: "person.crop.circle", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 1)
             Spacer()
             TabBarItem(title: t("Pain Scale", in: "MainTab_screen"), icon: "quotelevel", selectedTab: $selectedTab, homeRefreshID: $homeRefreshID, tag: 2)
-            Spacer()
         }
-        .frame(height: 60)
-        .background(Color(red: 0.7, green: 0.9, blue: 1.0))
-        .edgesIgnoringSafeArea(.bottom)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }
 
@@ -112,17 +77,17 @@ struct TabBarItem: View {
 
     var body: some View {
         Button(action: {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                if selectedTab == tag && tag == 0 {
-                    homeRefreshID = UUID()
-                } else {
-                    selectedTab = tag
-                }
+            if selectedTab == tag && tag == 0 {
+                homeRefreshID = UUID()
+            } else {
+                selectedTab = tag
             }
         }) {
             VStack {
                 Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
                 Text(title)
+                    .font(.system(size: 12, weight: .medium))
             }
             .foregroundColor(selectedTab == tag ? .blue : .gray)
         }

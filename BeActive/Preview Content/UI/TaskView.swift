@@ -211,6 +211,7 @@ struct TaskView: View {
                     }
                 }
                 .padding()
+                Color.clear.frame(height: 80)
             }
             .sheet(isPresented: $showMatePicker) {
                 ScrollView {

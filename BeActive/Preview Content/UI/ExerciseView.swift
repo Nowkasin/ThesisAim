@@ -125,6 +125,7 @@ struct ExerciseView: View {
                         .padding(.horizontal, padding)
 
                         Spacer().frame(height: 30)
+                        Color.clear.frame(height: 30)
                     }
                 }
                 .sheet(item: $selectedEmbedURL) { item in

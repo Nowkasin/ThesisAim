@@ -287,7 +287,8 @@ struct WaterView: View {
 //                        }
                         .padding(.bottom)
                     }
-                    .frame(minHeight: geometry.size.height)
+                        Color.clear.frame(height: 5)
+                    
                 }
                 .sheet(isPresented: $showingPopup) {
                     ScheduleSettingsSheet(

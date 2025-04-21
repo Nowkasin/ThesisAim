@@ -132,6 +132,7 @@ struct VoucherView: View {
                         }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 40)
+                        Color.clear.frame(height: 80)
                     }
                 } else {
                     VStack(spacing: 15) {

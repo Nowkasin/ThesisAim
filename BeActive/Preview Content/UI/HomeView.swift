@@ -154,6 +154,7 @@ struct HomeView: View {
                 Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
                 
                 buildReminders()
+                Color.clear.frame(height: 80)
             }
         }
         .onAppear { requestNotificationPermission() }

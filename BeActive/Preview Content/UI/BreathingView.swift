@@ -128,6 +128,7 @@ struct BreathingView: View {
                         .shadow(radius: 6)
                 }
                 .padding(.horizontal)
+                Color.clear.frame(height: 80)
                 .padding(.bottom, 30)
             }
             .padding()

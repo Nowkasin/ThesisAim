@@ -137,6 +137,7 @@ struct ScoreView: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
+            .padding(.trailing, 10)
         }
         .alert(t("Score Converted", in: "Noti_Screen.SC"), isPresented: $showAlert) {
             Button(t("OK", in: "Noti_Screen.SC"), role: .cancel) {}

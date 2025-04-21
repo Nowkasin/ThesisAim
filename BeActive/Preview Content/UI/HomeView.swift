@@ -119,17 +119,18 @@ struct HomeView: View {
 
     func buildHomeContent() -> some View {
         ZStack {
-            Color(.systemBackground)
-                .ignoresSafeArea()
-
+        Color(.systemBackground)
+            .ignoresSafeArea()
+        
+        ScrollView {
             VStack(alignment: .leading) {
                 buildHeader()
-
+                
                 Text(getFormattedDate())
                     .font(.system(size: 16))
                     .foregroundColor(getDayColor())
                     .padding(.horizontal)
-
+                
                 if showPushedScore {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
@@ -144,17 +145,18 @@ struct HomeView: View {
                     .transition(.scale.combined(with: .opacity))
                     .animation(.easeInOut(duration: 0.3), value: pushedScore)
                 }
-
+                
                 Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
-
+                
                 TabCardControlView()
                     .environmentObject(manager)
-
+                
                 Spacer().frame(height: DeviceHelper.adaptiveSpacing(baseSpacing: 20))
-
+                
                 buildReminders()
             }
-            .onAppear { requestNotificationPermission() }
+        }
+        .onAppear { requestNotificationPermission() }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

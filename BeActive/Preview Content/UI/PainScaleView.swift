@@ -14,6 +14,8 @@ struct PainRecord: Identifiable, Codable {
 }
 
 struct PainScaleView: View {
+    @ObservedObject var language = Language.shared
+
     @State private var headPain: Double = 0
     @State private var armPain: Double = 0
     @State private var shoulderPain: Double = 0
@@ -37,7 +39,7 @@ struct PainScaleView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
                 Text(t("Pain Scale", in: "Pain_screen"))
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 36))
                     .foregroundColor(.pink)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
@@ -60,7 +62,7 @@ struct PainScaleView: View {
                     showSaveAlert = true
                 }) {
                     Text(t("Save", in: "Pain_screen"))
-                        .font(.headline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -81,7 +83,7 @@ struct PainScaleView: View {
                             Text(showHistory ? t("Hide History", in: "Pain_screen") : t("Show History", in: "Pain_screen"))
 
                         }
-                        .font(.headline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                         .foregroundColor(.blue)
                         .padding(.horizontal)
                     }
@@ -93,7 +95,7 @@ struct PainScaleView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack {
                                     Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
-                                        .font(.subheadline)
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                         .foregroundColor(.secondary)
 
                                     Spacer()
@@ -143,7 +145,7 @@ struct PainScaleView: View {
             VStack(spacing: 10) {
                 if showSaveConfirmation {
                     Text(t("Pain Scale Saved!", in: "Pain_screen"))
-                        .font(.subheadline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                         .padding()
                         .background(Color.green.opacity(0.9))
                         .foregroundColor(.white)
@@ -153,7 +155,7 @@ struct PainScaleView: View {
 
                 if showDeleteConfirmation {
                     Text(t("Record Deleted", in: "Pain_screen"))
-                        .font(.subheadline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                         .padding()
                         .background(Color.red.opacity(0.9))
                         .foregroundColor(.white)
@@ -174,7 +176,7 @@ struct PainScaleView: View {
     func painSlider(label: String, value: Binding<Double>) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.system(size: 20, weight: .bold))
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 20))
                 .foregroundColor(.primary)
 
             GeometryReader { geometry in
@@ -207,7 +209,7 @@ struct PainScaleView: View {
             HStack {
                 ForEach(0...10, id: \.self) { number in
                     Text("\(number)")
-                        .font(.caption2)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 11))
                         .frame(maxWidth: .infinity)
                 }
             }

@@ -19,6 +19,7 @@ struct Activity {
 
 // 🃏 ActivityCard (แสดงการ์ดแต่ละกิจกรรม)
 struct ActivityCard: View {
+    @ObservedObject var language = Language.shared
     let activity: Activity
 
     var body: some View {
@@ -30,11 +31,11 @@ struct ActivityCard: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(activity.titleKey)
-                            .font(.system(size: 14))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
                             .foregroundColor(.primary)
 
                         Text(t(activity.subtitleKey, in: "Chart_screen"))
-                            .font(.system(size: 14))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
                             .foregroundColor(.secondary)
                     }
 
@@ -46,9 +47,8 @@ struct ActivityCard: View {
                 .padding([.top, .leading, .trailing])
 
                 Text(activity.amount)
-                    .font(.system(size: 24))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 24))
                     .minimumScaleFactor(0.6)
-                    .bold()
                     .foregroundColor(.primary)
                     .padding()
             }

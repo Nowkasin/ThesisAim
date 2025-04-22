@@ -16,6 +16,7 @@ struct BreathingTechnique: Identifiable, Equatable, Hashable {
 }
 
 struct BreathingView: View {
+    @ObservedObject var language = Language.shared
     @State private var selectedTechnique: BreathingTechnique
     @State private var currentPhase = 0
     @State private var instructionText = t("Ready?", in: "breath_screen")
@@ -50,10 +51,10 @@ struct BreathingView: View {
             VStack(spacing: 20) {
                 VStack(spacing: 4) {
                     Text(t(selectedTechnique.name, in: "breath_screen"))
-                        .font(.title.bold())
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
 
                     Text(t(selectedTechnique.description, in: "breath_screen"))
-                        .font(.subheadline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                         .foregroundColor(.gray)
                 }
 
@@ -72,12 +73,12 @@ struct BreathingView: View {
 
                     VStack(spacing: 4) {
                         Text(emojiForCurrentPhase() + " " + t(instructionText, in: "breath_screen"))
-                            .font(.callout.weight(.medium))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             .foregroundColor(.teal)
                         
                         if isBreathing {
                             Text("\(phaseTimeLeft)s")
-                                .font(.subheadline)
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                 .foregroundColor(.gray)
                         }
                     }
@@ -87,7 +88,7 @@ struct BreathingView: View {
                 // ✅ Total time moved below breathing circle
                 if isBreathing {
                     Text("\(t("Total Remaining", in: "breath_screen")): \(totalTimeLeft)\(t(" s", in: "breath_screen"))")
-                        .font(.footnote)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                         .foregroundColor(.gray)
                         .padding(.top, 24)
                 }
@@ -102,6 +103,7 @@ struct BreathingView: View {
                 } label: {
                     HStack {
                         Text(t(selectedTechnique.name, in: "breath_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                             .foregroundColor(.primary)
                         Spacer()
                         Image(systemName: "chevron.up")
@@ -119,7 +121,7 @@ struct BreathingView: View {
                     isBreathing ? stopBreathing() : startBreathing()
                 }) {
                     Text(isBreathing ? t("Stop", in: "breath_screen") : t("Start Now", in: "breath_screen"))
-                        .font(.headline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(isBreathing ? Color.red : Color.blue)
@@ -136,7 +138,7 @@ struct BreathingView: View {
         .sheet(isPresented: $showTechniqueSheet) {
             VStack(spacing: 12) {
                 Text(t("Choose Technique", in: "breath_screen"))
-                    .font(.headline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                     .padding(.top)
 
                 ForEach(techniques) { technique in
@@ -146,6 +148,7 @@ struct BreathingView: View {
                     }) {
                         HStack {
                             Text(t(technique.name, in: "breath_screen"))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                                 .foregroundColor(.primary)
                             Spacer()
                             if selectedTechnique == technique {

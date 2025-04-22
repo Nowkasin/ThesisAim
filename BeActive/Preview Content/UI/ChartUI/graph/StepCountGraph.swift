@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct StepCountGraph: View {
+    @ObservedObject var language = Language.shared
     var data: [StepData]
     @State private var selectedData: StepData?
     @State private var tooltipXPosition: CGFloat = .zero
@@ -71,8 +72,7 @@ struct StepCountGraph: View {
                 if showTooltip, let selected = selectedData {
                     VStack {
                         Text("\(Int(selected.steps)) ก้าว")
-                            .font(.headline)
-                            .bold()
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(
@@ -107,4 +107,3 @@ extension Date {
         StepData(date: Date(), steps: 4500)
     ])
 }
-

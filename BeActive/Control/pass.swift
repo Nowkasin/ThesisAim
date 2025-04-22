@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+// แปลด้วย พน.
 class PasswordValidator {
     var errorMessage: String = ""
 
@@ -16,36 +16,35 @@ class PasswordValidator {
 
         // Check for minimum length
         if password.count < 6 {
-            errorMessage = "Password must be at least 6 characters long."
+            errorMessage = t("min_length", in: "Password")
             return false
         }
 
         // Check for at least one uppercase letter
         if !password.contains(where: { $0.isUppercase }) {
-            errorMessage = "Password must contain at least one uppercase letter."
+            errorMessage = t("uppercase", in: "Password")
             return false
         }
 
         // Check for at least one lowercase letter
         if !password.contains(where: { $0.isLowercase }) {
-            errorMessage = "Password must contain at least one lowercase letter."
+            errorMessage = t("lowercase", in: "Password")
             return false
         }
 
         // Check for at least one digit
         if !password.contains(where: { $0.isNumber }) {
-            errorMessage = "Password must contain at least one digit."
+            errorMessage = t("number", in: "Password")
             return false
         }
 
         // Check for at least one special character
         let specialCharacterSet = CharacterSet(charactersIn: "!@#$%^&*()-_=+[]{}|;:'\",.<>?/\\")
         if password.rangeOfCharacter(from: specialCharacterSet) == nil {
-            errorMessage = "Password must contain at least one special character."
+            errorMessage = t("special", in: "Password")
             return false
         }
 
         return true
     }
 }
-

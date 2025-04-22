@@ -12,6 +12,7 @@ struct SwitchLang: View {
     @ObservedObject var language = Language.shared
 
     var body: some View {
+        let kanitOrRoboto = language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular"
         ZStack {
             Color(.systemBackground)
                 .edgesIgnoringSafeArea(.vertical)
@@ -20,7 +21,7 @@ struct SwitchLang: View {
             VStack {
                 HStack {
                     Text(t("Select Language", in: "Language_screen"))
-                        .font(.system(size: 20))
+                        .font(.custom(kanitOrRoboto, size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
 
@@ -45,7 +46,7 @@ struct SwitchLang: View {
                     isShowing = false
                 }) {
                     Text(t("TH", in: "Language_screen"))
-                        .font(.body)
+                        .font(.custom(kanitOrRoboto, size: 17))
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -59,7 +60,7 @@ struct SwitchLang: View {
                     isShowing = false
                 }) {
                     Text(t("EN", in: "Language_screen"))
-                        .font(.body)
+                        .font(.custom(kanitOrRoboto, size: 17))
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)

@@ -26,6 +26,7 @@ struct Mate: Identifiable, Codable, Equatable {
 
 // MARK: - MatesView
 struct MatesView: View {
+    @ObservedObject var language = Language.shared
     @EnvironmentObject var scoreManager: ScoreManager
     @AppStorage("purchasedMatesData") private var purchasedMatesData: Data = Data()
     @AppStorage("currentUserId") private var currentUserId: String = ""
@@ -78,7 +79,7 @@ struct MatesView: View {
                         ScrollView {
                             VStack(spacing: 20) {
                                 Text(t("Mates Shop", in: "Mate_screen"))
-                                    .font(.system(size: 32, weight: .bold))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
                                     .foregroundColor(.primary)
                                     .padding(.top, 20)
 
@@ -114,7 +115,7 @@ struct MatesView: View {
                     } else {
                         VStack(spacing: 20) {
                             Text(t("Unlocked Mates", in: "Mate_screen"))
-                                .font(.largeTitle)
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                                 .padding(.top)
 
                             if scoreManager.purchasedMates.isEmpty {
@@ -132,9 +133,9 @@ struct MatesView: View {
 
                                         VStack(alignment: .leading) {
                                             Text(mate.name)
-                                                .font(.headline)
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                                             Text("-\(mate.cost) \(t("Coins", in: "Mate_screen"))")
-                                                .font(.subheadline)
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                                 .foregroundColor(.red)
                                         }
 
@@ -287,11 +288,11 @@ struct MateCard: View {
                     .cornerRadius(15)
 
                 Text(mate.name)
-                    .font(.headline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                     .foregroundColor(.black)
 
                 Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
-                    .font(.subheadline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .fontWeight(.semibold)
                     .foregroundColor(.black)
             }
@@ -302,6 +303,8 @@ struct MateCard: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
+
+    @ObservedObject var language = Language.shared
 }
 
 struct MatesView_Previews: PreviewProvider {

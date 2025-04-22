@@ -9,6 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 
 struct HomeView: View {
+    @ObservedObject var language = Language.shared
     @EnvironmentObject var manager: HealthManager
 
     @AppStorage("currentUserId") private var currentUserId: String = ""
@@ -127,7 +128,7 @@ struct HomeView: View {
                 buildHeader()
                 
                 Text(getFormattedDate())
-                    .font(.system(size: 16))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                     .foregroundColor(getDayColor())
                     .padding(.horizontal)
                 
@@ -135,9 +136,9 @@ struct HomeView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
                             .foregroundColor(.yellow)
-                            .font(.system(size: 14))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
                         Text("\(pushedScore)")
-                            .font(.subheadline)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                             .foregroundColor(.yellow)
                     }
                     .padding(.horizontal)
@@ -165,7 +166,7 @@ struct HomeView: View {
     func buildHeader() -> some View {
         HStack {
             Text("\(welcomeArray[currentIndex])")
-                .font(.system(size: DeviceHelper.adaptiveFontSize(baseSize: 32), weight: .bold))
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: DeviceHelper.adaptiveFontSize(baseSize: 32)))
                 .foregroundColor(.primary)
                 .onAppear { startWelcomeTimer() }
 
@@ -188,7 +189,7 @@ struct HomeView: View {
     func buildReminders() -> some View {
         VStack(alignment: .leading) {
             Text(t("Reminders", in: "home_screen"))
-                .font(.headline)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                 .foregroundColor(.primary)
                 .padding(.horizontal)
                 .padding(.bottom, 5)
@@ -199,7 +200,7 @@ struct HomeView: View {
                         .navigate(to: TaskView())
 
                     ReminderSection(title: t("Exercise", in: "home_screen"), color: .tropicalPurple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"))
-                        .navigate(to: ExerciseView())
+                        .navigate(to: ExerciseView(language: Language.shared))
 
                     ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"))
                         .navigate(to: WaterView())
@@ -303,7 +304,7 @@ struct ReminderSection: View {
                     .foregroundColor(color)
                     .font(.system(size: 20))
                 Text(title)
-                    .font(.subheadline)
+                    .font(.custom(Language.shared.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .foregroundColor(.primary)
             }
             .padding(.horizontal)

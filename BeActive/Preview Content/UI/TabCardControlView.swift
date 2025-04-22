@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TabCardControlView: View {
+    @ObservedObject var language = Language.shared
     @EnvironmentObject var healthManager: HealthManager
     @EnvironmentObject var scoreManager: ScoreManager
 
@@ -21,7 +22,8 @@ struct TabCardControlView: View {
                 // Header: Today Activities and Score
                 HStack {
                     Text(t("Today Activities", in: "home_screen"))
-                        .font(.headline)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                        .fontWeight(.bold)
                         .foregroundColor(.primary)
                         .padding(.leading, 20)
 

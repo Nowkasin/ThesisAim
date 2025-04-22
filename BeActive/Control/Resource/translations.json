@@ -11,6 +11,13 @@
             "logging_in": "Logging in...",
             "Incorrect Email or Password.": "Incorrect Email or Password."
         },
+        "Password": {
+          "min_length": "Password must be at least 6 characters long.",
+          "uppercase": "Password must contain at least one uppercase letter.",
+          "lowercase": "Password must contain at least one lowercase letter.",
+          "number": "Password must contain at least one digit.",
+          "special": "Password must contain at least one special character."
+        },
         "register_screen": {
             "register": "Register",
             "e_mail": "Email",
@@ -28,7 +35,8 @@
             "Male" : "Male",
             "Female" : "Female",
             "Other" : "Other",
-            "have a member?" : "Already have an account?"
+            "have a member?" : "Already have an account?",
+            "register_success": "You have successfully registered."
         },
         "home_screen": {
             "Reminders": "Reminders",
@@ -339,6 +347,13 @@
             "ok": "ตกลง",
             "logging_in": "กำลังเข้าสู่ระบบ..."
         },
+        "Password": {
+          "min_length": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+          "uppercase": "รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว",
+          "lowercase": "รหัสผ่านต้องมีตัวพิมพ์เล็กอย่างน้อย 1 ตัว",
+          "number": "รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว",
+          "special": "รหัสผ่านต้องมีอักขระพิเศษอย่างน้อย 1 ตัว"
+        },
         "register_screen": {
             "register": "สมัครสมาชิก",
             "e_mail": "อีเมล",
@@ -356,7 +371,8 @@
             "Male" : "ผู้ชาย",
             "Female" : "ผู้หญิง",
             "Other" : "อื่นๆ",
-            "have a member?" : "มีสมาชิกอยู่แล้ว?"
+            "have a member?" : "มีสมาชิกอยู่แล้ว?",
+            "register_success": "คุณสมัครสมาชิกสำเร็จแล้ว"
         },
         "home_screen": {
             "Reminders": "แจ้งเตือน",

@@ -46,6 +46,7 @@ struct SplashScreen: View {
 struct Login: View {
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false
     @AppStorage("currentUserId") private var currentUserId: String = ""
+    @ObservedObject var language = Language.shared
 
     @State private var email: String = ""
     @State private var password: String = ""
@@ -83,13 +84,14 @@ struct Login: View {
                 Spacer().frame(height: 60)
                 
                 Text(t("log_in", in: "login_screen"))
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 36))
                     .foregroundColor(.primary)
                     .padding(.leading, 20)
                     .padding(.bottom, 40)
                 
                 VStack(alignment: .leading) {
                     TextField(t("e_mail", in: "login_screen"), text: $email)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                         .padding(.bottom, 10)
                         .foregroundColor(.primary)
                     Rectangle()
@@ -104,8 +106,10 @@ struct Login: View {
                         Group {
                             if showPassword {
                                 TextField(t("password", in: "login_screen"), text: $password)
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             } else {
                                 SecureField(t("password", in: "login_screen"), text: $password)
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             }
                         }
                         .padding(.bottom, 10)
@@ -130,9 +134,13 @@ struct Login: View {
                 HStack {
                     Spacer()
                     Text(t("no_account_yet", in: "login_screen"))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                         .foregroundColor(.secondary)
-                    Button(t("register", in: "login_screen")) {
+                    Button(action: {
                         showRegisterScreen = true
+                    }) {
+                        Text(t("register", in: "login_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                     }
                     .foregroundColor(.blue)
                     .fullScreenCover(isPresented: $showRegisterScreen) {
@@ -146,7 +154,7 @@ struct Login: View {
                 
                 Button(action: handleLogin) {
                     Text(t("log_in", in: "login_screen"))
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                         .frame(maxWidth: .infinity, minHeight: 50)
                         .background(Color.accentColor)
                         .foregroundColor(.white)
@@ -175,7 +183,7 @@ struct Login: View {
                         .scaleEffect(1.5)
 
                     Text(t("logging_in", in: "login_screen"))
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                         .offset(y: bounce ? -10 : 10) // ขยับขึ้นลง
                         .animation(
                             Animation.easeInOut(duration: 0.7).repeatForever(autoreverses: true),
@@ -257,6 +265,3 @@ struct Login_Previews: PreviewProvider {
             .environmentObject(ScoreManager.shared)
     }
 }
-
-
-

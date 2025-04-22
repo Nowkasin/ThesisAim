@@ -40,6 +40,11 @@ struct ExerciseView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedEmbedURL: IdentifiableURL?
     private let favoriteManager = FavoriteManager()
+    @ObservedObject var language: Language
+
+    public init(language: Language) {
+        self.language = language
+    }
 
     private var articles: [Article] = [
         Article(title: "Stretch to Reduce Pain", description: "Easy office stretches to relieve tension in your neck and back.", url: "https://www.example.com/stretch-tips"),
@@ -73,7 +78,7 @@ struct ExerciseView: View {
                                         .font(.system(size: 20))
                                     Text(t("Back", in: "Ex_screen"))
                                         .fontWeight(.semibold)
-                                        .font(.system(size: 18))
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                                 }
                                 .foregroundColor(.blue)
                             }
@@ -83,12 +88,12 @@ struct ExerciseView: View {
                         }
 
                         Text(t("Exercise", in: "Ex_screen"))
-                            .font(.system(size: titleFontSize, weight: .bold))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: titleFontSize))
                             .foregroundColor(.purple)
                             .padding(.horizontal, padding)
 
                         Text(t("Recommended for you", in: "Ex_screen"))
-                            .font(.system(size: subTitleFontSize, weight: .medium))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: subTitleFontSize))
                             .foregroundColor(.blue)
                             .padding(.horizontal, padding)
                             .padding(.top, -10)
@@ -102,24 +107,29 @@ struct ExerciseView: View {
                                     cardHeight: cardHeight,
                                     onFavoriteToggle: { title in
                                         toggleFavorite(for: title)
-                                    }
+                                    },
+                                    language: language
                                 )
                             }
                         }
                         .padding(.horizontal, padding)
 
                         Text(t("Article & Tip", in: "Ex_screen"))
-                            .font(.system(size: subTitleFontSize, weight: .medium))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: subTitleFontSize))
                             .foregroundColor(.blue)
                             .padding(.horizontal, padding)
 
                         VStack(spacing: 15) {
                             ForEach(articles) { article in
-                                ArticleCard(article: article) {
-                                    if let url = URL(string: article.url) {
-                                        UIApplication.shared.open(url)
-                                    }
-                                }
+                                ArticleCard(
+                                    article: article,
+                                    onTap: {
+                                        if let url = URL(string: article.url) {
+                                            UIApplication.shared.open(url)
+                                        }
+                                    },
+                                    language: language
+                                )
                             }
                         }
                         .padding(.horizontal, padding)
@@ -186,6 +196,7 @@ struct ExerciseCard: View {
     @Binding var selectedEmbedURL: IdentifiableURL?
     var cardHeight: CGFloat
     var onFavoriteToggle: ((String) -> Void)? = nil
+    @ObservedObject var language: Language
 
     var body: some View {
         ZStack {
@@ -216,10 +227,10 @@ struct ExerciseCard: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text(exercise.title)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                             .foregroundColor(.purple)
                         Text(exercise.duration)
-                            .font(.system(size: 16))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             .foregroundColor(.purple.opacity(0.9))
                     }
 
@@ -246,14 +257,15 @@ struct ExerciseCard: View {
 struct ArticleCard: View {
     var article: Article
     var onTap: () -> Void
+    @ObservedObject var language: Language
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(article.title)
-                .font(.headline)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                 .foregroundColor(.primary)
             Text(article.description)
-                .font(.subheadline)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .foregroundColor(.secondary)
                 .lineLimit(2)
         }
@@ -289,6 +301,40 @@ struct IdentifiableURL: Identifiable {
 
 struct ExerciseView_Previews: PreviewProvider {
     static var previews: some View {
-        ExerciseView()
+        ExerciseView(language: Language.shared)
+    }
+}
+
+struct ExerciseCard_Previews: PreviewProvider {
+    static var previews: some View {
+        ExerciseCard(
+            exercise: .constant(Exercise(
+                title: "Sample Exercise",
+                duration: "10 Minutes",
+                videoURL: "https://www.example.com",
+                isFavorite: false
+            )),
+            selectedEmbedURL: .constant(nil),
+            cardHeight: 180,
+            language: Language.shared
+        )
+        .padding()
+        .previewLayout(.sizeThatFits)
+    }
+}
+
+struct ArticleCard_Previews: PreviewProvider {
+    static var previews: some View {
+        ArticleCard(
+            article: Article(
+                title: "Sample Article",
+                description: "Quick tips to relieve back pain while working.",
+                url: "https://www.example.com/article"
+            ),
+            onTap: {},
+            language: Language.shared
+        )
+        .padding()
+        .previewLayout(.sizeThatFits)
     }
 }

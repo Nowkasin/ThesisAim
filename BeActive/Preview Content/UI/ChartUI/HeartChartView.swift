@@ -12,33 +12,40 @@ struct HeartChartView: View {
     let activity: Activity
     @StateObject private var viewModel = HeartRateViewModel()
     @State private var selectedRange: TimeRange = .today
+    @ObservedObject var language = Language.shared
 
     var body: some View {
         VStack {
             // ✅ Picker สำหรับเลือกช่วงเวลา
-            Picker("ช่วงเวลา", selection: $selectedRange) {
+            HStack(spacing: 8) {
                 ForEach(TimeRange.allCases, id: \.self) { range in
-                    Text(range.localized).tag(range)
+                    Button(action: {
+                        selectedRange = range
+                    }) {
+                        Text(range.localized)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
+                            .foregroundColor(selectedRange == range ? .white : .primary)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(selectedRange == range ? Color.accentColor : Color(.secondarySystemBackground))
+                            .cornerRadius(8)
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(8)
+            .padding(.horizontal)
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
                 Text("\(Int(viewModel.heartRateRange.min)) - \(Int(viewModel.heartRateRange.max)) \(t("BPM", in: "Chart.Summary"))")
-                    .font(.largeTitle)
-                    .bold()
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                     .foregroundColor(.primary)
 
                 Text("\(t("Average", in: "Chart.Summary")): \(Int(viewModel.averageBPM)) \(t("BPM", in: "Chart.Summary"))")
-                    .font(.headline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                     .foregroundColor(.primary)
 
                 Text(viewModel.dateRangeText(for: selectedRange))
-                    .font(.subheadline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

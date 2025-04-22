@@ -12,27 +12,36 @@ struct StepChartView: View {
     let activity: Activity
     @StateObject private var viewModel = StepCountViewModel()
     @State private var selectedRange: TimeRange = .month
+    @ObservedObject var language = Language.shared
 
     var body: some View {
         VStack {
             // ✅ Picker สำหรับเลือกช่วงเวลา
-            Picker("ช่วงเวลา", selection: $selectedRange) {
+            HStack(spacing: 8) {
                 ForEach(TimeRange.allCases, id: \.self) { range in
-                    Text(range.localized).tag(range)
+                    Button(action: {
+                        selectedRange = range
+                    }) {
+                        Text(range.localized)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
+                            .foregroundColor(selectedRange == range ? .white : .primary)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(selectedRange == range ? Color.accentColor : Color(.secondarySystemBackground))
+                            .cornerRadius(8)
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
+            .padding(.horizontal)
 
             // ✅ ข้อมูลสรุปด้านบน
             VStack(alignment: .leading, spacing: 5) {
                 Text("\(viewModel.averageSteps, specifier: "%.0f") \(t("Steps", in: "Chart.Summary"))")
-                    .font(.largeTitle)
-                    .bold()
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                     .foregroundColor(.primary)
 
                 Text(viewModel.dateRangeText(for: selectedRange))
-                    .font(.subheadline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

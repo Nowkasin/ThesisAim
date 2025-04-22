@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct DistanceGraph: View {
+    @ObservedObject var language = Language.shared
     var data: [DistanceData]
     @State private var selectedData: DistanceData?
     @State private var tooltipXPosition: CGFloat = .zero
@@ -69,8 +70,7 @@ struct DistanceGraph: View {
                 if showTooltip, let selected = selectedData {
                     VStack {
                         Text("\(String(format: "%.2f", selected.distance)) กม.")
-                            .font(.headline)
-                            .bold()
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(

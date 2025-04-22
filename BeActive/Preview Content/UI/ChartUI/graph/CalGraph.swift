@@ -9,6 +9,8 @@ import SwiftUI
 import Charts
 
 struct CalGraph: View {
+    @ObservedObject var language = Language.shared
+
     var data: [CalorieData]
     var timeRange: TimeRange
 
@@ -79,8 +81,7 @@ struct CalGraph: View {
                 if showTooltip, let selected = selectedData {
                     VStack {
                         Text("\(Int(selected.calories)) แคลอรี่")
-                            .font(.headline)
-                            .bold()
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(

@@ -75,6 +75,7 @@ struct CustomTabBar: View {
 }
 
 struct TabBarItem: View {
+    @ObservedObject var language = Language.shared
     let title: String
     let icon: String
     @Binding var selectedTab: Int
@@ -100,9 +101,11 @@ struct TabBarItem: View {
 
                 VStack(spacing: 2) {
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                        .fontWeight(.semibold)
                     Text(title)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 12))
+                        .fontWeight(.medium)
                 }
                 .frame(width: 70, height: 36)
             }

@@ -176,6 +176,7 @@ struct ScheduleItem: Codable, Identifiable {
 }
 
 struct WaterView: View {
+    @ObservedObject var language = Language.shared
     @AppStorage("waterIntake") private var waterIntake = 0
     @AppStorage("scheduleData") private var scheduleData: Data?
     @AppStorage("lastOpenedDate") private var lastOpenedDate: String?
@@ -202,10 +203,11 @@ struct WaterView: View {
                     VStack {
                         VStack(spacing: 16) {
                             Text(t("Water to Drink", in: "Water_screen"))
-                                .font(.system(size: 34, weight: .bold))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
+                                .fontWeight(.bold)
                                 .foregroundColor(.blue)
                             Text(t("Don't forget to drink water!", in: "Water_screen"))
-                                .font(.system(size: 18))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                                 .foregroundColor(.primary)
                         }
                         .multilineTextAlignment(.center)
@@ -225,7 +227,7 @@ struct WaterView: View {
 
                             VStack {
                                 Text("\(waterIntake) / \(totalWaterIntake) \(t("ml", in: "Water_screen"))")
-                                    .font(.system(size: 18))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
 
@@ -242,10 +244,12 @@ struct WaterView: View {
                             ForEach(schedule) { item in
                                 HStack {
                                     Text(item.time)
-                                        .font(.system(size: 18, weight: .medium))
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
+                                        .fontWeight(.medium)
                                     Spacer()
                                     Text("\(item.amount) \(t("ml", in: "Water_screen"))")
                                         .foregroundColor(.gray)
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                                     Button(action: {
                                         toggleCompletion(for: item)
                                     }) {
@@ -264,9 +268,11 @@ struct WaterView: View {
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "gearshape")
-                                    .font(.system(size: 16, weight: .medium))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                    .fontWeight(.medium)
                                 Text(t("Customize Schedule", in: "Water_screen"))
-                                    .font(.system(size: 16, weight: .medium))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                    .fontWeight(.medium)
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
@@ -278,7 +284,8 @@ struct WaterView: View {
                         // Simulate New Day (commented for production)
 //                        Button(action: simulateNewDay) {
 //                            Text("Simulate New Day")
-//                                .font(.headline)
+//                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+//                                .fontWeight(.bold)
 //                                .padding()
 //                                .frame(width: 200)
 //                                .background(.blue)
@@ -312,9 +319,15 @@ struct WaterView: View {
                 .alert(isPresented: $showCongratulations) {
                     Alert(
                         title:
-                            Text(t("Congratulations!", in: "Water_screen")),
-                        message: Text(t("You have completed your daily water schedule!", in: "Water_screen")),
-                        dismissButton: .default(Text(t("OK", in: "home_screen")))
+                            Text(t("Congratulations!", in: "Water_screen"))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
+                                .fontWeight(.bold),
+                        message: Text(t("You have completed your daily water schedule!", in: "Water_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17)),
+                        dismissButton: .default(
+                            Text(t("OK", in: "home_screen"))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                        )
                     )
                 }
             }
@@ -428,6 +441,7 @@ struct WaterView: View {
 }
 
 struct ScheduleSettingsSheet: View {
+    @ObservedObject var language = Language.shared
     @Binding var schedule: [ScheduleItem]
     @Binding var totalIntake: Int
     @Binding var selectedTime: Date
@@ -440,19 +454,28 @@ struct ScheduleSettingsSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text(t("Total Water Intake", in: "Water_screen"))) {
+                Section(header: Text(t("Total Water Intake", in: "Water_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+                ) {
                     Text("\(totalIntake) \(t("ml", in: "Water_screen"))")
                         .foregroundColor(.gray)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                 }
 
-                Section(header: Text(t("Add Time Slot", in: "Water_screen"))) {
+                Section(header: Text(t("Add Time Slot", in: "Water_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+                ) {
                     DatePicker(t("Time", in: "Water_screen"), selection: $selectedTime, displayedComponents: .hourAndMinute)
                         .labelsHidden()
                         .datePickerStyle(WheelDatePickerStyle())
 
                     Picker(t("Amount", in: "Water_screen"), selection: $selectedAmount) {
                         ForEach(Array(stride(from: 100, through: 1000, by: 50)), id: \.self) { amount in
-                            Text("\(amount) \(t("ml", in: "Water_screen"))").tag(amount)
+                            Text("\(amount) \(t("ml", in: "Water_screen"))")
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                .tag(amount)
                         }
                     }
                     .pickerStyle(WheelPickerStyle())
@@ -471,18 +494,25 @@ struct ScheduleSettingsSheet: View {
                         schedule.sort { $0.time < $1.time }
                         onSave()
                     }
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                 }
 
-                Section(header: Text(t("Your Time Slots", in: "Water_screen"))) {
+                Section(header: Text(t("Your Time Slots", in: "Water_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+                ) {
                     if schedule.isEmpty {
                         Text(t("No slots added.", in: "Water_screen"))
                             .foregroundColor(.gray)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     } else {
                         ForEach(schedule) { item in
                             HStack {
                                 Text(item.time)
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                                 Spacer()
                                 Text("\(item.amount) \(t("ml", in: "Water_screen"))")
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             }
                         }
                         .onDelete { indexSet in
@@ -500,7 +530,11 @@ struct ScheduleSettingsSheet: View {
                     }
                 }
             }
-            .navigationTitle(t("Customize Schedule", in: "Water_screen"))
+            .navigationTitle(
+                Text(t("Customize Schedule", in: "Water_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
+                    .fontWeight(.bold)
+            )
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -508,6 +542,7 @@ struct ScheduleSettingsSheet: View {
                         onSave()
                         dismiss()
                     }
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                 }
             }
         }

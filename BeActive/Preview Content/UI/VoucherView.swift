@@ -32,6 +32,7 @@ struct Voucher: Identifiable, Equatable, Codable {
 struct VoucherCard: View {
     let voucher: Voucher
     let onTap: () -> Void
+    @ObservedObject var language = Language.shared
 
     var body: some View {
         Button(action: onTap) {
@@ -52,10 +53,17 @@ struct VoucherCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(voucher.title).font(.headline).foregroundColor(.primary)
-                    Text(voucher.clinic).font(.subheadline).foregroundColor(.blue)
+                    Text(voucher.title)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    Text(voucher.clinic)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                        .foregroundColor(.blue)
                     Text(String(format: t("cost_format", in: "Voucher_screen"), voucher.cost))
-.font(.subheadline).fontWeight(.semibold).foregroundColor(.primary)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
                 }
                 Spacer()
             }
@@ -72,6 +80,7 @@ struct VoucherView: View {
     @EnvironmentObject var scoreManager: ScoreManager
     @AppStorage("purchasedVouchersData") private var purchasedVouchersData: Data = Data()
     @AppStorage("currentUserId") private var currentUserId: String = ""
+    @ObservedObject var language = Language.shared
 
     @State private var selectedTab = 0
     @State private var showConfirm = false
@@ -111,7 +120,8 @@ struct VoucherView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             Text(t("Voucher Shop", in: "Voucher_screen"))
-                                .font(.system(size: 32, weight: .bold))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
+                                .fontWeight(.bold)
                                 .foregroundColor(.pink)
                                 .padding(.top, 20)
 
@@ -136,10 +146,14 @@ struct VoucherView: View {
                     }
                 } else {
                     VStack(spacing: 15) {
-                        Text(t("Voucher History", in: "Voucher_screen")).font(.largeTitle).padding(.top)
+                        Text(t("Voucher History", in: "Voucher_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
+                            .fontWeight(.bold)
+                            .padding(.top)
 
                         if scoreManager.purchasedVouchers.isEmpty {
                             Text(t("🛒 Voucher has not been purchased yet", in: "Voucher_screen"))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                 .foregroundColor(.gray)
                                 .padding()
                         } else {
@@ -162,17 +176,26 @@ struct VoucherView: View {
 
                                             VStack(alignment: .leading) {
                                                 Text(voucher.title)
-                                                Text(voucher.clinic).font(.caption).foregroundColor(.gray)
+                                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                Text(voucher.clinic)
+                                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                    .foregroundColor(.gray)
                                                 if let code = voucher.code {
-                                                    Text(t("Code", in: "Voucher_screen") + ": \(code)").font(.caption2).foregroundColor(.green)
+                                                    Text(t("Code", in: "Voucher_screen") + ": \(code)")
+                                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                        .foregroundColor(.green)
                                                 }
                                                 if voucher.isActivated {
-                                                    Text(t("Activated", in: "Voucher_screen")).font(.caption2).foregroundColor(.blue)
+                                                    Text(t("Activated", in: "Voucher_screen"))
+                                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                        .foregroundColor(.blue)
                                                 }
                                             }
 
                                             Spacer()
-                                            Text("-\(voucher.cost)").foregroundColor(.red)
+                                            Text("-\(voucher.cost)")
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                .foregroundColor(.red)
                                         }
                                     }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -273,4 +296,3 @@ struct VoucherView_Previews: PreviewProvider {
             .environmentObject(ScoreManager.shared)
     }
 }
-

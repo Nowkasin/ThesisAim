@@ -12,6 +12,7 @@ import FirebaseFirestore
 import CryptoKit
 
 struct RegisterView: View {
+    @ObservedObject var language = Language.shared
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -41,7 +42,7 @@ struct RegisterView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(t("register", in: "register_screen"))
-                            .font(.system(size: 32, weight: .bold))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
                             .foregroundColor(.primary)
                             .padding(.top, 40)
                             .padding(.bottom, 30)
@@ -51,17 +52,17 @@ struct RegisterView: View {
 
                         
                         Group {
-                            CustomTextField(placeholder: t("first_name", in: "register_screen"), text: $name)
-                            CustomTextField(placeholder: t("e_mail", in: "register_screen"), text: $email)
-                            CustomPasswordField(placeholder: t("password", in: "register_screen"), text: $password, isPasswordVisible: $isPasswordVisible)
+                            CustomTextField(placeholder: t("first_name", in: "register_screen"), text: $name, language: language)
+                            CustomTextField(placeholder: t("e_mail", in: "register_screen"), text: $email, language: language)
+                            CustomPasswordField(placeholder: t("password", in: "register_screen"), text: $password, isPasswordVisible: $isPasswordVisible, language: language)
                                 .onChange(of: password) { newValue in
                                     validatePassword(newValue)
                                 }
-                            CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age)
-                            SexPickerView(sex: $sex, sexOptions: sexOptions)
-                            CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height)
-                            CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight)
-                            CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber)
+                            CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age, language: language)
+                            SexPickerView(sex: $sex, sexOptions: sexOptions, language: language)
+                            CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height, language: language)
+                            CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight, language: language)
+                            CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber, language: language)
                         }
                         
                         if !errorMessage.isEmpty {
@@ -75,7 +76,7 @@ struct RegisterView: View {
                             registerUser()
                         }) {
                             Text(t("sign_up", in: "register_screen"))
-                                .font(.system(size: 18, weight: .medium))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                                 .frame(maxWidth: .infinity, minHeight: 50)
                                 .background(Color.accentColor)
                                 .foregroundColor(.white)
@@ -94,10 +95,12 @@ struct RegisterView: View {
                         HStack {
                             Text(t("have a member?", in: "register_screen"))
                                 .foregroundColor(.primary)
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                             Button(t("log_in", in: "login_screen")) {
                                 showLoginScreen = true
                             }
                             .foregroundColor(.blue)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                         }
                         .font(.footnote)
                         .frame(maxWidth: .infinity)
@@ -118,7 +121,7 @@ struct RegisterView: View {
                     }
                 }
             } message: {
-                Text("You have successfully registered.")
+                Text(t("register_success", in: "register_screen"))
             }
             .fullScreenCover(isPresented: $showLoginScreen) {
                 Login()
@@ -202,11 +205,12 @@ struct RegisterView: View {
 struct CustomTextField: View {
     var placeholder: String
     @Binding var text: String
+    @ObservedObject var language: Language
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             TextField(placeholder, text: $text)
-                .font(.system(size: 16))
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                 .padding(.vertical, 10)
                 .foregroundColor(.primary)
             
@@ -222,6 +226,7 @@ struct CustomPasswordField: View {
     var placeholder: String
     @Binding var text: String
     @Binding var isPasswordVisible: Bool
+    @ObservedObject var language: Language
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -239,7 +244,7 @@ struct CustomPasswordField: View {
                         .foregroundColor(.gray)
                 }
             }
-            .font(.system(size: 16))
+            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
             .padding(.vertical, 10)
             
             Divider()
@@ -253,11 +258,12 @@ struct CustomPasswordField: View {
 struct SexPickerView: View {
     @Binding var sex: String
     let sexOptions: [String]
+    @ObservedObject var language: Language
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(t("Sex", in: "register_screen"))
-                .font(.system(size: 16))
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                 .foregroundColor(.secondary)
             
             Menu {
@@ -271,6 +277,7 @@ struct SexPickerView: View {
             } label: {
                 HStack {
                     Text(sex.isEmpty ? t("Select", in: "register_screen") : sex)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                         .foregroundColor(sex.isEmpty ? .gray : .primary)
                     Spacer()
                     Image(systemName: "chevron.down")

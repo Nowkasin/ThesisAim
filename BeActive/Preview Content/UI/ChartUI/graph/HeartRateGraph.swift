@@ -12,6 +12,8 @@ struct HeartRateGraph: View {
     @ObservedObject var viewModel: HeartRateViewModel
     var timeRange: TimeRange
 
+    @ObservedObject var language = Language.shared
+
     @State private var selectedData: HeartRateData?
     @State private var tooltipXPosition: CGFloat = .zero
     @State private var showTooltip: Bool = false
@@ -82,8 +84,7 @@ struct HeartRateGraph: View {
                 if showTooltip, let selected = selectedData {
                     VStack {
                         Text("\(Int(selected.bpm)) BPM")
-                            .font(.headline)
-                            .bold()
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                             .foregroundColor(.primary)
                             .padding(8)
                             .background(
@@ -121,4 +122,3 @@ struct HeartRateGraph: View {
 #Preview {
     HeartRateGraph(viewModel: HeartRateViewModel(), timeRange: .today)
 }
-

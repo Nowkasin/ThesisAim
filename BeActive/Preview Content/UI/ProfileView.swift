@@ -26,6 +26,7 @@ struct ProfileView: View {
     @State private var errorMessage: String?
     
     @State private var isEditingProfile = false
+    @ObservedObject var language = Language.shared
 
     var body: some View {
         ZStack {
@@ -33,7 +34,7 @@ struct ProfileView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    ProfileHeader(userName: userName, userAge: userAge)
+                    ProfileHeader(userName: userName, userAge: userAge, language: language)
 
                     Button(action: {
                         isEditingProfile = true
@@ -58,36 +59,39 @@ struct ProfileView: View {
                             userHeight: $userHeight,
                             userPhone: $userPhone,
                             userSex: $userSex,
-                            userWeight: $userWeight
+                            userWeight: $userWeight,
+                            language: language
                         )
                     }
 
-                    InfoCard(title: t("User Information", in: "Profile_screen"), icon: "person.fill") {
-                        UserInfoRow(icon: "envelope.fill", title: t("Email", in: "Profile_screen"), value: userEmail)
+                    InfoCard(title: t("User Information", in: "Profile_screen"), icon: "person.fill", language: language) {
+                        UserInfoRow(icon: "envelope.fill", title: t("Email", in: "Profile_screen"), value: userEmail, language: language)
                         if let height = userHeight {
                             UserInfoRow(
                                 icon: "ruler.fill",
                                 title: t("Height", in: "Profile_screen"),
-                                value: "\(height) \(t("cm", in: "Profile_screen"))"
+                                value: "\(height) \(t("cm", in: "Profile_screen"))",
+                                language: language
                             )
                         }
-                        UserInfoRow(icon: "phone.fill", title: t("Phone", in: "Profile_screen"), value: userPhone)
-                        UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"),  value: t(userSex, in: "Profile_screen.SEX"))
+                        UserInfoRow(icon: "phone.fill", title: t("Phone", in: "Profile_screen"), value: userPhone, language: language)
+                        UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"),  value: t(userSex, in: "Profile_screen.SEX"), language: language)
 
                         if let weight = userWeight {
                             UserInfoRow(
                                 icon: "scalemass.fill",
                                 title: t("Weight", in: "Profile_screen"),
-                                value: "\(weight) \(t("kg", in: "Profile_screen"))"
+                                value: "\(weight) \(t("kg", in: "Profile_screen"))",
+                                language: language
                             )
                         }
                     }
 
-                    InfoCard(title: t("Health Stats", in: "Profile_screen"), icon: "heart.fill") {
-                        HealthStatView(icon: "heart.fill", color: .red, title: t("Heart Rate", in: "Profile_screen"), value: localHealthStats.heartRate)
-                        HealthStatView(icon: "figure.walk", color: .green, title: t("Steps", in: "Profile_screen"), value: localHealthStats.stepCount)
-                        HealthStatView(icon: "flame.fill", color: .orange, title: t("Calories", in: "Profile_screen"), value: localHealthStats.caloriesBurned)
-                        HealthStatView(icon: "figure.walk.circle", color: .blue, title: t("Distance", in: "Profile_screen"), value: localHealthStats.distance)
+                    InfoCard(title: t("Health Stats", in: "Profile_screen"), icon: "heart.fill", language: language) {
+                        HealthStatView(icon: "heart.fill", color: .red, title: t("Heart Rate", in: "Profile_screen"), value: localHealthStats.heartRate, language: language)
+                        HealthStatView(icon: "figure.walk", color: .green, title: t("Steps", in: "Profile_screen"), value: localHealthStats.stepCount, language: language)
+                        HealthStatView(icon: "flame.fill", color: .orange, title: t("Calories", in: "Profile_screen"), value: localHealthStats.caloriesBurned, language: language)
+                        HealthStatView(icon: "figure.walk.circle", color: .blue, title: t("Distance", in: "Profile_screen"), value: localHealthStats.distance, language: language)
                     }
 
                     Button(action: {
@@ -99,7 +103,8 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                                 .font(.title2)
                             Text(t("Log Out", in: "Profile_screen"))
-                                .font(.headline)
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                                .fontWeight(.bold)
                                 .foregroundColor(.white)
                                 .padding(5)
                         }
@@ -176,6 +181,7 @@ struct EditProfileView: View {
     @Binding var userPhone: String
     @Binding var userSex: String
     @Binding var userWeight: Int?
+    var language: Language
 
     let db = Firestore.firestore()
     @Environment(\.presentationMode) var presentationMode
@@ -183,22 +189,34 @@ struct EditProfileView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text(t("Personal Information", in: "Profile_screen"))) {
-                    LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $userName)
-                    LabeledTextField(label: t("Email", in: "Profile_screen"), text: $userEmail)
-                    LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $userPhone)
+                Section(header: Text(t("Personal Information", in: "Profile_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+                ) {
+                    LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $userName, language: language)
+                    LabeledTextField(label: t("Email", in: "Profile_screen"), text: $userEmail, language: language)
+                    LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $userPhone, language: language)
                 }
 
-                Section(header: Text(t("Physical Information", in: "Profile_screen"))) {
-                    LabeledNumberField(label: t("Age", in: "register_screen"), value: $userAge)
-                    LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $userHeight)
-                    LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $userWeight)
+                Section(header: Text(t("Physical Information", in: "Profile_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+                ) {
+                    LabeledNumberField(label: t("Age", in: "register_screen"), value: $userAge, language: language)
+                    LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $userHeight, language: language)
+                    LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $userWeight, language: language)
 
                     Picker(t("Sex", in: "register_screen"), selection: $userSex) {
-                            Text(t("Male", in: "register_screen")).tag("Male")
-                            Text(t("Female", in: "register_screen")).tag("Female")
-                            Text(t("Other", in: "register_screen")).tag("Other")
-                        }
+                        Text(t("Male", in: "register_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .tag("Male")
+                        Text(t("Female", in: "register_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .tag("Female")
+                        Text(t("Other", in: "register_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .tag("Other")
+                    }
                     .pickerStyle(SegmentedPickerStyle())
                 }
 
@@ -207,6 +225,8 @@ struct EditProfileView: View {
                         saveUserData()
                     }) {
                         Text(t("Save Changes", in: "Profile_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -215,10 +235,19 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .navigationTitle(t("Edit Profile", in: "Profile_screen"))
-            .navigationBarItems(trailing: Button(t("Cancel", in: "Mate_screen")) {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationTitle(
+                Text(t("Edit Profile", in: "Profile_screen"))
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
+            )
+            .navigationBarItems(trailing:
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text(t("Cancel", in: "Mate_screen"))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                }
+            )
         }
     }
 
@@ -252,6 +281,7 @@ struct EditProfileView: View {
 struct ProfileHeader: View {
     var userName: String
     var userAge: Int?
+    var language: Language
 
     var body: some View {
         VStack {
@@ -263,13 +293,13 @@ struct ProfileHeader: View {
                 .shadow(radius: 5)
 
             Text(userName)
-                .font(.title)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
 
             if let age = userAge {
                 Text("\(t("Age", in: "register_screen")): \(age)")
-                    .font(.subheadline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .foregroundColor(.gray)
             }
         }
@@ -279,6 +309,7 @@ struct ProfileHeader: View {
 struct InfoCard<Content: View>: View {
     var title: String
     var icon: String
+    var language: Language
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -288,7 +319,8 @@ struct InfoCard<Content: View>: View {
                     .foregroundColor(.gray)
                     .font(.title2)
                 Text(title)
-                    .font(.headline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
             }
             .padding(.bottom, 5)
 
@@ -310,6 +342,7 @@ struct UserInfoRow: View {
     var icon: String
     var title: String
     var value: String
+    var language: Language
 
     var body: some View {
         HStack {
@@ -318,6 +351,7 @@ struct UserInfoRow: View {
                 .frame(width: 30)
 
             Text(title)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .fontWeight(.medium)
                 .foregroundColor(.primary)
 
@@ -325,7 +359,7 @@ struct UserInfoRow: View {
 
             Text(value)
                 .foregroundColor(.secondary)
-                .font(.system(size: 15)) // ปรับขนาดตรงนี้
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
         }
         .padding(.horizontal)
     }
@@ -336,6 +370,7 @@ struct HealthStatView: View {
     var color: Color
     var title: String
     var value: String
+    var language: Language
 
     var body: some View {
         HStack {
@@ -346,9 +381,10 @@ struct HealthStatView: View {
 
             VStack(alignment: .leading) {
                 Text(title)
-                    .font(.headline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.bold)
                 Text(value)
-                    .font(.subheadline)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                     .foregroundColor(.gray)
             }
             Spacer()
@@ -362,13 +398,15 @@ struct HealthStatView: View {
 struct LabeledTextField: View {
     var label: String
     @Binding var text: String
+    var language: Language
 
     var body: some View {
         VStack(alignment: .leading) {
             Text(label)
-                .font(.subheadline)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .foregroundColor(.gray)
             TextField(label, text: $text)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
         .padding(.vertical, 5)
@@ -378,13 +416,15 @@ struct LabeledTextField: View {
 struct LabeledNumberField: View {
     var label: String
     @Binding var value: Int?
+    var language: Language
 
     var body: some View {
         VStack(alignment: .leading) {
             Text(label)
-                .font(.subheadline)
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .foregroundColor(.gray)
             TextField(label, value: $value, formatter: NumberFormatter())
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                 .keyboardType(.numberPad)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }

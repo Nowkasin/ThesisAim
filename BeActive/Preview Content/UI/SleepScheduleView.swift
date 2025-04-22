@@ -17,6 +17,8 @@ struct SleepSchedule: Identifiable, Codable {
 }
 
 struct SleepScheduleView: View {
+    @ObservedObject var language = Language.shared
+
     @State private var wakeUpTime = Date()
     @State private var bedTime = Date()
 
@@ -38,7 +40,7 @@ struct SleepScheduleView: View {
         NavigationView {
             VStack(spacing: 24) {
                 Text(t("title", in: "Sleep_screen"))
-                    .font(.largeTitle)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                     .fontWeight(.bold)
                     .padding(.top)
 
@@ -66,7 +68,7 @@ struct SleepScheduleView: View {
                 if !savedSchedules.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(t("history", in: "Sleep_screen"))
-                            .font(.subheadline)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                             .fontWeight(.medium)
                             .padding(.horizontal)
 
@@ -76,7 +78,7 @@ struct SleepScheduleView: View {
                                     Text("⏰ \(formattedTime(hour: schedule.wakeUpHour, minute: schedule.wakeUpMinute)) | 🌙 \(formattedTime(hour: schedule.bedHour, minute: schedule.bedMinute))")
                                         .fontWeight(.medium)
                                     Text("\(t("saved_on", in: "Sleep_screen")) \(formattedDate(schedule.savedDate))")
-                                        .font(.caption)
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                                         .foregroundColor(.gray)
                                 }
                                 .padding(.vertical, 4)
@@ -111,7 +113,7 @@ struct SleepScheduleView: View {
                 .frame(width: 28)
             VStack(alignment: .leading) {
                 Text(label)
-                    .font(.caption)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
                     .foregroundColor(.gray)
                 DatePicker("", selection: selection, displayedComponents: .hourAndMinute)
                     .labelsHidden()
@@ -247,4 +249,3 @@ struct SleepScheduleView_Previews: PreviewProvider {
         SleepScheduleView()
     }
 }
-

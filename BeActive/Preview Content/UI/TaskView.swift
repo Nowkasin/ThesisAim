@@ -20,6 +20,7 @@ struct TaskRecord: Identifiable, Codable {
 
 struct TaskView: View {
     @EnvironmentObject var scoreManager: ScoreManager
+    @ObservedObject var language = Language.shared
     @AppStorage("lastTaskOpenedDate") private var lastTaskOpenedDate: String?
     @AppStorage("mission") private var mission: String = ""
     @AppStorage("selectedTime") private var selectedTime: Double = 1
@@ -82,8 +83,7 @@ struct TaskView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     Text("\(mateEmoji) \(selectedMate) Mate")
-                        .font(.system(size: 30, weight: .heavy))
-                        .foregroundStyle(.blue)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 30))                        .foregroundStyle(.blue)
 
                     KFImage(URL(string: imageUrl))
                         .resizable()
@@ -101,10 +101,10 @@ struct TaskView: View {
 
                     VStack(spacing: 12) {
                         Text(t("mission_label", in: "Task_screen"))
-                            .font(.headline)
-                            .foregroundColor(.gray)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .foregroundColor(.gray)
 
                         TextField(t("mission_placeholder", in: "Task_screen"), text: $mission)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                             .padding()
                             .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.3), lineWidth: 1))
@@ -115,8 +115,7 @@ struct TaskView: View {
 
                     VStack(spacing: 4) {
                         Text(t("set_timer", in: "Task_screen"))
-                            .font(.headline)
-                            .padding(.top)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .padding(.top)
 
                         Slider(value: $selectedTime, in: 1...120, step: 1)
                             .tint(.blue)
@@ -124,8 +123,7 @@ struct TaskView: View {
                             .padding(.horizontal)
 
                         Text("\(Int(selectedTime)) \(t("minutes_unit", in: "Task_screen"))")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))                            .foregroundColor(.gray)
                     }
 
                     if isTaskStarted {
@@ -146,8 +144,7 @@ struct TaskView: View {
                         }
                     }) {
                         Text(isTaskStarted ? t("give_up", in: "Task_screen") : t("start", in: "Task_screen"))
-                            .font(.headline)
-                            .foregroundColor(.white)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(isTaskStarted ? Color.red : Color.green)
@@ -159,8 +156,7 @@ struct TaskView: View {
                     Button(t("select_mate", in: "Task_screen")) {
                         showMatePicker = true
                     }
-                    .font(.subheadline)
-                    .foregroundColor(isTaskStarted ? .gray : .blue)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))                    .foregroundColor(isTaskStarted ? .gray : .blue)
                     .disabled(isTaskStarted)
 
                     if !taskHistory.isEmpty {
@@ -173,8 +169,7 @@ struct TaskView: View {
                                 Image(systemName: "clock.arrow.circlepath")
                                 Text(showTaskHistory ? t("hide_history", in: "Task_screen") : t("show_history", in: "Task_screen"))
                             }
-                            .font(.headline)
-                            .foregroundColor(.blue)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .foregroundColor(.blue)
                         }
                     }
 
@@ -184,8 +179,7 @@ struct TaskView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text(record.timestamp.formatted(date: .abbreviated, time: .shortened))
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
+                                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))                                            .foregroundColor(.secondary)
 
                                         Spacer()
 
@@ -198,9 +192,13 @@ struct TaskView: View {
                                     }
 
                                     Text("📝 \(t("mission", in: "Task_screen")): \(record.mission)")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                     Text("🐾 \(t("mate", in: "Task_screen")): \(emoji(for: record.mate)) \(record.mate)")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                     Text("⏱ \(t("duration", in: "Task_screen")): \(record.duration) \(t("minutes_unit", in: "Task_screen"))")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                     Text("📊 \(t("status", in: "Task_screen")): \(record.completed ? t("completed", in: "Task_screen") : t("gave_up", in: "Task_screen"))")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                 }
                                 .padding()
                                 .background(Color(.secondarySystemBackground))
@@ -217,8 +215,7 @@ struct TaskView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         Text(t("choose_mate", in: "Task_screen"))
-                            .font(.headline)
-                            .padding(.top)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .padding(.top)
 
                         ForEach(unlockedMates, id: \.self) { mate in
                             Button(action: {
@@ -226,8 +223,7 @@ struct TaskView: View {
                                 showMatePicker = false
                             }) {
                                 Text("\(emoji(for: mate)) \(mate)")
-                                    .font(.title2)
-                                    .padding()
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 22))                                    .padding()
                                     .frame(maxWidth: .infinity)
                                     .background(Color.blue.opacity(0.1))
                                     .cornerRadius(10)

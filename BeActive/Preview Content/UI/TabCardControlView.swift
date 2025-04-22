@@ -17,6 +17,7 @@ struct TabCardControlView: View {
             let screenWidth = geometry.size.width
             let cardWidth = min(screenWidth * 0.45, 200) // Responsive but capped
             let cardHeight = cardWidth * 0.9 // Maintain ratio
+            let _ = language.currentLanguage
 
             VStack(alignment: .leading, spacing: 5) {
                 // Header: Today Activities and Score
@@ -37,7 +38,7 @@ struct TabCardControlView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         ForEach(healthManager.activities.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                            NavigationLink(destination: destinationView(for: item.value)) {
+                            NavigationLink(destination: destinationView(for: item.value).id(language.currentLanguage)) {
                                 ActivityCard(activity: item.value)
                                     .frame(width: cardWidth, height: cardHeight)
                             }
@@ -52,6 +53,8 @@ struct TabCardControlView: View {
     }
 
     private func destinationView(for activity: Activity) -> some View {
+        // Ensure the view reevaluates on language change
+        _ = language.currentLanguage
         let titleKey = activity.titleKey.lowercased()
         let todayHeartRateKey = t("Today Heart Rate", in: "Chart_screen").lowercased()
         let todayStepsKey = t("Today Steps", in: "Chart_screen").lowercased()

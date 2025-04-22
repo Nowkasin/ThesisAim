@@ -55,12 +55,13 @@ struct SleepScheduleView: View {
 
                 Button(action: saveSettings) {
                     Text(hasSetSleepSchedule ? t("saved", in: "Sleep_screen") : t("save", in: "Sleep_screen"))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                        .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(hasSetSleepSchedule ? Color.gray.opacity(0.4) : Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(12)
-                        .font(.headline)
                         .padding(.horizontal)
                 }
                 .disabled(hasSetSleepSchedule)

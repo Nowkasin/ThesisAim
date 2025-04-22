@@ -28,7 +28,7 @@ struct HeartChartView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
                             .background(selectedRange == range ? Color.accentColor : Color(.secondarySystemBackground))
-                            .cornerRadius(8)
+                            .cornerRadius(15)
                     }
                 }
             }

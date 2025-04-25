@@ -266,6 +266,13 @@ struct TaskView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(Color.clear, for: .navigationBar)
             .onAppear {
+                // Set transparent navigation bar appearance
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.backgroundColor = .clear
+                UINavigationBar.appearance().standardAppearance = appearance
+                UINavigationBar.appearance().scrollEdgeAppearance = appearance
+
                 checkIfTaskCompleted()
                 loadTaskHistory()
                 loadUnlockedMates()

@@ -61,7 +61,7 @@ class HealthManager: ObservableObject {
         setMockActivity(id: 0, key: "todaySteps", titleKey: "Today Steps", goalValue: "10,000", image: "figure.walk", tintColor: .gray, amount: "0")
         setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "0")
         setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
-        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 km", image: "figure.walk.circle", tintColor: .gray, amount: "0")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 KM", image: "figure.walk.circle", tintColor: .gray, amount: "0")
 
         // เริ่มจับเวลา
         startTimer()
@@ -339,7 +339,7 @@ class HealthManager: ObservableObject {
 
             let distanceInMeters = quantity.doubleValue(for: .meter())
             let distanceInKilometers = distanceInMeters / 1000.0
-            let goalValue = "5 km"
+            let goalValue = "5 KM"
 
             DispatchQueue.main.async {
                 let translatedTitle = t("Today's Distance", in: "Chart_screen")
@@ -391,8 +391,8 @@ class HealthManager: ObservableObject {
     }
 
     private func setMockDistanceActivity() {
-        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 \(t("km", in: "Chart.Summary"))"
-            , image: "figure.walk.circle", tintColor: .gray, amount: "0 \(t("km", in: "Chart.Summary"))")
+        setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 \(t("KM", in: "Chart.Summary"))"
+            , image: "figure.walk.circle", tintColor: .gray, amount: "0 \(t("KM", in: "Chart.Summary"))")
     }
 
     

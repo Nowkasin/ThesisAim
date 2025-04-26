@@ -121,6 +121,16 @@
             "Recommended for you": "Recommended for you",
             "Minutes": "Minutes"
         },
+        "Articles": {
+            "Stretch to Reduce Pain": "Stretch to Reduce Pain",
+            "Stretch to Reduce Pain Desc": "Alleviate discomfort in your upper body, lower body, and core with these miracle moves.",
+            "Guide to Good Posture": "Guide to Good Posture",
+            "Guide to Good Posture Desc": "Good posture is about more than standing up straight.",
+            "Preventing Office Syndrome While WFH": "Preventing Office Syndrome While WFH",
+            "Preventing Office Syndrome While WFH Desc": "Office Syndrome is a group of symptoms caused by sitting or remaining in the same position for long periods of time.",
+            "Why Move More?": "Why Move More?",
+            "Why Move More? Desc": "Health benefits of standing up and walking during work."
+        },
         "Setting_screen":{
             "Settings": "Settings",
             "Language": "Language",
@@ -297,7 +307,7 @@
                 "Average": "Average",
                 "Goal": "Goal",
                 "kcal": "kcal",
-                "steps": "steps",
+                "Steps": "Steps",
                 "BPM": "BPM",
                 "KM": "KM"
             }
@@ -432,6 +442,16 @@
             "Article & Tip": "เคล็ดลับ",
             "Recommended for you": "แนะนำสำหรับคุณ",
             "Minutes": "นาที"
+        },
+        "Articles": {
+            "Stretch to Reduce Pain": "ยืดกล้ามเนื้อลดอาการปวด",
+            "Stretch to Reduce Pain Desc": "บรรเทาความไม่สบายในร่างกายส่วนบน ส่วนล่าง และแกนกลางด้วยท่าออกกำลังกายมหัศจรรย์เหล่านี้",
+            "Guide to Good Posture": "แนวทางสู่ท่าทางที่ดี",
+            "Guide to Good Posture Desc": "ท่าทางที่ดีมีมากกว่าการยืนตัวตรง",
+            "Preventing Office Syndrome While WFH": "ป้องกันออฟฟิศซินโดรมขณะทำงานที่บ้าน",
+            "Preventing Office Syndrome While WFH Desc": "ออฟฟิศซินโดรมคือกลุ่มอาการที่เกิดจากการนั่งหรือนิ่งในท่าเดิมเป็นเวลานาน",
+            "Why Move More?": "ทำไมต้องเคลื่อนไหวให้มากขึ้น?",
+            "Why Move More? Desc": "ประโยชน์ต่อสุขภาพจากการลุกขึ้นยืนและเดินระหว่างทำงาน"
         },
         "Setting_screen": {
             "Settings": "การตั้งค่า",

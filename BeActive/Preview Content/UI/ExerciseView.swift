@@ -13,6 +13,7 @@ struct Exercise: Identifiable, Codable {
     let title: String
     let duration: String
     let videoURL: String
+    let previewImageName: String
     var isFavorite: Bool
 }
 
@@ -47,10 +48,10 @@ struct ExerciseView: View {
     }
 
     private var articles: [Article] = [
-        Article(title: "Stretch to Reduce Pain", description: "Easy office stretches to relieve tension in your neck and back.", url: "https://www.example.com/stretch-tips"),
-        Article(title: "Perfect Posture", description: "Tips for improving posture while working at a desk.", url: "https://www.example.com/posture-tips"),
-        Article(title: "Break Time Ideas", description: "Simple routines to do during work breaks to keep your body active.", url: "https://www.example.com/break-ideas"),
-        Article(title: "Why Move More?", description: "Health benefits of standing up and walking during work.", url: "https://www.example.com/why-move")
+        Article(title: t("Stretch to Reduce Pain", in: "Articles"), description: t("Stretch to Reduce Pain Desc", in: "Articles"), url: "https://www.prevention.com/fitness/a20505758/deep-stretches-for-everyday-aches-and-pains/"),
+        Article(title: t("Guide to Good Posture", in: "Articles"), description: t("Guide to Good Posture Desc", in: "Articles"), url: "https://medlineplus.gov/guidetogoodposture.html"),
+        Article(title: t("Preventing Office Syndrome While WFH", in: "Articles"), description: t("Preventing Office Syndrome While WFH Desc", in: "Articles"), url: "https://www.bangkokhospital.com/en/content/work-from-home-and-office-syndrome"),
+        Article(title: t("Why Move More?", in: "Articles"), description: t("Why Move More? Desc", in: "Articles"), url: "https://wellbeing.ubc.ca/wellbeing-campaigns-and-initiatives/move-ubc/why-move-more")
     ]
 
     @State private var exerciseStates: [Exercise] = []
@@ -58,11 +59,11 @@ struct ExerciseView: View {
     var body: some View {
         GeometryReader { geometry in
             let screenWidth = geometry.size.width
-            let cardHeight: CGFloat = screenWidth > 400 ? 180 : 150
             let cardSpacing: CGFloat = screenWidth > 400 ? 30 : 20
             let padding: CGFloat = screenWidth > 400 ? 24 : 16
             let titleFontSize: CGFloat = screenWidth > 400 ? 34 : 28
             let subTitleFontSize: CGFloat = screenWidth > 400 ? 20 : 18
+            let cardWidth = (screenWidth - padding * 2 - cardSpacing) / 2
 
             ZStack {
                 Color(.systemBackground).ignoresSafeArea()
@@ -101,15 +102,15 @@ struct ExerciseView: View {
 
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: cardSpacing) {
                             ForEach($exerciseStates) { $exercise in
-                                ExerciseCard(
-                                    exercise: $exercise,
-                                    selectedEmbedURL: $selectedEmbedURL,
-                                    cardHeight: cardHeight,
-                                    onFavoriteToggle: { title in
-                                        toggleFavorite(for: title)
-                                    },
-                                    language: language
-                                )
+                        ExerciseCard(
+                            exercise: $exercise,
+                            selectedEmbedURL: $selectedEmbedURL,
+                            cardWidth: cardWidth,
+                            onFavoriteToggle: { videoURL in
+                                toggleFavorite(for: videoURL)
+                            },
+                            language: language
+                        )
                             }
                         }
                         .padding(.horizontal, padding)
@@ -138,16 +139,16 @@ struct ExerciseView: View {
                         Color.clear.frame(height: 30)
                     }
                 }
-                .sheet(item: $selectedEmbedURL) { item in
-                    WebViewPlayer(embedURL: item.url)
-                        .ignoresSafeArea()
-                }
             }
         }
         .onAppear {
             loadExercises()
         }
         .navigationBarHidden(true)
+        .sheet(item: $selectedEmbedURL) { item in
+            WebViewPlayer(embedURL: item.url)
+                .ignoresSafeArea()
+        }
     }
 
     private func loadExercises() {
@@ -157,35 +158,39 @@ struct ExerciseView: View {
                 title: t("Back Exercise", in: "Ex_screen"),
                 duration: "10 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/g43xYk4VAjU",
-                isFavorite: savedFavorites.contains(t("Back Exercise", in: "Ex_screen"))
+                previewImageName: "Bear",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/g43xYk4VAjU")
             ),
             Exercise(
                 title: t("Neck Exercise", in: "Ex_screen"),
                 duration: "5 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/8JNDtye2CB0?si=_ZdNl7uAGXTkpm-0",
-                isFavorite: savedFavorites.contains(t("Neck Exercise", in: "Ex_screen"))
+                previewImageName: "neck_exercise",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/8JNDtye2CB0?si=_ZdNl7uAGXTkpm-0")
             ),
             Exercise(
                 title: t("Arm Exercise", in: "Ex_screen"),
                 duration: "7 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/TSrfB7JIzxY",
-                isFavorite: savedFavorites.contains(t("Arm Exercise", in: "Ex_screen"))
+                previewImageName: "arm_exercise",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/TSrfB7JIzxY")
             ),
             Exercise(
                 title: t("Shoulder Exercise", in: "Ex_screen"),
                 duration: "5 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/2VuLBYrgG94",
-                isFavorite: savedFavorites.contains(t("Shoulder Exercise", in: "Ex_screen"))
+                previewImageName: "shoulder_exercise",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/2VuLBYrgG94")
             )
         ]
     }
 
-    private func toggleFavorite(for title: String) {
+    private func toggleFavorite(for videoURL: String) {
         var favorites = favoriteManager.loadFavorites()
-        if favorites.contains(title) {
-            favorites.remove(title)
+        if favorites.contains(videoURL) {
+            favorites.remove(videoURL)
         } else {
-            favorites.insert(title)
+            favorites.insert(videoURL)
         }
         favoriteManager.saveFavorites(favorites)
     }
@@ -194,63 +199,76 @@ struct ExerciseView: View {
 struct ExerciseCard: View {
     @Binding var exercise: Exercise
     @Binding var selectedEmbedURL: IdentifiableURL?
-    var cardHeight: CGFloat
+    var cardWidth: CGFloat
     var onFavoriteToggle: ((String) -> Void)? = nil
     @ObservedObject var language: Language
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(Color(.secondarySystemBackground))
-                .shadow(radius: 3)
+        VStack(spacing: 0) {
+            ZStack(alignment: .topTrailing) {
+                if let uiImage = UIImage(named: exercise.previewImageName) ?? UIImage(named: "no_preview") {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: cardWidth, height: cardWidth * 0.6)
+                        .clipped()
+                        .cornerRadius(15, corners: [.topLeft, .topRight])
+                } else {
+                    Color.gray
+                        .frame(width: cardWidth, height: cardWidth * 0.6)
+                        .cornerRadius(15, corners: [.topLeft, .topRight])
+                }
 
-            VStack {
-                HStack {
-                    Spacer()
+                Button(action: {
+                    exercise.isFavorite.toggle()
+                    onFavoriteToggle?(exercise.videoURL)
+                }) {
                     Image(systemName: exercise.isFavorite ? "star.fill" : "star")
-                        .foregroundColor(exercise.isFavorite ? Color.yellow : .purple)
-                        .padding()
-                        .scaleEffect(exercise.isFavorite ? 1.2 : 1)
-                        .animation(.spring(), value: exercise.isFavorite)
-                        .onTapGesture {
-                            exercise.isFavorite.toggle()
-                            onFavoriteToggle?(exercise.title)
-                        }
+                        .font(.system(size: 22))
+                        .fontWeight(.bold)
+                        .foregroundColor(exercise.isFavorite ? .yellow : .purple)
+                        .padding(8)
+//                        .background(Color.white.opacity(0.9))
+//                        .clipShape(Circle())
+//                        .shadow(radius: 3)
+//                        .padding(10)
                 }
+            }
 
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(exercise.title)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
+                    .foregroundColor(.purple)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
 
-                RoundedRectangle(cornerRadius: 0)
-                    .fill(Color.purple.opacity(0.8))
-                    .frame(height: 50)
+                Text(exercise.duration)
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                    .foregroundColor(.purple.opacity(0.8))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
 
                 HStack {
-                    VStack(alignment: .leading) {
-                        Text(exercise.title)
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
-                            .foregroundColor(.purple)
-                        Text(exercise.duration)
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                            .foregroundColor(.purple.opacity(0.9))
-                    }
-
                     Spacer()
-
                     Image(systemName: "play.circle.fill")
+                        .font(.system(size: 36))
                         .foregroundColor(.purple)
-                        .font(.system(size: 22))
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
+            }
+            .padding(10)
+            .frame(width: cardWidth)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(15, corners: [.bottomLeft, .bottomRight])
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if let url = URL(string: exercise.videoURL) {
+                    selectedEmbedURL = IdentifiableURL(url: url)
+                }
             }
         }
-        .frame(height: cardHeight)
-        .padding(.bottom, 10)
-        .onTapGesture {
-            if let url = URL(string: exercise.videoURL) {
-                selectedEmbedURL = IdentifiableURL(url: url)
-            }
-        }
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(15)
+        .shadow(radius: 3)
     }
 }
 
@@ -312,10 +330,11 @@ struct ExerciseCard_Previews: PreviewProvider {
                 title: "Sample Exercise",
                 duration: "10 Minutes",
                 videoURL: "https://www.example.com",
+                previewImageName: "back_exercise",
                 isFavorite: false
             )),
             selectedEmbedURL: .constant(nil),
-            cardHeight: 180,
+            cardWidth: 180,
             language: Language.shared
         )
         .padding()
@@ -336,5 +355,24 @@ struct ArticleCard_Previews: PreviewProvider {
         )
         .padding()
         .previewLayout(.sizeThatFits)
+    }
+}
+
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape( RoundedCorner(radius: radius, corners: corners) )
+    }
+}
+
+struct RoundedCorner: Shape {
+
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect,
+                                byRoundingCorners: corners,
+                                cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
     }
 }

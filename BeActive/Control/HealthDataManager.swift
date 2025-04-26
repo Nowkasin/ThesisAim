@@ -63,7 +63,7 @@ class HealthDataManager: ObservableObject {
         return await withCheckedContinuation { continuation in
             let query = HKStatisticsQuery(quantityType: caloriesType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
                 let value = result?.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0
-                let kcalText = t("kcal", in: "Chart.Summary")
+                let kcalText = t("Kcal", in: "Chart.Summary")
                 continuation.resume(returning: "\(Int(value)) \(kcalText)")
             }
             healthStore.execute(query)
@@ -101,7 +101,7 @@ class HealthDataManager: ObservableObject {
                 options: .cumulativeSum
             ) { _, result, _ in
                 let value = (result?.sumQuantity()?.doubleValue(for: .meter()) ?? 0) / 1000
-                let kmText = t("km", in: "Chart.Summary")
+                let kmText = t("KM", in: "Chart.Summary")
                 continuation.resume(returning: String(format: "%.2f %@", value, kmText))
             }
             healthStore.execute(query)

@@ -227,6 +227,11 @@
             "kg" : "kg",
             "Save Changes" : "Save Changes",
             "Weight" :  "Weight",
+            "Select Image": "Select Image",
+            "Camera": "Camera",
+            "Photo Library": "Photo Library",
+            "Crop & Save": "Crop & Save",
+            "Cancel": "Cancel",
             "SEX" : {
                 "Male": "Male",
                 "Female": "Female",
@@ -556,6 +561,11 @@
             "cm" : "ซม.",
             "kg" : "กก.",
             "Save Changes" : "บันทึกการเปลี่ยนแปลง",
+            "Select Image": "เลือกรูปภาพ",
+            "Camera": "กล้องถ่ายรูป",
+            "Photo Library": "คลังรูปภาพ",
+            "Crop & Save": "ปรับและบันทึก",
+            "Cancel": "ยกเลิก",
             "Weight" :  "น้ำหนัก",
             "SEX" : {
                 "Male": "ชาย",

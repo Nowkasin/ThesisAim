@@ -29,13 +29,16 @@ struct ProfileView: View {
     @State private var isEditingProfile = false
     @ObservedObject var language = Language.shared
 
-    // Image picker states
+    // Image picker & cropper states
     @State private var showingImagePicker = false
     @State private var inputImage: UIImage?
     @State private var profileImage: UIImage?
     @State private var profileImageUrl: String?
     @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
     @State private var showingActionSheet = false
+    @State private var isCropping = false
+    @State private var croppedImage: UIImage?
+    @State private var didCropImage = false
 
     var body: some View {
         ZStack {
@@ -48,8 +51,8 @@ struct ProfileView: View {
                             showingActionSheet = true
                         }
                         .actionSheet(isPresented: $showingActionSheet) {
-                            ActionSheet(title: Text("Select Image"), buttons: [
-                                .default(Text("Camera")) {
+                            ActionSheet(title: Text(t("Select Image", in: "Profile_screen")), buttons: [
+                                .default(Text(t("Camera", in: "Profile_screen"))) {
                                     if UIImagePickerController.isSourceTypeAvailable(.camera) {
                                         sourceType = .camera
                                         showingImagePicker = true
@@ -57,15 +60,34 @@ struct ProfileView: View {
                                         print("❌ Camera not available")
                                     }
                                 },
-                                .default(Text("Photo Library")) {
+                                .default(Text(t("Photo Library", in: "Profile_screen"))) {
                                     sourceType = .photoLibrary
                                     showingImagePicker = true
                                 },
-                                .cancel()
+                                .cancel(Text(t("Cancel", in: "Profile_screen")))
                             ])
                         }
-                        .sheet(isPresented: $showingImagePicker, onDismiss: uploadProfileImageToCloudinary) {
+                        .sheet(isPresented: $showingImagePicker, onDismiss: {
+                            if inputImage != nil {
+                                isCropping = true
+                            }
+                        }) {
                             ImagePicker(image: $inputImage, sourceType: sourceType)
+                        }
+                        .sheet(isPresented: $isCropping, onDismiss: {
+                            if didCropImage {
+                                uploadProfileImageToCloudinary()
+                            }
+                            didCropImage = false
+                        }) {
+                            if let inputImage = inputImage {
+                                CropImageView(image: inputImage) { cropped in
+                                    self.inputImage = cropped
+                                    self.profileImage = cropped
+                                    self.isCropping = false
+                                    self.didCropImage = true
+                                }
+                            }
                         }
 
                     Button(action: {
@@ -356,7 +378,18 @@ struct EditProfileView: View {
                     .fontWeight(.bold)
                 ) {
                     LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $userName, language: language)
-                    LabeledTextField(label: t("Email", in: "Profile_screen"), text: $userEmail, language: language)
+                    VStack(alignment: .leading) {
+                        Text(t("Email", in: "Profile_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .foregroundColor(.gray)
+                        Text(userEmail)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .foregroundColor(.secondary)
+                            .padding(10)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                    }
+                    .padding(.vertical, 5)
                     LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $userPhone, language: language)
                 }
 
@@ -636,6 +669,11 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
             parent.presentationMode.wrappedValue.dismiss()
         }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.image = nil
+            parent.presentationMode.wrappedValue.dismiss()
+        }
     }
 
     @Environment(\.presentationMode) var presentationMode
@@ -656,3 +694,86 @@ struct ImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 }
 
+
+// MARK: - CropImageView
+import UIKit
+struct CropImageView: View {
+    let image: UIImage
+    var onCrop: (UIImage) -> Void
+
+    @State private var zoom: CGFloat = 1.0
+    @Environment(\.presentationMode) var presentationMode
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+
+    var body: some View {
+        VStack {
+            Spacer()
+
+            GeometryReader { geometry in
+                ZStack {
+                    Color.black
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .scaleEffect(zoom)
+                        .offset(offset)
+                        .frame(width: geometry.size.width, height: geometry.size.width)
+                        .clipped()
+                        .gesture(
+                            SimultaneousGesture(
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        zoom = min(max(1, value), 3)
+                                    },
+                                DragGesture()
+                                    .onChanged { value in
+                                        self.offset = CGSize(width: lastOffset.width + value.translation.width, height: lastOffset.height + value.translation.height)
+                                    }
+                                    .onEnded { value in
+                                        self.lastOffset = self.offset
+                                    }
+                            )
+                        )
+                }
+            }
+            .frame(height: UIScreen.main.bounds.width)
+            .background(Color.black)
+
+            Slider(value: $zoom, in: 1...3)
+                .padding()
+
+            HStack {
+                Button(t("Cancel", in: "Profile_screen")) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .foregroundColor(.red)
+                .padding()
+
+                Spacer()
+
+                Button(t("Crop & Save", in: "Profile_screen")) {
+                    // Render the visible area as a cropped image
+                    let side = UIScreen.main.bounds.width
+                    let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
+                    let cropped = renderer.image { ctx in
+                        // Calculate how the image is currently being shown (zoom and position)
+                        let imgSize = image.size
+                        let scale = zoom
+                        // Calculate how much to scale the image to fit the square area at zoom=1
+                        let displayScale = min(side / imgSize.width, side / imgSize.height)
+                        let actualScale = displayScale * scale
+                        // Calculate offset
+                        let x = (side - imgSize.width * actualScale) / 2 + offset.width
+                        let y = (side - imgSize.height * actualScale) / 2 + offset.height
+                        image.draw(in: CGRect(x: x, y: y, width: imgSize.width * actualScale, height: imgSize.height * actualScale))
+                    }
+                    onCrop(cropped)
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .foregroundColor(.green)
+                .padding()
+            }
+        }
+    }
+}

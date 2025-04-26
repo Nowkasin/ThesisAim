@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import FirebaseStorage
 
 struct ProfileView: View {
     @EnvironmentObject var healthData: HealthDataManager
@@ -28,13 +29,44 @@ struct ProfileView: View {
     @State private var isEditingProfile = false
     @ObservedObject var language = Language.shared
 
+    // Image picker states
+    @State private var showingImagePicker = false
+    @State private var inputImage: UIImage?
+    @State private var profileImage: UIImage?
+    @State private var profileImageUrl: String?
+    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showingActionSheet = false
+
     var body: some View {
         ZStack {
             Color(.systemBackground).edgesIgnoringSafeArea(.all)
 
             ScrollView {
                 VStack(spacing: 20) {
-                    ProfileHeader(userName: userName, userAge: userAge, language: language)
+                    ProfileHeader(userName: userName, userAge: userAge, profileImage: profileImage, language: language)
+                        .onTapGesture {
+                            showingActionSheet = true
+                        }
+                        .actionSheet(isPresented: $showingActionSheet) {
+                            ActionSheet(title: Text("Select Image"), buttons: [
+                                .default(Text("Camera")) {
+                                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                                        sourceType = .camera
+                                        showingImagePicker = true
+                                    } else {
+                                        print("❌ Camera not available")
+                                    }
+                                },
+                                .default(Text("Photo Library")) {
+                                    sourceType = .photoLibrary
+                                    showingImagePicker = true
+                                },
+                                .cancel()
+                            ])
+                        }
+                        .sheet(isPresented: $showingImagePicker, onDismiss: uploadProfileImageToCloudinary) {
+                            ImagePicker(image: $inputImage, sourceType: sourceType)
+                        }
 
                     Button(action: {
                         isEditingProfile = true
@@ -124,6 +156,7 @@ struct ProfileView: View {
                 await fetchProfileData()
             }
             getUserDataFromFirestore()
+            fetchProfileImageIfNeeded()
         }
         .onChange(of: healthData.healthStats) { newStats in
             if localHealthStats != newStats {
@@ -165,9 +198,139 @@ struct ProfileView: View {
                 self.userPhone = data["phone"] as? String ?? "No phone"
                 self.userSex = data["sex"] as? String ?? "No sex info"
                 self.userWeight = data["weight"] as? Int
+                self.profileImageUrl = data["profileImageUrl"] as? String
                 self.errorMessage = nil
+                self.fetchProfileImageIfNeeded()
             }
         }
+    }
+
+    private func uploadProfileImage() {
+        guard let inputImage = inputImage else { return }
+        profileImage = inputImage
+
+        guard let imageData = inputImage.jpegData(compressionQuality: 0.5) else { return }
+
+        let storageRef = Storage.storage().reference()
+        let imageRef = storageRef.child("profile_images/\(currentUserId).jpg")
+
+        imageRef.putData(imageData, metadata: nil) { metadata, error in
+            if let error = error {
+                print("❌ Error uploading profile image: \(error.localizedDescription)")
+                return
+            }
+
+            guard metadata != nil else {
+                print("❌ Upload completed but metadata is nil (upload failed silently)")
+                return
+            }
+
+            // Slight delay to ensure upload completes properly before requesting download URL
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                imageRef.downloadURL { url, error in
+                    if let error = error {
+                        print("❌ Error getting download URL: \(error.localizedDescription)")
+                        return
+                    }
+                    if let downloadURL = url {
+                        print("✅ Got download URL: \(downloadURL.absoluteString)")
+                        saveProfileImageURL(url: downloadURL)
+                    }
+                }
+            }
+        }
+    }
+
+    private func saveProfileImageURL(url: URL) {
+        let db = Firestore.firestore()
+        print("🔥 Trying to save profileImageUrl for userId:", currentUserId)
+        print("🔥 URL to save:", url.absoluteString)
+        db.collection("users").document(currentUserId).updateData([
+            "profileImageUrl": url.absoluteString
+        ]) { error in
+            if let error = error {
+                print("❌ Firestore update error: \(error.localizedDescription)")
+            } else {
+                print("✅ Firestore update success")
+                // Optionally update UI
+                self.profileImageUrl = url.absoluteString
+                self.fetchProfileImageIfNeeded()
+            }
+        }
+    }
+
+    private func fetchProfileImageIfNeeded() {
+        guard let urlString = profileImageUrl, let url = URL(string: urlString), profileImage == nil else { return }
+        // Download and set profileImage from URL
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data, let uiImage = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.profileImage = uiImage
+                }
+            }
+        }.resume()
+    }
+
+    // Upload profile image to Cloudinary and save URL to Firestore
+    private func uploadProfileImageToCloudinary() {
+        guard let inputImage = inputImage else { return }
+        profileImage = inputImage
+
+        guard let imageData = inputImage.jpegData(compressionQuality: 0.5) else { return }
+
+        let url = URL(string: "https://api.cloudinary.com/v1_1/dhkuiwxxz/image/upload")!
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"upload_preset\"\r\n\r\n".data(using: .utf8)!)
+        body.append("AimMatesUpload\r\n".data(using: .utf8)!)
+
+        let timestamp = Int(Date().timeIntervalSince1970)
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"public_id\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(currentUserId)-\(timestamp)\r\n".data(using: .utf8)!)
+
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n".data(using: .utf8)!)
+
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ Upload error:", error.localizedDescription)
+                return
+            }
+
+            guard let data = data else {
+                print("❌ No data received from Cloudinary")
+                return
+            }
+
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let imageUrl = json["secure_url"] as? String {
+                    print("✅ Uploaded to Cloudinary. Image URL: \(imageUrl)")
+                    let refreshedUrl = URL(string: imageUrl + "?v=\(Int.random(in: 1000...9999))")!
+                    saveProfileImageURL(url: refreshedUrl)
+                } else {
+                    print("❌ Unexpected response from Cloudinary")
+                }
+            } catch {
+                print("❌ JSON parse error:", error.localizedDescription)
+            }
+        }.resume()
     }
 }
 
@@ -283,16 +446,26 @@ struct EditProfileView: View {
 struct ProfileHeader: View {
     var userName: String
     var userAge: Int?
+    var profileImage: UIImage?
     var language: Language
 
     var body: some View {
         VStack {
-            Image(systemName: "person.crop.circle.fill")
-                .resizable()
-                .frame(width: 100, height: 100)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.blue, lineWidth: 2))
-                .shadow(radius: 5)
+            if let profileImage = profileImage {
+                Image(uiImage: profileImage)
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.blue, lineWidth: 2))
+                    .shadow(radius: 5)
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.blue, lineWidth: 2))
+                    .shadow(radius: 5)
+            }
 
             Text(userName)
                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
@@ -447,5 +620,39 @@ struct ProfileView_Previews: PreviewProvider {
         }
     }
 }
+// MARK: - ImagePicker
+import UIKit
+struct ImagePicker: UIViewControllerRepresentable {
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: ImagePicker
 
+        init(parent: ImagePicker) {
+            self.parent = parent
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                parent.image = uiImage
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var image: UIImage?
+    var sourceType: UIImagePickerController.SourceType = .photoLibrary
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = sourceType
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+}
 

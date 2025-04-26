@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
+import FirebaseAuth
 import CryptoKit
 import Kingfisher
 
@@ -211,13 +212,13 @@ struct Login: View {
         db.collection("users").getDocuments { snapshot, error in
             isLoading = false
             if let error = error {
-                alertMessage = "Error fetching users: \(error.localizedDescription)"
+                alertMessage = t("Error fetching users", in: "login_screen")
                 showAlert = true
                 return
             }
 
             guard let documents = snapshot?.documents else {
-                alertMessage = "No users found."
+                alertMessage = t("No users found", in: "login_screen")
                 showAlert = true
                 return
             }
@@ -228,10 +229,38 @@ struct Login: View {
                 let storedHashedPass = data["pass"] as? String ?? ""
 
                 if storedEmail.lowercased() == email.lowercased() && storedHashedPass == hashedInput {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                        withAnimation {
-                            isLoggedIn = true
-                            currentUserId = document.documentID
+                    Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+                        if let error = error {
+                            alertMessage = t("Authentication failed", in: "login_screen")
+                            showAlert = true
+                            return
+                        }
+
+                        guard let user = authResult?.user else {
+                            alertMessage = t("User authentication failed", in: "login_screen")
+                            showAlert = true
+                            return
+                        }
+
+                        user.reload { reloadError in
+                            if let reloadError = reloadError {
+                                alertMessage = t("Failed to reload user info", in: "login_screen")
+                                showAlert = true
+                                return
+                            }
+
+                            if user.isEmailVerified {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                    withAnimation {
+                                        isLoggedIn = true
+                                        currentUserId = document.documentID
+                                    }
+                                }
+                            } else {
+                                alertMessage = t("Please verify your email before logging in", in: "login_screen")
+                                showAlert = true
+                                try? Auth.auth().signOut()
+                            }
                         }
                     }
                     return

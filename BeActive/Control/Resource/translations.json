@@ -9,7 +9,13 @@
             "Login Failed" : "Login Failed",
             "ok": "ok",
             "logging_in": "Logging in...",
-            "Incorrect Email or Password.": "Incorrect Email or Password."
+            "Incorrect Email or Password.": "Incorrect Email or Password.",
+            "Error fetching users": "Error fetching users",
+            "No users found": "No users found",
+            "Authentication failed": "Authentication failed",
+            "User authentication failed": "User authentication failed",
+            "Failed to reload user info": "Failed to reload user info",
+            "Please verify your email before logging in": "Please verify your email before logging in"
         },
         "Password": {
           "min_length": "Password must be at least 6 characters long.",
@@ -357,7 +363,13 @@
             "Login Failed" : "เข้าสู่ระบบล้มเหลว",
             "Incorrect Email or Password." : "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
             "ok": "ตกลง",
-            "logging_in": "กำลังเข้าสู่ระบบ..."
+            "logging_in": "กำลังเข้าสู่ระบบ...",
+            "Error fetching users": "เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้",
+            "No users found": "ไม่พบผู้ใช้",
+            "Authentication failed": "การยืนยันตัวตนล้มเหลว",
+            "User authentication failed": "การยืนยันตัวตนของผู้ใช้ล้มเหลว",
+            "Failed to reload user info": "ไม่สามารถรีเฟรชข้อมูลผู้ใช้ได้",
+            "Please verify your email before logging in": "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ"
         },
         "Password": {
           "min_length": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",

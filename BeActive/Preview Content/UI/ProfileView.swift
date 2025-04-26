@@ -39,18 +39,17 @@ struct ProfileView: View {
                     Button(action: {
                         isEditingProfile = true
                     }) {
-                        HStack {
-                            Image(systemName: "pencil")
-                                .font(.system(size: 16, weight: .medium))
-                            Text(t("Edit Profile", in: "Profile_screen"))
-                                .font(.system(size: 16, weight: .medium))
-                        }
-                        .foregroundColor(.primary)
-                        .padding(10)
-                        .background(Color(.systemBackground))
-                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        .padding(.horizontal)
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 20, weight: .medium))
+                            .padding(7)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemBackground))
+                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                            )
+                            .foregroundColor(.primary)
                     }
+                    .padding(.horizontal)
                     .sheet(isPresented: $isEditingProfile) {
                         EditProfileView(
                             userName: $userName,
@@ -235,19 +234,22 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .navigationTitle(
-                Text(t("Edit Profile", in: "Profile_screen"))
-                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
-                    .fontWeight(.bold)
-            )
-            .navigationBarItems(trailing:
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text(t("Cancel", in: "Mate_screen"))
-                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(t("Edit Profile", in: "Profile_screen"))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 20))
+                        .fontWeight(.bold)
                 }
-            )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text(t("Cancel", in: "Mate_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                    }
+                }
+            }
         }
     }
 
@@ -267,7 +269,7 @@ struct EditProfileView: View {
             "weight": userWeight ?? 0
         ]
 
-        db.collection("users").document(userId).setData(updatedData) { error in
+        db.collection("users").document(userId).setData(updatedData, merge: true) { error in
             if let error = error {
                 print("❌ Error updating user: \(error.localizedDescription)")
             } else {

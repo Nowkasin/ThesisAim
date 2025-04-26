@@ -9,6 +9,7 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
+import FirebaseAuth
 import CryptoKit
 
 struct RegisterView: View {
@@ -30,11 +31,7 @@ struct RegisterView: View {
     @State private var appear = false
 
     private let passwordValidator = PasswordValidator()
-    let sexOptions = [
-        t("Male", in: "register_screen"),
-        t("Female", in: "register_screen"),
-        t("Other", in: "register_screen")
-    ]
+    let sexOptions = ["Male", "Female", "Other"]
     
     var body: some View {
         NavigationStack {
@@ -153,34 +150,52 @@ struct RegisterView: View {
         
         let hashedPassword = hashPassword(password)
         
-        let db = Firestore.firestore()
-        let userData: [String: Any] = [
-            "name": name,
-            "email": email,
-            "pass": hashedPassword,
-            "age": ageNum,
-            "sex": sex,
-            "height": heightNum,
-            "weight": weightNum,
-            "phone": phoneNumber,
-            "score": 0
-        ]
-        
-        var newUserRef: DocumentReference? = nil
-        newUserRef = db.collection("users").addDocument(data: userData) { error in
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 errorMessage = "Failed to register: \(error.localizedDescription)"
-            } else if let userRef = newUserRef {
-                userRef.collection("mates").document("Bear").setData([
-                    "unlocked": true
-                ]) { mateError in
-                    if let mateError = mateError {
-                        print("⚠️ Failed to unlock Bear: \(mateError.localizedDescription)")
-                    }
+                return
+            }
+            
+            guard let user = authResult?.user else {
+                errorMessage = "User creation failed."
+                return
+            }
+            
+            user.sendEmailVerification { verificationError in
+                if let verificationError = verificationError {
+                    errorMessage = "Failed to send verification email: \(verificationError.localizedDescription)"
+                    return
                 }
                 
-                errorMessage = ""
-                showSuccessAlert = true
+                let db = Firestore.firestore()
+                let userData: [String: Any] = [
+                    "name": name,
+                    "email": email,
+                    "pass": hashedPassword,
+                    "age": ageNum,
+                    "sex": sex,
+                    "height": heightNum,
+                    "weight": weightNum,
+                    "phone": phoneNumber,
+                    "score": 0
+                ]
+                
+                db.collection("users").document(user.uid).setData(userData) { firestoreError in
+                    if let firestoreError = firestoreError {
+                        errorMessage = "Failed to save user data: \(firestoreError.localizedDescription)"
+                    } else {
+                        db.collection("users").document(user.uid).collection("mates").document("Bear").setData([
+                            "unlocked": true
+                        ]) { mateError in
+                            if let mateError = mateError {
+                                print("⚠️ Failed to unlock Bear: \(mateError.localizedDescription)")
+                            }
+                        }
+                        
+                        errorMessage = ""
+                        showSuccessAlert = true
+                    }
+                }
             }
         }
     }
@@ -271,12 +286,12 @@ struct SexPickerView: View {
                     Button(action: {
                         sex = option
                     }) {
-                        Text(option)
+                        Text(t(option, in: "register_screen"))
                     }
                 }
             } label: {
                 HStack {
-                    Text(sex.isEmpty ? t("Select", in: "register_screen") : sex)
+                    Text(sex.isEmpty ? t("Select", in: "register_screen") : t(sex, in: "register_screen"))
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                         .foregroundColor(sex.isEmpty ? .gray : .primary)
                     Spacer()

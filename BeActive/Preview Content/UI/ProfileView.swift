@@ -115,14 +115,23 @@ struct ProfileView: View {
                     .padding(.horizontal)
                     .sheet(isPresented: $isEditingProfile) {
                         EditProfileView(
-                            userName: $userName,
-                            userAge: $userAge,
-                            userEmail: $userEmail,
-                            userHeight: $userHeight,
-                            userPhone: $userPhone,
-                            userSex: $userSex,
-                            userWeight: $userWeight,
-                            language: language
+                            originalUserName: userName,
+                            originalUserAge: userAge,
+                            originalUserEmail: userEmail,
+                            originalUserHeight: userHeight,
+                            originalUserPhone: userPhone,
+                            originalUserSex: userSex,
+                            originalUserWeight: userWeight,
+                            language: language,
+                            onSave: { name, age, email, height, phone, sex, weight in
+                                userName = name
+                                userAge = age
+                                userEmail = email
+                                userHeight = height
+                                userPhone = phone
+                                userSex = sex
+                                userWeight = weight
+                            }
                         )
                     }
 
@@ -390,17 +399,26 @@ struct ProfileView: View {
 
 
 struct EditProfileView: View {
-    @Binding var userName: String
-    @Binding var userAge: Int?
-    @Binding var userEmail: String
-    @Binding var userHeight: Int?
-    @Binding var userPhone: String
-    @Binding var userSex: String
-    @Binding var userWeight: Int?
+    let originalUserName: String
+    let originalUserAge: Int?
+    let originalUserEmail: String
+    let originalUserHeight: Int?
+    let originalUserPhone: String
+    let originalUserSex: String
+    let originalUserWeight: Int?
     var language: Language
+    var onSave: ((String, Int?, String, Int?, String, String, Int?) -> Void)?
 
     let db = Firestore.firestore()
     @Environment(\.presentationMode) var presentationMode
+
+    @State private var localUserName: String = ""
+    @State private var localUserAge: Int?
+    @State private var localUserEmail: String = ""
+    @State private var localUserHeight: Int?
+    @State private var localUserPhone: String = ""
+    @State private var localUserSex: String = ""
+    @State private var localUserWeight: Int?
 
     var body: some View {
         NavigationView {
@@ -409,12 +427,12 @@ struct EditProfileView: View {
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                     .fontWeight(.bold)
                 ) {
-                    LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $userName, language: language)
+                    LabeledTextField(label: t("Full Name", in: "Profile_screen"), text: $localUserName, language: language)
                     VStack(alignment: .leading) {
                         Text(t("Email", in: "Profile_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                             .foregroundColor(.gray)
-                        Text(userEmail)
+                        Text(localUserEmail)
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                             .foregroundColor(.secondary)
                             .padding(10)
@@ -422,18 +440,18 @@ struct EditProfileView: View {
                             .cornerRadius(8)
                     }
                     .padding(.vertical, 5)
-                    LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $userPhone, language: language)
+                    LabeledTextField(label: t("Phone", in: "Profile_screen"), text: $localUserPhone, language: language)
                 }
 
                 Section(header: Text(t("Physical Information", in: "Profile_screen"))
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
                     .fontWeight(.bold)
                 ) {
-                    LabeledNumberField(label: t("Age", in: "register_screen"), value: $userAge, language: language)
-                    LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $userHeight, language: language)
-                    LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $userWeight, language: language)
+                    LabeledNumberField(label: t("Age", in: "register_screen"), value: $localUserAge, language: language)
+                    LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $localUserHeight, language: language)
+                    LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $localUserWeight, language: language)
 
-                    Picker(t("Sex", in: "register_screen"), selection: $userSex) {
+                    Picker(t("Sex", in: "register_screen"), selection: $localUserSex) {
                         Text(t("Male", in: "register_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                             .tag("Male")
@@ -450,6 +468,8 @@ struct EditProfileView: View {
                 Section {
                     Button(action: {
                         saveUserData()
+                        onSave?(localUserName, localUserAge, localUserEmail, localUserHeight, localUserPhone, localUserSex, localUserWeight)
+                        presentationMode.wrappedValue.dismiss()
                     }) {
                         Text(t("Save Changes", in: "Profile_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
@@ -478,6 +498,15 @@ struct EditProfileView: View {
                     }
                 }
             }
+            .onAppear {
+                localUserName = originalUserName
+                localUserAge = originalUserAge
+                localUserEmail = originalUserEmail
+                localUserHeight = originalUserHeight
+                localUserPhone = originalUserPhone
+                localUserSex = originalUserSex
+                localUserWeight = originalUserWeight
+            }
         }
     }
 
@@ -488,13 +517,13 @@ struct EditProfileView: View {
         }
 
         let updatedData: [String: Any] = [
-            "name": userName,
-            "age": userAge ?? 0,
-            "email": userEmail,
-            "height": userHeight ?? 0,
-            "phone": userPhone,
-            "sex": userSex,
-            "weight": userWeight ?? 0
+            "name": localUserName,
+            "age": localUserAge ?? 0,
+            "email": localUserEmail,
+            "height": localUserHeight ?? 0,
+            "phone": localUserPhone,
+            "sex": localUserSex,
+            "weight": localUserWeight ?? 0
         ]
 
         db.collection("users").document(userId).setData(updatedData, merge: true) { error in
@@ -502,7 +531,6 @@ struct EditProfileView: View {
                 print("❌ Error updating user: \(error.localizedDescription)")
             } else {
                 print("✅ User data successfully updated!")
-                presentationMode.wrappedValue.dismiss()
             }
         }
     }

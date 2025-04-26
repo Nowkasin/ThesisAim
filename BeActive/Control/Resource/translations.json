@@ -232,6 +232,7 @@
             "Photo Library": "Photo Library",
             "Crop & Save": "Crop & Save",
             "Cancel": "Cancel",
+            "Preparing Image": "Preparing image...",
             "SEX" : {
                 "Male": "Male",
                 "Female": "Female",
@@ -567,6 +568,7 @@
             "Crop & Save": "ปรับและบันทึก",
             "Cancel": "ยกเลิก",
             "Weight" :  "น้ำหนัก",
+            "Preparing Image": "กำลังเตรียมรูปภาพ...",
             "SEX" : {
                 "Male": "ชาย",
                 "Female": "หญิง",

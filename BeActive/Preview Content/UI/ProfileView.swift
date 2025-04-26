@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseStorage
+import TOCropViewController
 
 struct ProfileView: View {
     @EnvironmentObject var healthData: HealthDataManager
@@ -39,6 +40,7 @@ struct ProfileView: View {
     @State private var isCropping = false
     @State private var croppedImage: UIImage?
     @State private var didCropImage = false
+    @State private var isLoadingCropper = false
 
     var body: some View {
         ZStack {
@@ -68,20 +70,27 @@ struct ProfileView: View {
                             ])
                         }
                         .sheet(isPresented: $showingImagePicker, onDismiss: {
-                            if inputImage != nil {
-                                isCropping = true
+                            if let originalImage = inputImage {
+                                if let resized = originalImage.resized(toMaxSize: 1024) {
+                                    inputImage = resized
+                                }
+                                isLoadingCropper = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                    isLoadingCropper = false
+                                    isCropping = true
+                                }
                             }
                         }) {
                             ImagePicker(image: $inputImage, sourceType: sourceType)
                         }
-                        .sheet(isPresented: $isCropping, onDismiss: {
+                        .fullScreenCover(isPresented: $isCropping, onDismiss: {
                             if didCropImage {
                                 uploadProfileImageToCloudinary()
                             }
                             didCropImage = false
                         }) {
                             if let inputImage = inputImage {
-                                CropImageView(image: inputImage) { cropped in
+                                CropViewControllerWrapper(image: inputImage) { cropped in
                                     self.inputImage = cropped
                                     self.profileImage = cropped
                                     self.isCropping = false
@@ -173,6 +182,29 @@ struct ProfileView: View {
                 Spacer()
             }
         }
+        .overlay(
+            Group {
+                if isLoadingCropper {
+                    ZStack {
+                        Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .scaleEffect(isLoadingCropper ? 1.2 : 1.0)
+                                .animation(
+                                    Animation.easeInOut(duration: 0.8)
+                                        .repeatForever(autoreverses: true),
+                                    value: isLoadingCropper
+                                )
+                            Text(t("Preparing Image", in: "Profile_screen"))
+                                .foregroundColor(.white)
+                                .font(.headline)
+                                .opacity(0.8)
+                        }
+                    }
+                }
+            }
+        )
         .onAppear {
             Task {
                 await fetchProfileData()
@@ -695,85 +727,62 @@ struct ImagePicker: UIViewControllerRepresentable {
 }
 
 
-// MARK: - CropImageView
+
+// MARK: - UIImage Resize Extension
 import UIKit
-struct CropImageView: View {
-    let image: UIImage
+extension UIImage {
+    func resized(toMaxSize maxSize: CGFloat) -> UIImage? {
+        let maxDimension = max(size.width, size.height)
+        let scale = (maxDimension > maxSize) ? (maxSize / maxDimension) : 1.0
+        let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        draw(in: CGRect(origin: .zero, size: newSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return resizedImage
+    }
+}
+
+// MARK: - TOCropViewController SwiftUI Wrapper
+import UIKit
+struct CropViewControllerWrapper: UIViewControllerRepresentable {
+    var image: UIImage
     var onCrop: (UIImage) -> Void
+    @Environment(\.presentationMode) private var presentationMode
 
-    @State private var zoom: CGFloat = 1.0
-    @Environment(\.presentationMode) var presentationMode
-    @State private var offset: CGSize = .zero
-    @State private var lastOffset: CGSize = .zero
+    func makeUIViewController(context: Context) -> TOCropViewController {
+        let cropViewController = TOCropViewController(image: image)
+        cropViewController.delegate = context.coordinator
+        cropViewController.aspectRatioPreset = .presetSquare
+        cropViewController.aspectRatioLockEnabled = true
+        cropViewController.resetButtonHidden = true
+        cropViewController.modalTransitionStyle = .crossDissolve
+        cropViewController.modalPresentationStyle = .fullScreen
+        return cropViewController
+    }
 
-    var body: some View {
-        VStack {
-            Spacer()
+    func updateUIViewController(_ uiViewController: TOCropViewController, context: Context) {}
 
-            GeometryReader { geometry in
-                ZStack {
-                    Color.black
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .scaleEffect(zoom)
-                        .offset(offset)
-                        .frame(width: geometry.size.width, height: geometry.size.width)
-                        .clipped()
-                        .gesture(
-                            SimultaneousGesture(
-                                MagnificationGesture()
-                                    .onChanged { value in
-                                        zoom = min(max(1, value), 3)
-                                    },
-                                DragGesture()
-                                    .onChanged { value in
-                                        self.offset = CGSize(width: lastOffset.width + value.translation.width, height: lastOffset.height + value.translation.height)
-                                    }
-                                    .onEnded { value in
-                                        self.lastOffset = self.offset
-                                    }
-                            )
-                        )
-                }
-            }
-            .frame(height: UIScreen.main.bounds.width)
-            .background(Color.black)
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
 
-            Slider(value: $zoom, in: 1...3)
-                .padding()
+    class Coordinator: NSObject, TOCropViewControllerDelegate {
+        let parent: CropViewControllerWrapper
 
-            HStack {
-                Button(t("Cancel", in: "Profile_screen")) {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .foregroundColor(.red)
-                .padding()
+        init(_ parent: CropViewControllerWrapper) {
+            self.parent = parent
+        }
 
-                Spacer()
+        func cropViewController(_ cropViewController: TOCropViewController, didCropTo image: UIImage, with cropRect: CGRect, angle: Int) {
+            parent.onCrop(image)
+            parent.presentationMode.wrappedValue.dismiss()
+        }
 
-                Button(t("Crop & Save", in: "Profile_screen")) {
-                    // Render the visible area as a cropped image
-                    let side = UIScreen.main.bounds.width
-                    let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
-                    let cropped = renderer.image { ctx in
-                        // Calculate how the image is currently being shown (zoom and position)
-                        let imgSize = image.size
-                        let scale = zoom
-                        // Calculate how much to scale the image to fit the square area at zoom=1
-                        let displayScale = min(side / imgSize.width, side / imgSize.height)
-                        let actualScale = displayScale * scale
-                        // Calculate offset
-                        let x = (side - imgSize.width * actualScale) / 2 + offset.width
-                        let y = (side - imgSize.height * actualScale) / 2 + offset.height
-                        image.draw(in: CGRect(x: x, y: y, width: imgSize.width * actualScale, height: imgSize.height * actualScale))
-                    }
-                    onCrop(cropped)
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .foregroundColor(.green)
-                .padding()
-            }
+        func cropViewController(_ cropViewController: TOCropViewController, didFinishCancelled cancelled: Bool) {
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
 }

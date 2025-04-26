@@ -40,6 +40,7 @@ class FavoriteManager {
 struct ExerciseView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedEmbedURL: IdentifiableURL?
+    @State private var selectedArticleURL: IdentifiableURL?
     private let favoriteManager = FavoriteManager()
     @ObservedObject var language: Language
 
@@ -126,7 +127,7 @@ struct ExerciseView: View {
                                     article: article,
                                     onTap: {
                                         if let url = URL(string: article.url) {
-                                            UIApplication.shared.open(url)
+                                            selectedArticleURL = IdentifiableURL(url: url)
                                         }
                                     },
                                     language: language
@@ -146,6 +147,10 @@ struct ExerciseView: View {
         }
         .navigationBarHidden(true)
         .sheet(item: $selectedEmbedURL) { item in
+            WebViewPlayer(embedURL: item.url)
+                .ignoresSafeArea()
+        }
+        .sheet(item: $selectedArticleURL) { item in
             WebViewPlayer(embedURL: item.url)
                 .ignoresSafeArea()
         }
@@ -181,6 +186,20 @@ struct ExerciseView: View {
                 videoURL: "https://www.youtube.com/embed/2VuLBYrgG94",
                 previewImageName: "shoulder_exercise",
                 isFavorite: savedFavorites.contains("https://www.youtube.com/embed/2VuLBYrgG94")
+            ),
+            Exercise(
+                title: t("Chest Exercise", in: "Ex_screen"),
+                duration: "5 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/d2ZYz9RmYk0",
+                previewImageName: "chest_stretch",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/d2ZYz9RmYk0")
+            ),
+            Exercise(
+                title: t("Eye Exercise", in: "Ex_screen"),
+                duration: "3 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/6SB3w5Sb0hQ",
+                previewImageName: "eye_exercise",
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/6SB3w5Sb0hQ")
             )
         ]
     }
@@ -307,7 +326,6 @@ struct WebViewPlayer: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         let request = URLRequest(url: embedURL)
-        uiView.scrollView.isScrollEnabled = false
         uiView.load(request)
     }
 }

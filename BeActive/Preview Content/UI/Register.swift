@@ -55,11 +55,11 @@ struct RegisterView: View {
                                 .onChange(of: password) { newValue in
                                     validatePassword(newValue)
                                 }
-                            CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age, language: language)
+                            CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age, language: language, keyboardType: .numberPad)
                             SexPickerView(sex: $sex, sexOptions: sexOptions, language: language)
-                            CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height, language: language)
-                            CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight, language: language)
-                            CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber, language: language)
+                            CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height, language: language, keyboardType: .numberPad)
+                            CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight, language: language, keyboardType: .numberPad)
+                            CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber, language: language, keyboardType: .numberPad)
                         }
                         
                         if !errorMessage.isEmpty {
@@ -132,38 +132,48 @@ struct RegisterView: View {
             errorMessage = t("fill_all_fields", in: "register_screen")
             return
         }
-        
-        guard let ageNum = Int(age), let heightNum = Int(height), let weightNum = Int(weight) else {
-            errorMessage = "Age, height, and weight must be valid numbers."
+
+        guard let ageNum = Int(age), ageNum >= 0, ageNum <= 999 else {
+            errorMessage = t("invalid_age", in: "register_screen")
             return
         }
-        
+
+        guard let heightNum = Int(height), heightNum >= 10, heightNum <= 999 else {
+            errorMessage = t("invalid_height", in: "register_screen")
+            return
+        }
+
+        guard let weightNum = Int(weight), weightNum >= 10, weightNum <= 999 else {
+            errorMessage = t("invalid_weight", in: "register_screen")
+            return
+        }
+
         guard phoneNumber.count == 10, phoneNumber.allSatisfy({ $0.isNumber }) else {
-            errorMessage = "Phone number must be exactly 10 digits."
+            errorMessage = t("invalid_phone", in: "register_screen")
             return
         }
-        
+
         guard passwordValidator.validatePassword(password) else {
             errorMessage = passwordValidator.errorMessage
             return
         }
-        
+
         let hashedPassword = hashPassword(password)
         
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let error = error {
-                errorMessage = "Failed to register: \(error.localizedDescription)"
+                errorMessage = "\(t("register_failed", in: "register_screen")) \(error.localizedDescription)"
                 return
             }
             
             guard let user = authResult?.user else {
-                errorMessage = "User creation failed."
+                errorMessage = t("user_creation_failed", in: "register_screen")
                 return
             }
             
             user.sendEmailVerification { verificationError in
                 if let verificationError = verificationError {
-                    errorMessage = "Failed to send verification email: \(verificationError.localizedDescription)"
+                    errorMessage = "\(t("email_verification_failed", in: "register_screen")) \(verificationError.localizedDescription)"
                     return
                 }
                 
@@ -182,7 +192,7 @@ struct RegisterView: View {
                 
                 db.collection("users").document(user.uid).setData(userData) { firestoreError in
                     if let firestoreError = firestoreError {
-                        errorMessage = "Failed to save user data: \(firestoreError.localizedDescription)"
+                        errorMessage = "\(t("save_user_failed", in: "register_screen")) \(firestoreError.localizedDescription)"
                     } else {
                         db.collection("users").document(user.uid).collection("mates").document("Bear").setData([
                             "unlocked": true
@@ -221,6 +231,7 @@ struct CustomTextField: View {
     var placeholder: String
     @Binding var text: String
     @ObservedObject var language: Language
+    var keyboardType: UIKeyboardType = .default
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -228,6 +239,7 @@ struct CustomTextField: View {
                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                 .padding(.vertical, 10)
                 .foregroundColor(.primary)
+                .keyboardType(keyboardType)
             
             Divider()
                 .background(Color.gray.opacity(0.4))

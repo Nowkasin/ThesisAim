@@ -160,46 +160,46 @@ struct ExerciseView: View {
         let savedFavorites = favoriteManager.loadFavorites()
         exerciseStates = [
             Exercise(
-                title: t("Back Exercise", in: "Ex_screen"),
-                duration: "10 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/g43xYk4VAjU",
+                title: t("Neck and Shoulders", in: "Ex_screen"),
+                duration: "1:13 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/cUkfDaUGRBc",
                 previewImageName: "Bear",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/g43xYk4VAjU")
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/cUkfDaUGRBc")
             ),
             Exercise(
-                title: t("Neck Exercise", in: "Ex_screen"),
-                duration: "5 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/8JNDtye2CB0?si=_ZdNl7uAGXTkpm-0",
+                title: t("Shoulders", in: "Ex_screen"),
+                duration: "2:01 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/Cdo5lZjeD1E",
                 previewImageName: "neck_exercise",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/8JNDtye2CB0?si=_ZdNl7uAGXTkpm-0")
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/Cdo5lZjeD1E")
             ),
             Exercise(
-                title: t("Arm Exercise", in: "Ex_screen"),
-                duration: "7 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/TSrfB7JIzxY",
+                title: t("Upper Back", in: "Ex_screen"),
+                duration: "0:37 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/Bi4tQn2ifYg",
                 previewImageName: "arm_exercise",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/TSrfB7JIzxY")
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/Bi4tQn2ifYg")
             ),
             Exercise(
-                title: t("Shoulder Exercise", in: "Ex_screen"),
-                duration: "5 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/2VuLBYrgG94",
+                title: t("Front Chest", in: "Ex_screen"),
+                duration: "0:27 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/XQNmCUlX7nE",
                 previewImageName: "shoulder_exercise",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/2VuLBYrgG94")
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/XQNmCUlX7nE")
             ),
             Exercise(
-                title: t("Chest Exercise", in: "Ex_screen"),
-                duration: "5 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/d2ZYz9RmYk0",
+                title: t("Back Side", in: "Ex_screen"),
+                duration: "0:28 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/T4_Hd-XT3cc",
                 previewImageName: "chest_stretch",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/d2ZYz9RmYk0")
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/T4_Hd-XT3cc")
             ),
             Exercise(
-                title: t("Eye Exercise", in: "Ex_screen"),
-                duration: "3 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://www.youtube.com/embed/6SB3w5Sb0hQ",
+                title: t("Arm", in: "Ex_screen"),
+                duration: "0:40 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://www.youtube.com/embed/a2gk4uBqhEM?si=FY9mBlm3rI9v6Zz3",
                 previewImageName: "eye_exercise",
-                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/6SB3w5Sb0hQ")
+                isFavorite: savedFavorites.contains("https://www.youtube.com/embed/a2gk4uBqhEM?si=FY9mBlm3rI9v6Zz3")
             )
         ]
     }

@@ -163,42 +163,42 @@ struct ExerciseView: View {
                 title: t("Neck and Shoulders", in: "Ex_screen"),
                 duration: "1:13 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/cUkfDaUGRBc",
-                previewImageName: "Bear",
+                previewImageName: "NeckNShoulders",
                 isFavorite: savedFavorites.contains("https://www.youtube.com/embed/cUkfDaUGRBc")
-            ),
-            Exercise(
-                title: t("Shoulders", in: "Ex_screen"),
-                duration: "2:01 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://youtube.com/embed/Cdo5lZjeD1E",
-                previewImageName: "neck_exercise",
-                isFavorite: savedFavorites.contains("https://youtube.com/embed/Cdo5lZjeD1E")
-            ),
-            Exercise(
-                title: t("Upper Back", in: "Ex_screen"),
-                duration: "0:37 " + t("Minutes", in: "Ex_screen"),
-                videoURL: "https://youtube.com/embed/Bi4tQn2ifYg",
-                previewImageName: "arm_exercise",
-                isFavorite: savedFavorites.contains("https://youtube.com/embed/Bi4tQn2ifYg")
             ),
             Exercise(
                 title: t("Front Chest", in: "Ex_screen"),
                 duration: "0:27 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://youtube.com/embed/XQNmCUlX7nE",
-                previewImageName: "shoulder_exercise",
+                previewImageName: "FrontChest",
                 isFavorite: savedFavorites.contains("https://youtube.com/embed/XQNmCUlX7nE")
             ),
             Exercise(
                 title: t("Back Side", in: "Ex_screen"),
                 duration: "0:28 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://youtube.com/embed/T4_Hd-XT3cc",
-                previewImageName: "chest_stretch",
+                previewImageName: "BackSide",
                 isFavorite: savedFavorites.contains("https://youtube.com/embed/T4_Hd-XT3cc")
+            ),
+            Exercise(
+                title: t("Shoulders", in: "Ex_screen"),
+                duration: "2:01 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/Cdo5lZjeD1E",
+                previewImageName: "Shoulders",
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/Cdo5lZjeD1E")
+            ),
+            Exercise(
+                title: t("Upper Back", in: "Ex_screen"),
+                duration: "0:37 " + t("Minutes", in: "Ex_screen"),
+                videoURL: "https://youtube.com/embed/Bi4tQn2ifYg",
+                previewImageName: "UpperBack",
+                isFavorite: savedFavorites.contains("https://youtube.com/embed/Bi4tQn2ifYg")
             ),
             Exercise(
                 title: t("Arm", in: "Ex_screen"),
                 duration: "0:40 " + t("Minutes", in: "Ex_screen"),
                 videoURL: "https://www.youtube.com/embed/a2gk4uBqhEM?si=FY9mBlm3rI9v6Zz3",
-                previewImageName: "eye_exercise",
+                previewImageName: "Arm",
                 isFavorite: savedFavorites.contains("https://www.youtube.com/embed/a2gk4uBqhEM?si=FY9mBlm3rI9v6Zz3")
             )
         ]

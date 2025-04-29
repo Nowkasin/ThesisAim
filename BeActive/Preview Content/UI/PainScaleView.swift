@@ -108,11 +108,20 @@ struct PainScaleView: View {
                                     }
                                 }
 
-                                ForEach(record.values.sorted(by: { $0.key < $1.key }), id: \.key) { part, value in
-                                    HStack {
-                                        Text(part)
-                                        Spacer()
-                                        Text("\(value)").bold()
+                                ForEach([
+                                    t("Head", in: "Pain_screen"),
+                                    t("Arm", in: "Pain_screen"),
+                                    t("Shoulder", in: "Pain_screen"),
+                                    t("Back", in: "Pain_screen"),
+                                    t("Leg", in: "Pain_screen"),
+                                    t("Foot", in: "Pain_screen")
+                                ], id: \.self) { part in
+                                    if let value = record.values[part] {
+                                        HStack {
+                                            Text("\(part) \(value <= 3 ? "(✅)" : value <= 7 ? "(⚠️)" : "(🚨)")")
+                                            Spacer()
+                                            Text("\(value)").bold()
+                                        }
                                     }
                                 }
                             }

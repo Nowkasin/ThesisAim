@@ -36,6 +36,7 @@
 
 import SwiftUI
 import Firebase
+import UserNotifications
 
 @main
 struct BeActiveApp: App {
@@ -45,6 +46,16 @@ struct BeActiveApp: App {
 
     init() {
         FirebaseApp.configure()
+
+        // ✅ Request notification permission on app launch
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("❌ Notification permission error: \(error.localizedDescription)")
+            } else {
+                print("✅ Notification permission granted: \(granted)")
+            }
+        }
+        UNUserNotificationCenter.current().delegate = appDelegate
 
         // ✅ Force logout every time app starts
 //        UserDefaults.standard.set(false, forKey: "isLoggedIn")

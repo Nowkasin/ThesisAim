@@ -167,6 +167,8 @@
                 "title" : "🚨 High heart rate!",
                 "body" : "Your heart beats too fast without movement. Please rest or check your health."
             },
+            "noti_task_completed_title": "Task Completed 🎉",
+            "noti_task_completed_body": "You’ve earned 20 points for finishing your task!",
             "SC": {
                 "Score Converted": "Score Converted",
                 "You’ve already converted today’s score to coins.": "You’ve already converted today’s score to coins.",
@@ -511,6 +513,8 @@
                 "title" : "🚨 อัตราการเต้นของหัวใจสูง!",
                 "body" : "หัวใจของคุณเต้นเร็วเกินไปโดยไม่มีการเคลื่อนไหว โปรดพักหรือตรวจสอบสุขภาพของคุณ"
             },
+            "noti_task_completed_title": "ภารกิจสำเร็จ 🎉",
+            "noti_task_completed_body": "คุณได้รับ 20 แต้มจากการทำภารกิจเสร็จสิ้น!",
             "SC": {
                 "Score Converted": "คะแนนถูกแลกแล้ว",
                 "You’ve already converted today’s score to coins.": "คุณได้แลกคะแนนของวันนี้เป็นเหรียญไปแล้ว",

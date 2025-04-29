@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseFirestore
 import Kingfisher
+import UserNotifications
 
 struct TaskRecord: Identifiable, Codable {
     let id: UUID
@@ -325,6 +326,19 @@ struct TaskView: View {
         taskStartTime = Date().timeIntervalSince1970
         timeRemaining = selectedTime * 60
         startTimer()
+
+        // Schedule notification for task end
+        let fireDate = Calendar.current.date(byAdding: .second, value: Int(selectedTime * 60), to: Date())!
+        let dateComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: fireDate)
+
+        let content = UNMutableNotificationContent()
+        content.title = t("noti_task_completed_title", in: "Noti_Screen")
+        content.body = t("noti_task_completed_body", in: "Noti_Screen")
+        content.sound = .default
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let request = UNNotificationRequest(identifier: "task_end_noti", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
     }
 
 //    func startTimer() {
@@ -376,6 +390,7 @@ struct TaskView: View {
         saveTaskHistory()
         scoreManager.addTaskScore(20)
 
+
         withAnimation { showBadge = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             withAnimation { showBadge = false }
@@ -388,6 +403,9 @@ struct TaskView: View {
         isTaskStarted = false
         taskStartTime = 0
         timeRemaining = 0
+
+        // Remove pending notification for task end
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["task_end_noti"])
 
         let record = TaskRecord(
             id: UUID(),

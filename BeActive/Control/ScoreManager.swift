@@ -34,6 +34,9 @@ class ScoreManager: ObservableObject {
             waterScore = 0
             stepScore = 0
             taskScore = 0
+            calScore = 0
+            kmScore = 0
+            
             lastTotalScoreResetDate = today
             print("✅ totalScore components reset for new day.")
         }

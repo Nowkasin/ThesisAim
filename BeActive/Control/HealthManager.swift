@@ -51,6 +51,8 @@ class HealthManager: ObservableObject {
     
     // Properties for tracking score and steps
     @Published var stepScore: Int = 0
+    @Published var calScore: Int = 0
+    @Published var kmScore: Int = 0
     @AppStorage("waterScore") var waterScore: Int = 0
     private var previousStepCount: Double = 0
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health
@@ -62,6 +64,14 @@ class HealthManager: ObservableObject {
         setMockActivity(id: 1, key: "todayCalories", titleKey: "Today Calories", goalValue: "900", image: "flame", tintColor: .gray, amount: "0")
         setMockActivity(id: 2, key: "todayHeartRate", titleKey: "Today Heart Rate", goalValue: "60-100 BPM", image: "heart.fill", tintColor: .gray, amount: "0 BPM")
         setMockActivity(id: 3, key: "dayDistance", titleKey: "Today's Distance", goalValue: "5 KM", image: "figure.walk.circle", tintColor: .gray, amount: "0")
+
+        // Daily reset logic for calorie goal completion
+        let lastResetDate = UserDefaults.standard.string(forKey: "lastCalorieScoreResetDate")
+        let todayString = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .none)
+        if lastResetDate != todayString {
+            UserDefaults.standard.set(false, forKey: "calGoalCompleted")
+            UserDefaults.standard.set(todayString, forKey: "lastCalorieScoreResetDate")
+        }
 
         // เริ่มจับเวลา
         startTimer()
@@ -97,7 +107,7 @@ class HealthManager: ObservableObject {
                 self?.fetchTodayCalories()
                 self?.fetchTodayHeartRate()
                 self?.fetchTodayDistance()
-                self?.alertsManager?.scheduleWaterAlerts() 
+                self?.alertsManager?.scheduleWaterAlerts()
             }
     }
     func startObservingHealthData() {
@@ -214,6 +224,13 @@ class HealthManager: ObservableObject {
             let goalValue = "900"
 
             DispatchQueue.main.async {
+                if ScoreManager.shared.stepScore > 0 {
+                    let score = Int(caloriesBurned / 100) * 10
+                    ScoreManager.shared.calScore = score
+                    self?.calScore = score
+                    print("✅ Calories recalculated: \(score) points.")
+                }
+
                 let translatedTitle = t("Today Calories", in: "Chart_screen")
                 print("🌎 Translated Title: \(translatedTitle)")
 
@@ -342,6 +359,11 @@ class HealthManager: ObservableObject {
             let goalValue = "5 KM"
 
             DispatchQueue.main.async {
+                let score = Int(distanceInKilometers) * 10
+                ScoreManager.shared.kmScore = score
+                self?.kmScore = score
+                print("✅ Distance recalculated: \(score) points.")
+
                 let translatedTitle = t("Today's Distance", in: "Chart_screen")
                 print("🌎 Translated Title: \(translatedTitle)")
 

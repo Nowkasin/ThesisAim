@@ -62,6 +62,9 @@ struct ScoreView: View {
         .onAppear {
             scoreManager.resetTotalScoreIfNewDay()
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            scoreManager.resetTotalScoreIfNewDay()
+        }
     }
 
     func pushScoreToFirestore() {

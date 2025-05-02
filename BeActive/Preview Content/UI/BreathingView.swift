@@ -54,7 +54,7 @@ struct BreathingView: View {
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
 
                     Text(t(selectedTechnique.description, in: "breath_screen"))
-                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                         .foregroundColor(.gray)
                 }
 
@@ -73,12 +73,12 @@ struct BreathingView: View {
 
                     VStack(spacing: 4) {
                         Text(emojiForCurrentPhase() + " " + t(instructionText, in: "breath_screen"))
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                             .foregroundColor(.teal)
                         
                         if isBreathing {
                             Text("\(phaseTimeLeft)s")
-                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                                 .foregroundColor(.gray)
                         }
                     }
@@ -88,7 +88,7 @@ struct BreathingView: View {
                 // ✅ Total time moved below breathing circle
                 if isBreathing {
                     Text("\(t("Total Remaining", in: "breath_screen")): \(totalTimeLeft)\(t(" s", in: "breath_screen"))")
-                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                         .foregroundColor(.gray)
                         .padding(.top, 24)
                 }

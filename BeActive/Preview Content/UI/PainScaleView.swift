@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct PainRecord: Identifiable, Codable {
     let id: UUID
@@ -73,6 +74,19 @@ struct PainScaleView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 10)
+
+                // MARK: - 🔔 Test Notification Button (Comment out to disable)
+//                Button(action: {
+//                    triggerTestPainNotification()
+//                }) {
+//                    Text("🔔 Test Notification")
+//                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+//                        .foregroundColor(.white)
+//                        .padding()
+//                        .background(Color.orange)
+//                        .cornerRadius(10)
+//                }
+//                .padding(.horizontal)
 
                 if !history.isEmpty {
                     Button(action: {
@@ -182,6 +196,9 @@ struct PainScaleView: View {
         .animation(.easeInOut, value: showSaveConfirmation || showDeleteConfirmation)
         .onAppear {
             loadHistory()
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+
+            schedulePainReminder()
         }
     }
 
@@ -261,6 +278,8 @@ struct PainScaleView: View {
 
         history.append(newRecord)
         saveHistory()
+        
+        schedulePainReminder()
 
         withAnimation {
             showSaveConfirmation = true
@@ -276,6 +295,8 @@ struct PainScaleView: View {
     func deleteRecord(_ record: PainRecord) {
         history.removeAll { $0.id == record.id }
         saveHistory()
+        
+        schedulePainReminder()
 
         withAnimation {
             showDeleteConfirmation = true
@@ -299,6 +320,32 @@ struct PainScaleView: View {
             history = decoded
         }
     }
+    
+    func schedulePainReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["painReminder"])
+
+        let content = UNMutableNotificationContent()
+        if let latest = history.last,
+           latest.values.contains(where: { $0.value >= 5 }) {
+            content.title = t("PainReminderTitle", in: "Pain_screen")
+            content.body = t("PainReminderPain", in: "Pain_screen")
+        } else {
+            content.title = t("PainReminderTitle", in: "Pain_screen")
+            content.body = t("PainReminderNormal", in: "Pain_screen")
+        }
+        content.sound = .default
+
+        var dateComponents = DateComponents()
+        dateComponents.weekday = 2 // Monday
+        dateComponents.hour = 12
+        dateComponents.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+
+        let request = UNNotificationRequest(identifier: "painReminder", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request)
+    }
 }
 
 struct PainScaleView_Previews: PreviewProvider {
@@ -307,5 +354,26 @@ struct PainScaleView_Previews: PreviewProvider {
             PainScaleView().preferredColorScheme(.light)
             PainScaleView().preferredColorScheme(.dark)
         }
+    }
+}
+
+// MARK: - Test Pain Notification function moved inside PainScaleView
+extension PainScaleView {
+    func triggerTestPainNotification() {
+        let content = UNMutableNotificationContent()
+        if let latest = history.last,
+           latest.values.contains(where: { $0.value >= 5 }) {
+            content.title = t("PainReminderTitle", in: "Pain_screen")
+            content.body = t("PainReminderPain", in: "Pain_screen")
+        } else {
+            content.title = t("PainReminderTitle", in: "Pain_screen")
+            content.body = t("PainReminderNormal", in: "Pain_screen")
+        }
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: "testPainReminder", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request)
     }
 }

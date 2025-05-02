@@ -216,7 +216,10 @@
             "Delete this record?" : "Delete this record?",
             "Pain Scale Saved!" : "Pain Scale Saved!",
             "Record Deleted" : "Record Deleted",
-            "Delete" : "Delete"
+            "Delete" : "Delete",
+            "PainReminderPain": "You have a Pain Part according to your Pain Scale. Be sure to take care of it.",
+            "PainReminderNormal": "Your body seems okay. You can track Pain levels regularly with the Pain Scale.",
+            "PainReminderTitle": "Pain Reminder"
         },
         "Profile_screen" : {
             "Personal Information" : "Personal Information",
@@ -574,7 +577,10 @@
             "Delete this record?" : "ลบบันทึก",
             "Pain Scale Saved!" : "บันทึกระดับความเจ็บปวด!",
             "Record Deleted" : "ลบบันทึก",
-            "Delete" : "ลบ"
+            "Delete" : "ลบ",
+            "PainReminderPain": "คุณมีอาการปวดในบางส่วนของร่างกายตามแบบวัดระดับความเจ็บปวด อย่าลืมดูแลสุขภาพด้วยนะ",
+            "PainReminderNormal": "ร่างกายของคุณปกติดี ติดตามอาการปวดของคุณได้เป็นประจำผ่านแบบวัดระดับความเจ็บปวด",
+            "PainReminderTitle": "แจ้งเตือนอาการปวด"
         },
         "Profile_screen" : {
             "Personal Information" : "ข้อมูลส่วนตัว",

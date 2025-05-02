@@ -38,6 +38,10 @@ struct MatesView: View {
     @State private var selectedTab = 0
 
     @State private var purchasedMateIDs: Set<UUID> = []
+    
+    @State private var showPromo: Bool = false
+    @State private var promoMate: Mate? = nil
+    @AppStorage("lastPromoDate") private var lastPromoDate: String = ""
 
     let mates: [Mate] = [
         Mate(name: "Happy Bear", cost: 1500, imageUrl: URL(string: "https://i.imgur.com/mTEiOqd.png")!),
@@ -61,6 +65,24 @@ struct MatesView: View {
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
     ]
+    
+    private func maybeShowPromo() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+
+        if lastPromoDate == today { return }
+
+        if Int.random(in: 1...5) == 1 {
+            let eligibleMates = mates.filter { $0.name != "Mocha" }
+            if let randomMate = eligibleMates.randomElement() {
+                withAnimation {
+                    promoMate = randomMate
+                    showPromo = true
+                }
+            }
+        }
+    }
 
     var body: some View {
         NavigationView {
@@ -102,11 +124,16 @@ struct MatesView: View {
                                     }
                                 }
 
-                                if scoreManager.purchasedMates.isEmpty {
-                                    Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
-                                        .foregroundColor(.gray)
-                                        .padding(.top, 30)
+                                Group {
+                                    if scoreManager.purchasedMates.isEmpty {
+                                        Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
+                                            .foregroundColor(.gray)
+                                            .padding(.top, 30)
+                                    }
                                 }
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                .foregroundColor(.blue)
+                                .padding(.bottom, 20)
                             }
                             .padding(.horizontal, 20)
                             .padding(.bottom, 40)
@@ -195,8 +222,80 @@ struct MatesView: View {
             .onAppear {
                 loadMates()
                 fetchUnlockedMatesFromFirestore()
+                maybeShowPromo()
             }
         }
+        .overlay(
+            Group {
+                if showPromo, let mate = promoMate {
+                    ZStack {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .transition(.opacity)
+
+                        ZStack(alignment: .topTrailing) {
+                            VStack(spacing: 8) {
+                                KFImage(mate.imageUrl)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 120, height: 120)
+
+                                Text(t("Meet your next friend", in: "Mate_screen"))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
+                                    .padding(.top, 2)
+
+                                Text("\(mate.name) Mate")
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.gray)
+                                    .padding(.top, 0)
+
+                                Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                    .foregroundColor(.red)
+                                    .padding(.top, 2)
+
+                                Button(action: {
+                                    withAnimation {
+                                        let formatter = DateFormatter()
+                                        formatter.dateFormat = "yyyy-MM-dd"
+                                        lastPromoDate = formatter.string(from: Date())
+                                        showPromo = false
+                                    }
+                                }) {
+                                    Text(t("Don’t show again today", in: "Mate_screen"))
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
+                                        .underline()
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.top, 10)
+                            }
+                            .frame(width: 260)
+                            .padding(.vertical, 20)
+                            .background(Color.white)
+                            .cornerRadius(20)
+                            .shadow(radius: 10)
+                            .transition(.scale)
+                            .animation(.spring(), value: showPromo)
+
+                            Button(action: {
+                                withAnimation {
+                                    showPromo = false
+                                }
+                            }) {
+                                Image(systemName: "xmark")
+                                    .foregroundColor(.black)
+                                    .frame(width: 30, height: 30)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 2)
+                            }
+                            .offset(x: 10, y: -10)
+                        }
+                    }
+                }
+            }
+        )
     }
 
     private func isMateAlreadyUnlocked(_ mate: Mate) -> Bool {

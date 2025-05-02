@@ -59,13 +59,29 @@ struct SettingsView: View {
                     SleepScheduleView()
                 }
 
-                Spacer()
-
                 // ปุ่มเปิดไฟล์ PDF
-                settingButton(icon: "book", title: t("How to use", in: "Setting_screen")) {
+                Button(action: {
                     UIApplication.shared.open(pdfURL)
+                }) {
+                    HStack {
+                        Image(systemName: "book")
+                            .font(.title2)
+                            .foregroundColor(.primary)
+                        Text(t("How to use", in: "Setting_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.gray.opacity(0.2))
+                    )
+                    .padding(.horizontal)
                 }
-                .padding(.bottom, 20)
+
+                Spacer()
             }
             .frame(maxWidth: .infinity)
             .opacity(isShowing ? 1 : 0)

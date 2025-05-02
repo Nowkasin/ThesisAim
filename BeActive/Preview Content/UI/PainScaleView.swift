@@ -17,6 +17,7 @@ struct PainScaleView: View {
     @ObservedObject var language = Language.shared
 
     @State private var headPain: Double = 0
+    @State private var neckPain: Double = 0
     @State private var armPain: Double = 0
     @State private var shoulderPain: Double = 0
     @State private var backPain: Double = 0
@@ -52,6 +53,7 @@ struct PainScaleView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
 
                 painSlider(label: t("Head", in: "Pain_screen"), value: $headPain)
+                painSlider(label: t("Neck", in: "Pain_screen"), value: $neckPain)
                 painSlider(label: t("Arm", in: "Pain_screen"), value: $armPain)
                 painSlider(label: t("Shoulder", in: "Pain_screen"), value: $shoulderPain)
                 painSlider(label: t("Back", in: "Pain_screen"), value: $backPain)
@@ -110,6 +112,7 @@ struct PainScaleView: View {
 
                                 ForEach([
                                     t("Head", in: "Pain_screen"),
+                                    t("Neck", in: "Pain_screen"),
                                     t("Arm", in: "Pain_screen"),
                                     t("Shoulder", in: "Pain_screen"),
                                     t("Back", in: "Pain_screen"),
@@ -247,6 +250,7 @@ struct PainScaleView: View {
             timestamp: Date(),
             values: [
                 t("Head", in: "Pain_screen"): Int(headPain),
+                t("Neck", in: "Pain_screen"): Int(neckPain),
                 t("Arm", in: "Pain_screen"): Int(armPain),
                 t("Shoulder", in: "Pain_screen"): Int(shoulderPain),
                 t("Back", in: "Pain_screen"): Int(backPain),

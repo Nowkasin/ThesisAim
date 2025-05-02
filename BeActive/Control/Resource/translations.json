@@ -203,6 +203,7 @@
         "Pain_screen" : {
             "Pain Scale" : "Pain Scale",
             "Head" : "Head",
+            "Neck" : "Neck",
             "Arm" : "Arm",
             "Shoulder" : "Shoulder",
             "Back" : "Back",
@@ -560,6 +561,7 @@
         "Pain_screen" : {
             "Pain Scale" : "ระดับความเจ็บปวด",
             "Head" : "ศีรษะ",
+            "Neck" : "คอ",
             "Arm" : "แขน",
             "Shoulder" : "ไหล่",
             "Back" : "หลัง",

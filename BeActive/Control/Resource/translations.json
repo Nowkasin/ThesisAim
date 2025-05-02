@@ -289,7 +289,18 @@
             "completed_message": "Great job!",
             "delete_title": "Delete this task?",
             "delete": "Delete",
-            "cancel": "Cancel"
+            "cancel": "Cancel",
+            "enter_shortcut_placeholder": "Enter Task Shortcut...",
+            "add_shortcut_button": "+",
+            "ok": "OK",
+            "delete": "Delete",
+            "stretch_5_min": "Stretch for 5 min",
+            "eye_break": "Eye break",
+            "stand_and_walk": "Stand and walk",
+            "posture_check": "Posture check",
+            "deep_breathing": "Deep breathing",
+            "drink_water": "Drink water",
+            "neck_rolls": "Neck rolls"
         },
         "Voucher_screen": {
             "Voucher Shop": "Voucher Shop",
@@ -657,7 +668,18 @@
             "completed_message": "เยี่ยมมาก!",
             "delete_title": "ลบภารกิจนี้?",
             "delete": "ลบ",
-            "cancel": "ยกเลิก"
+            "cancel": "ยกเลิก",
+            "enter_shortcut_placeholder": "พิมพ์ทางลัดสำหรับภารกิจ...",
+            "add_shortcut_button": "+",
+            "ok": "ตกลง",
+            "delete": "ลบ",
+            "stretch_5_min": "ยืดเส้น 5 นาที",
+            "eye_break": "พักสายตา",
+            "stand_and_walk": "ยืนและเดิน",
+            "posture_check": "เปลี่ยนท่าทำงาน",
+            "deep_breathing": "หายใจลึก",
+            "drink_water": "ดื่มน้ำ",
+            "neck_rolls": "หมุนคอ"
         },
         "Voucher_screen": {
             "Voucher Shop": "ร้านบัตรกำนัล",

@@ -35,6 +35,10 @@ struct TaskView: View {
     @AppStorage("taskJustCompleted") private var taskJustCompleted: Bool = false
 
     @State private var unlockedMates: [String] = ["Bear"]
+    @AppStorage("customShortcuts") private var customShortcutsData: Data = Data()
+    @State private var customShortcuts: [String] = []
+    @State private var isAddingShortcut: Bool = false
+    @State private var newShortcutText: String = ""
 
     @State private var timer: Timer? = nil
     @State private var animateMateBounce = false
@@ -102,17 +106,129 @@ struct TaskView: View {
 
                     VStack(spacing: 12) {
                         Text(t("mission_label", in: "Task_screen"))
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))                            .foregroundColor(.gray)
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                            .foregroundColor(.gray)
 
-                        TextField(t("mission_placeholder", in: "Task_screen"), text: $mission)
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.3), lineWidth: 1))
-                            .disabled(isTaskStarted)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        VStack(spacing: 6) {
+                            // Mission TextField with tap gesture to dismiss custom shortcut input
+                            TextField(t("mission_placeholder", in: "Task_screen"), text: Binding<String>(
+                                get: {
+                                    // If the mission is a default shortcut, show its localized version
+                                    let defaultShortcuts = ["Stretch for 5 min", "Eye break", "Stand and walk", "Posture check", "Deep breathing", "Drink water", "Neck rolls"]
+                                    if defaultShortcuts.contains(mission) {
+                                        return t(shortcutTranslationKey(for: mission), in: "Task_screen")
+                                    } else {
+                                        return mission
+                                    }
+                                },
+                                set: { newValue in
+                                    mission = newValue
+                                }
+                            ))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                .padding(8)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 1))
+                                .disabled(isTaskStarted)
+                                .multilineTextAlignment(.center)
+                                .simultaneousGesture(TapGesture().onEnded {
+                                    isAddingShortcut = false
+                                    newShortcutText = ""
+                                })
+
+                            // Shortcut scroll row: scroll enabled, buttons/fields disabled if isTaskStarted
+                            ZStack(alignment: .topLeading) {
+                                // Tap area behind the scroll row, so one tap closes the custom input
+                                Color.clear
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        isAddingShortcut = false
+                                        newShortcutText = ""
+                                    }
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 12) {
+                                        let defaultShortcuts = ["Stretch for 5 min", "Eye break", "Stand and walk", "Posture check", "Deep breathing", "Drink water", "Neck rolls"]
+                                        ForEach(defaultShortcuts + customShortcuts, id: \.self) { suggestion in
+                                            Button(action: {
+                                                if !isTaskStarted {
+                                                    isAddingShortcut = false
+                                                    mission = defaultShortcuts.contains(suggestion) ? t(shortcutTranslationKey(for: suggestion), in: "Task_screen") : suggestion
+                                                }
+                                            }) {
+                                                Text(
+                                                    defaultShortcuts.contains(suggestion)
+                                                    ? t(shortcutTranslationKey(for: suggestion), in: "Task_screen")
+                                                    : suggestion
+                                                )
+                                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
+                                                    .padding(.horizontal, 10)
+                                                    .padding(.vertical, 6)
+                                                    .background(Color.blue.opacity(0.1))
+                                                    .foregroundColor(.blue)
+                                                    .cornerRadius(8)
+                                            }
+                                            .disabled(isTaskStarted)
+                                            .contextMenu {
+                                                if !isTaskStarted && !defaultShortcuts.contains(suggestion) {
+                                                    Button(role: .destructive) {
+                                                        customShortcuts.removeAll { $0 == suggestion }
+                                                        saveCustomShortcuts()
+                                                    } label: {
+                                                        Label(t("delete", in: "Task_screen"), systemImage: "trash")
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if isAddingShortcut && !isTaskStarted {
+                                            ZStack(alignment: .trailing) {
+                                                TextField(
+                                                    t("enter_shortcut_placeholder", in: "Task_screen"),
+                                                    text: $newShortcutText
+                                                )
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .padding(.trailing, 32) // space for checkmark icon
+                                                .background(Color.gray.opacity(0.1))
+                                                .foregroundColor(.primary)
+                                                .cornerRadius(8)
+                                                .disabled(isTaskStarted)
+                                                Button(action: {
+                                                    if !newShortcutText.isEmpty {
+                                                        customShortcuts.append(newShortcutText)
+                                                        saveCustomShortcuts()
+                                                        mission = newShortcutText
+                                                        newShortcutText = ""
+                                                    }
+                                                    isAddingShortcut = false
+                                                }) {
+                                                    Image(systemName: "checkmark.circle.fill")
+                                                        .foregroundColor(.gray)
+                                                }
+                                                .padding(.trailing, 8)
+                                                .disabled(isTaskStarted)
+                                            }
+                                        } else if !isTaskStarted {
+                                            Button(action: {
+                                                isAddingShortcut = true
+                                            }) {
+                                                Text(t("add_shortcut_button", in: "Task_screen"))
+                                                    .font(.title2)
+                                                    .frame(width: 32, height: 32)
+                                                    .background(Color.blue.opacity(0.2))
+                                                    .foregroundColor(.blue)
+                                                    .cornerRadius(8)
+                                            }
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+                            .padding(.top, 6)
+                        }
+                        .padding()
                     }
+                    .padding(.horizontal)
 
                     VStack(spacing: 4) {
                         Text(t("set_timer", in: "Task_screen"))
@@ -237,17 +353,17 @@ struct TaskView: View {
                 }
             }
             .alert(t("mission_required_title", in: "Task_screen"), isPresented: $showMissingMissionAlert) {
-                Button("OK", role: .cancel) { }
+                Button(t("ok", in: "Task_screen"), role: .cancel) { }
             } message: {
                 Text(t("mission_required_message", in: "Task_screen"))
             }
             .alert(t("gave_up_title", in: "Task_screen"), isPresented: $showGaveUpAlert) {
-                Button("OK") { }
+                Button(t("ok", in: "Task_screen")) { }
             } message: {
                 Text(t("gave_up_message", in: "Task_screen"))
             }
             .alert(t("completed_title", in: "Task_screen"), isPresented: $showCompletedAlert) {
-                Button("OK") { }
+                Button(t("ok", in: "Task_screen")) { }
             } message: {
                 Text(t("completed_message", in: "Task_screen"))
             }
@@ -279,6 +395,7 @@ struct TaskView: View {
                 loadUnlockedMates()
                 checkForNewTaskDay()
                 scoreManager.resetTaskScoreIfNewDay()
+                loadCustomShortcuts()
             }
         }
     }
@@ -498,6 +615,18 @@ struct TaskView: View {
             showBadge = false
         }
     }
+
+    func saveCustomShortcuts() {
+        if let data = try? JSONEncoder().encode(customShortcuts) {
+            customShortcutsData = data
+        }
+    }
+
+    func loadCustomShortcuts() {
+        if let decoded = try? JSONDecoder().decode([String].self, from: customShortcutsData) {
+            customShortcuts = decoded
+        }
+    }
 }
 
 struct ProgressCircle: View {
@@ -536,5 +665,30 @@ struct ProgressCircle: View {
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
         TaskView().environmentObject(ScoreManager.shared)
+    }
+}
+
+
+// Helper for shortcut translation keys
+extension TaskView {
+    func shortcutTranslationKey(for shortcut: String) -> String {
+        switch shortcut {
+        case "Stretch for 5 min":
+            return "stretch_5_min"
+        case "Eye break":
+            return "eye_break"
+        case "Stand and walk":
+            return "stand_and_walk"
+        case "Posture check":
+            return "posture_check"
+        case "Deep breathing":
+            return "deep_breathing"
+        case "Drink water":
+            return "drink_water"
+        case "Neck rolls":
+            return "neck_rolls"
+        default:
+            return shortcut
+        }
     }
 }

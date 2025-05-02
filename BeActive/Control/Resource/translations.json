@@ -198,7 +198,9 @@
             "🧸 You haven’t unlocked any mates yet." : "🧸 You haven’t unlocked any mates yet.",
             "Coins" : "Coins",
             "Do you want to unlock %@ for %d coins?": "Do you want to unlock %@ for %d coins?",
-            "Unlocked Mate?" : "Unlocked Mate?"
+            "Unlocked Mate?" : "Unlocked Mate?",
+            "Meet your next friend": "Meet your next friend",
+            "Don’t show again today": "Don’t show again today"
         },
         "Pain_screen" : {
             "Pain Scale" : "Pain Scale",
@@ -559,7 +561,9 @@
             "Unlocked Mates" : "ปลดล็อคสัตว์เลี้ยง",
             "🧸 You haven’t unlocked any mates yet." : "🧸 คุณยังไม่ได้ปลดล็อคสัตว์เลี้ยง",
             "Coins" : "เหรียญ",
-            "Unlocked Mate?" : "ปลดล็อคสัตว์เลี้ยง?"
+            "Unlocked Mate?" : "ปลดล็อคสัตว์เลี้ยง?",
+            "Meet your next friend": "ปลดล็อคสัตว์เลี้ยงใหม่",
+            "Don’t show again today": "ไม่ต้องแสดงอีกวันนี้"
         },
         "Pain_screen" : {
             "Pain Scale" : "ระดับความเจ็บปวด",

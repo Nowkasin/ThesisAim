@@ -196,24 +196,43 @@ struct HomeView: View {
 
             ScrollView {
                 VStack(spacing: DeviceHelper.adaptiveSpacing(baseSpacing: 15)) {
-                    ReminderSection(title: t("Task to Complete", in: "home_screen"), color: .jasmineYellow, icon: Image(systemName: "exclamationmark.bubble.fill"))
-                        .navigate(to: TaskView())
+                    ReminderCard(
+                        title: t("Task to Complete", in: "home_screen"),
+                        icon: Image(systemName: "exclamationmark.bubble.fill"),
+                        color: .jasmineYellow,
+                        destination: AnyView(TaskView())
+                    )
+                    ReminderCard(
+                        title: t("Exercise", in: "home_screen"),
+                        icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"),
+                        color: .tropicalPurple,
+                        destination: AnyView(ExerciseView(language: Language.shared))
+                    )
+                    ReminderCard(
+                        title: t("Water to Drink", in: "home_screen"),
+                        icon: Image(systemName: "drop.fill"),
+                        color: .pastelBlue,
+                        destination: AnyView(WaterView())
+                    )
+                    ReminderCard(
+                        title: t("Breathing Technique", in: "home_screen"),
+                        icon: Image(systemName: "wind"),
+                        color: .pastelOrange,
+                        destination: AnyView(BreathingView())
+                    )
+                    ReminderCard(
+                        title: t("Voucher Shop", in: "home_screen"),
+                        icon: Image(systemName: "ticket.fill"),
+                        color: .salmonPink,
+                        destination: AnyView(VoucherView())
+                    )
+                    ReminderCard(
+                        title: t("Mates Shop", in: "home_screen"),
+                        icon: Image(systemName: "cart"),
+                        color: .magicMint,
+                        destination: AnyView(MatesView())
+                    )
 
-                    ReminderSection(title: t("Exercise", in: "home_screen"), color: .tropicalPurple, icon: Image(systemName: "figure.strengthtraining.functional.circle.fill"))
-                        .navigate(to: ExerciseView(language: Language.shared))
-
-                    ReminderSection(title: t("Water to Drink", in: "home_screen"), color: .pastelBlue, icon: Image(systemName: "drop.fill"))
-                        .navigate(to: WaterView())
-                    
-                    ReminderSection(title: t("Breathing Technique", in: "home_screen"), color: .pastelOrange, icon: Image(systemName: "wind"))
-                        .navigate(to: BreathingView())
-
-                    ReminderSection(title: t("Voucher Shop", in: "home_screen"), color: .salmonPink, icon: Image(systemName: "ticket.fill"))
-                        .navigate(to: VoucherView())
-
-                    ReminderSection(title: t("Mates Shop", in: "home_screen"), color: .magicMint, icon: Image(systemName: "cart"))
-                        .navigate(to: MatesView())
-                    
                     Spacer()
                 }
             }
@@ -292,38 +311,40 @@ struct HomeView: View {
     }
 }
 
-struct ReminderSection: View {
+struct ReminderCard: View {
     var title: String
-    var color: Color
     var icon: Image
+    var color: Color
+    var destination: AnyView
 
     var body: some View {
-        VStack(alignment: .leading) {
+        NavigationLink(destination: destination) {
             HStack {
                 icon
-                    .foregroundColor(color)
-                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+                    .font(.system(size: 28))
+                    .padding(.trailing, 8)
+                    .shadow(color: .black.opacity(0.4), radius: 1, x: 0, y: 1)
+
                 Text(title)
-                    .font(.custom(Language.shared.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
+                    .font(.custom(Language.shared.currentLanguage == "th" ? "Kanit-SemiBold" : "RobotoCondensed-SemiBold", size: 17))
+                    .shadow(color: .black.opacity(0.4), radius: 1, x: 0, y: 1)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 20, weight: .bold)) // Increased size
+                    .foregroundColor(.white.opacity(0.85))
+                    .shadow(color: .black.opacity(0.4), radius: 1, x: 0, y: 1)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 5)
-
-            ReminderCard(color: color)
-        }
-    }
-}
-
-struct ReminderCard: View {
-    var color: Color
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: DeviceHelper.adaptiveCornerRadius(baseRadius: 12))
-            .fill(color)
-            .frame(maxWidth: .infinity, minHeight: DeviceHelper.adaptiveFrameSize(baseSize: 60))
+            .padding()
+            .background(color)
+            .cornerRadius(DeviceHelper.adaptiveCornerRadius(baseRadius: 12))
             .shadow(radius: 4)
             .padding(.horizontal, DeviceHelper.adaptivePadding())
+            .padding(.bottom, DeviceHelper.adaptiveSpacing(baseSpacing: 8)) // Add spacing between cards
+        }
     }
 }
 

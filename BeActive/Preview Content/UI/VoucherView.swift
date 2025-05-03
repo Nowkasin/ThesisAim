@@ -120,7 +120,7 @@ struct VoucherView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             Text(t("Voucher Shop", in: "Voucher_screen"))
-                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
+                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                                 .fontWeight(.bold)
                                 .foregroundColor(.pink)
                                 .padding(.top, 20)
@@ -149,6 +149,7 @@ struct VoucherView: View {
                         Text(t("Voucher History", in: "Voucher_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
                             .fontWeight(.bold)
+                            .foregroundColor(.pink)
                             .padding(.top)
 
                         if scoreManager.purchasedVouchers.isEmpty {
@@ -177,7 +178,7 @@ struct VoucherView: View {
                                             VStack(alignment: .leading) {
                                                 Text(voucher.title)
                                                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                                                Text(voucher.clinic)
+                                                Text(t(voucher.clinic, in: "Voucher_screen.Clinic"))
                                                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
                                                     .foregroundColor(.gray)
                                                 if let code = voucher.code {

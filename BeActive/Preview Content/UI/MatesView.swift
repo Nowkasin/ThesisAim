@@ -102,7 +102,8 @@ struct MatesView: View {
                             VStack(spacing: 20) {
                                 Text(t("Mates Shop", in: "Mate_screen"))
                                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
-                                    .foregroundColor(.primary)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.mint)
                                     .padding(.top, 20)
 
                                 LazyVGrid(columns: columns, spacing: 20) {
@@ -143,6 +144,8 @@ struct MatesView: View {
                         VStack(spacing: 20) {
                             Text(t("Unlocked Mates", in: "Mate_screen"))
                                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
+                                .fontWeight(.bold)
+                                .foregroundColor(.mint)
                                 .padding(.top)
 
                             if scoreManager.purchasedMates.isEmpty {

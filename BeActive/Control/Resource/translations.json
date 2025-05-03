@@ -705,8 +705,8 @@
             "You don’t have enough coins to redeem this voucher.": "คุณไม่มีเหรียญเพียงพอในการแลกบัตรกำนัลนี้",
             "Voucher Code": "โค้ดบัตรกำนัล",
             "Code not found": "ไม่พบโค้ด",
-            "Activate": "เปิดใช้งาน",
-            "Deactivate": "ปิดใช้งาน",
+            "Activate": "ใช้แล้ว",
+            "Deactivate": "ยังไม่ได้ใช้",
             "cost_format": "%d เหรียญ",
             "Coupon": {
                 "Discount": "ส่วนลด",

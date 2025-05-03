@@ -88,7 +88,9 @@ struct TaskView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     Text("\(mateEmoji) \(selectedMate) Mate")
-                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 30))                        .foregroundStyle(.blue)
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 30))
+                        .fontWeight(.bold)
+                        .foregroundStyle(.blue)
 
                     KFImage(URL(string: imageUrl))
                         .resizable()

@@ -79,7 +79,7 @@ struct ExerciseView: View {
                                     Image(systemName: "chevron.left")
                                         .font(.system(size: 20))
                                     Text(t("Back", in: "Ex_screen"))
-                                        .fontWeight(.semibold)
+//                                        .fontWeight(.semibold)
                                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
                                 }
                                 .foregroundColor(.blue)
@@ -91,6 +91,7 @@ struct ExerciseView: View {
 
                         Text(t("Exercise", in: "Ex_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: titleFontSize))
+                            .fontWeight(.bold)
                             .foregroundColor(.purple)
                             .padding(.horizontal, padding)
 

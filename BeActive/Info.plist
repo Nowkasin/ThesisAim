@@ -5,7 +5,9 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Kanit-Regular.ttf</string>
+		<string>Kanit-SemiBold.ttf</string>
 		<string>RobotoCondensed-Regular.ttf</string>
+		<string>RobotoCondensed-SemiBold.ttf</string>
 	</array>
 </dict>
 </plist>

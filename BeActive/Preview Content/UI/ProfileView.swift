@@ -451,18 +451,27 @@ struct EditProfileView: View {
                     LabeledNumberField(label: t("Height (cm)", in: "register_screen"), value: $localUserHeight, language: language)
                     LabeledNumberField(label: t("Weight (kg)", in: "register_screen"), value: $localUserWeight, language: language)
 
-                    Picker(t("Sex", in: "register_screen"), selection: $localUserSex) {
-                        Text(t("Male", in: "register_screen"))
+                    VStack(alignment: .leading) {
+                        Text(t("Sex", in: "register_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                            .tag("Male")
-                        Text(t("Female", in: "register_screen"))
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                            .tag("Female")
-                        Text(t("Other", in: "register_screen"))
-                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                            .tag("Other")
+                            .foregroundColor(.gray)
+
+                        HStack(spacing: 10) {
+                            ForEach(["Male", "Female", "Other"], id: \.self) { sex in
+                                Text(t(sex, in: "register_screen"))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(localUserSex == sex ? Color.gray : Color.gray.opacity(0.3))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                    .onTapGesture {
+                                        localUserSex = sex
+                                    }
+                            }
+                        }
                     }
-                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(.vertical, 5)
                 }
 
                 Section {

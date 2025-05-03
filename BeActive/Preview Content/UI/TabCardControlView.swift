@@ -24,7 +24,7 @@ struct TabCardControlView: View {
                 HStack {
                     Text(t("Today Activities", in: "home_screen"))
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
-                        .fontWeight(.bold)
+//                        .fontWeight(.bold)
                         .foregroundColor(.primary)
                         .padding(.leading, 20)
 

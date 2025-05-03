@@ -22,6 +22,7 @@ struct RegisterView: View {
     @State private var height = ""
     @State private var weight = ""
     @State private var phoneNumber = ""
+    @State private var job = ""
     
     @State private var errorMessage = ""
     @State private var isPasswordVisible = false
@@ -57,6 +58,7 @@ struct RegisterView: View {
                                 }
                             CustomTextField(placeholder: t("Age", in: "register_screen"), text: $age, language: language, keyboardType: .numberPad)
                             SexPickerView(sex: $sex, sexOptions: sexOptions, language: language)
+                            JobPickerView(job: $job, jobOptions: ["Student / University", "Office Worker", "Freelancer", "Self-Employed", "Jobless"], language: language)
                             CustomTextField(placeholder: t("Height (cm)", in: "register_screen"), text: $height, language: language, keyboardType: .numberPad)
                             CustomTextField(placeholder: t("Weight (kg)", in: "register_screen"), text: $weight, language: language, keyboardType: .numberPad)
                             CustomTextField(placeholder: t("phone_number", in: "register_screen"), text: $phoneNumber, language: language, keyboardType: .numberPad)
@@ -132,6 +134,11 @@ struct RegisterView: View {
             errorMessage = t("fill_all_fields", in: "register_screen")
             return
         }
+        
+        guard !job.isEmpty else {
+            errorMessage = t("fill_all_fields", in: "register_screen")
+            return
+        }
 
         guard let ageNum = Int(age), ageNum >= 0, ageNum <= 999 else {
             errorMessage = t("invalid_age", in: "register_screen")
@@ -184,6 +191,7 @@ struct RegisterView: View {
                     "pass": hashedPassword,
                     "age": ageNum,
                     "sex": sex,
+                    "job": job,
                     "height": heightNum,
                     "weight": weightNum,
                     "phone": phoneNumber,
@@ -306,6 +314,45 @@ struct SexPickerView: View {
                     Text(sex.isEmpty ? t("Select", in: "register_screen") : t(sex, in: "register_screen"))
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
                         .foregroundColor(sex.isEmpty ? .gray : .primary)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding(.vertical, 10)
+            }
+            
+            Divider()
+                .background(Color.gray.opacity(0.4))
+        }
+        .padding(.bottom, 15)
+    }
+}
+
+// MARK: - Job Picker (Styled)
+struct JobPickerView: View {
+    @Binding var job: String
+    let jobOptions: [String]
+    @ObservedObject var language: Language
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(t("Job", in: "register_screen"))
+                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                .foregroundColor(.secondary)
+            
+            Menu {
+                ForEach(jobOptions, id: \.self) { option in
+                    Button(action: {
+                        job = option
+                    }) {
+                        Text(t(option, in: "register_screen"))
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(job.isEmpty ? t("Select", in: "register_screen") : t(job, in: "register_screen"))
+                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                        .foregroundColor(job.isEmpty ? .gray : .primary)
                     Spacer()
                     Image(systemName: "chevron.down")
                         .foregroundColor(.gray)

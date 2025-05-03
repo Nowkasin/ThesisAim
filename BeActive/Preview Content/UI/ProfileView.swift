@@ -25,6 +25,7 @@ struct ProfileView: View {
     @State private var userPhone: String = "No phone"
     @State private var userSex: String = "No sex info"
     @State private var userWeight: Int?
+    @State private var userJob: String = "No job info"
     @State private var errorMessage: String?
     
     @State private var isEditingProfile = false
@@ -122,8 +123,9 @@ struct ProfileView: View {
                             originalUserPhone: userPhone,
                             originalUserSex: userSex,
                             originalUserWeight: userWeight,
+                            originalUserJob: userJob,
                             language: language,
-                            onSave: { name, age, email, height, phone, sex, weight in
+                            onSave: { name, age, email, height, phone, sex, weight, job in
                                 userName = name
                                 userAge = age
                                 userEmail = email
@@ -131,6 +133,7 @@ struct ProfileView: View {
                                 userPhone = phone
                                 userSex = sex
                                 userWeight = weight
+                                userJob = job
                             }
                         )
                     }
@@ -147,7 +150,7 @@ struct ProfileView: View {
                         }
                         UserInfoRow(icon: "phone.fill", title: t("Phone", in: "Profile_screen"), value: userPhone, language: language)
                         UserInfoRow(icon: "person.fill", title: t("Sex", in: "Profile_screen"),  value: t(userSex, in: "Profile_screen.SEX"), language: language)
-
+                        UserInfoRow(icon: "briefcase.fill", title: t("Job", in: "Profile_screen"), value: t(userJob, in: "register_screen"), language: language)
                         if let weight = userWeight {
                             UserInfoRow(
                                 icon: "scalemass.fill",
@@ -261,6 +264,7 @@ struct ProfileView: View {
                 self.userPhone = data["phone"] as? String ?? "No phone"
                 self.userSex = data["sex"] as? String ?? "No sex info"
                 self.userWeight = data["weight"] as? Int
+                self.userJob = data["job"] as? String ?? "No job info"
                 self.profileImageUrl = data["profileImageUrl"] as? String
                 self.errorMessage = nil
                 self.fetchProfileImageIfNeeded()
@@ -406,8 +410,9 @@ struct EditProfileView: View {
     let originalUserPhone: String
     let originalUserSex: String
     let originalUserWeight: Int?
+    let originalUserJob: String
     var language: Language
-    var onSave: ((String, Int?, String, Int?, String, String, Int?) -> Void)?
+    var onSave: ((String, Int?, String, Int?, String, String, Int?, String) -> Void)?
 
     let db = Firestore.firestore()
     @Environment(\.presentationMode) var presentationMode
@@ -419,6 +424,7 @@ struct EditProfileView: View {
     @State private var localUserPhone: String = ""
     @State private var localUserSex: String = ""
     @State private var localUserWeight: Int?
+    @State private var localUserJob: String = ""
 
     var body: some View {
         NavigationView {
@@ -472,12 +478,36 @@ struct EditProfileView: View {
                         }
                     }
                     .padding(.vertical, 5)
+
+                    VStack(alignment: .leading) {
+                        Text(t("Job", in: "register_screen"))
+                            .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                            .foregroundColor(.gray)
+
+                        let jobOptions = ["Student / University", "Office Worker", "Freelancer", "Self-Employed", "Jobless"]
+
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach(jobOptions, id: \.self) { job in
+                                Text(t(job, in: "register_screen"))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(localUserJob == job ? Color.gray : Color.gray.opacity(0.3))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                    .onTapGesture {
+                                        localUserJob = job
+                                    }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 5)
                 }
 
                 Section {
                     Button(action: {
                         saveUserData()
-                        onSave?(localUserName, localUserAge, localUserEmail, localUserHeight, localUserPhone, localUserSex, localUserWeight)
+                        onSave?(localUserName, localUserAge, localUserEmail, localUserHeight, localUserPhone, localUserSex, localUserWeight, localUserJob)
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text(t("Save Changes", in: "Profile_screen"))
@@ -515,6 +545,7 @@ struct EditProfileView: View {
                 localUserPhone = originalUserPhone
                 localUserSex = originalUserSex
                 localUserWeight = originalUserWeight
+                localUserJob = originalUserJob
             }
         }
     }
@@ -532,7 +563,8 @@ struct EditProfileView: View {
             "height": localUserHeight ?? 0,
             "phone": localUserPhone,
             "sex": localUserSex,
-            "weight": localUserWeight ?? 0
+            "weight": localUserWeight ?? 0,
+            "job": localUserJob
         ]
 
         db.collection("users").document(userId).setData(updatedData, merge: true) { error in

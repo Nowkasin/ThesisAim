@@ -50,7 +50,13 @@
             "email_verification_failed": "Failed to send verification email.",
             "save_user_failed": "Failed to save user data.",
             "register_failed": "Failed to register:",
-            "register_success": "You have successfully registered."
+            "register_success": "You have successfully registered.",
+            "Job": "Job",
+            "Student / University": "Student / University",
+            "Office Worker": "Office Worker",
+            "Freelancer": "Freelancer",
+            "Self-Employed": "Self-Employed",
+            "Jobless": "Jobless"
         },
         "home_screen": {
             "Reminders": "Reminders",
@@ -233,6 +239,7 @@
             "Phone" : "Phone",
             "Sex" : "Sex",
             "Height" : "Height",
+            "Job": "Job",
             "Health Stats" : "Health Stats",
             "Heart Rate" : "Heart Rate",
             "Steps" : "Steps",
@@ -437,7 +444,13 @@
             "email_verification_failed": "ส่งอีเมลยืนยันไม่สำเร็จ",
             "save_user_failed": "บันทึกข้อมูลผู้ใช้ล้มเหลว",
             "register_failed": "การสมัครสมาชิกล้มเหลว:",
-            "register_success": "คุณสมัครสมาชิกสำเร็จแล้ว"
+            "register_success": "คุณสมัครสมาชิกสำเร็จแล้ว",
+            "Job": "อาชีพ",
+            "Student / University": "นักเรียน / นักศึกษา",
+            "Office Worker": "พนักงานออฟฟิศ",
+            "Freelancer": "ฟรีแลนซ์",
+            "Self-Employed": "เจ้าของกิจการ",
+            "Jobless": "ว่างงาน"
         },
         "home_screen": {
             "Reminders": "แจ้งเตือน",
@@ -596,6 +609,7 @@
             "Phone" : "โทรศัพท์",
             "Sex" : "เพศ",
             "Height" : "ส่วนสูง",
+            "Job": "อาชีพ",
             "Health Stats" : "ข้อมูลสุขภาพ",
             "Heart Rate" : "อัตราการเต้นหัวใจ",
             "Steps" : "จำนวนก้าว",
@@ -771,5 +785,5 @@
             "Profile" : "โปรไฟล์",
             "Pain Scale" : "ความเจ็บปวด"
         }
-    }  
+    }
 }

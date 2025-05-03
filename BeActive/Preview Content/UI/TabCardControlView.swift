@@ -7,10 +7,13 @@
 
 import SwiftUI
 
+import Kingfisher
+
 struct TabCardControlView: View {
     @ObservedObject var language = Language.shared
     @EnvironmentObject var healthManager: HealthManager
     @EnvironmentObject var scoreManager: ScoreManager
+    @AppStorage("selectedMate") private var selectedMate: String = "Bear"
 
     var body: some View {
         GeometryReader { geometry in
@@ -22,17 +25,23 @@ struct TabCardControlView: View {
             VStack(alignment: .leading, spacing: 5) {
                 // Header: Today Activities and Score
                 HStack {
-                    Text(t("Today Activities", in: "home_screen"))
-                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
-//                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                        .padding(.leading, 20)
+                    HStack(spacing: 2) {
+                        Text(t("Today Activities", in: "home_screen"))
+                        KFImage(URL(string: selectedMateImageUrl()))
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 38, height: 38)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] }
+                    }
+                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .foregroundColor(.primary)
 
                     Spacer()
 
                     ScoreView()
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
+                .padding(.horizontal, 20)
 
                 // Horizontal ScrollView สำหรับ Activity Cards
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -50,6 +59,27 @@ struct TabCardControlView: View {
             }
         }
         .frame(height: 220) // Prevent GeometryReader from expanding indefinitely
+    }
+
+    private func selectedMateImageUrl() -> String {
+        switch selectedMate {
+        case "Cat": return "https://i.imgur.com/5ym20Wl.png"
+        case "Happy Cat": return "https://i.imgur.com/0JJOJbK.png"
+        case "Lovely Cat": return "https://i.imgur.com/TRIDeEw.png"
+        case "Bunny": return "https://i.imgur.com/if52U93.png"
+        case "Happy Bunny": return "https://i.imgur.com/ZZlNIjX.png"
+        case "Lovely Bunny": return "https://i.imgur.com/VLvp9Qm.png"
+        case "Chick": return "https://i.imgur.com/ay4YRSm.png"
+        case "Happy Chick": return "https://i.imgur.com/YBn2oFH.png"
+        case "Lovely Chick": return "https://i.imgur.com/YPFM2Bu.png"
+        case "Dog": return "https://i.imgur.com/RObtJjY.png"
+        case "Happy Dog": return "https://i.imgur.com/YiEE02e.png"
+        case "Lovely Dog": return "https://i.imgur.com/y3ocZ22.png"
+        case "Mocha": return "https://i.imgur.com/sY0fdeH.png"
+        case "Happy Bear": return "https://i.imgur.com/mTEiOqd.png"
+        case "Lovely Bear": return "https://i.imgur.com/OT2vJPe.png"
+        default: return "https://i.imgur.com/TR7HwEa.png"
+        }
     }
 
     private func destinationView(for activity: Activity) -> some View {

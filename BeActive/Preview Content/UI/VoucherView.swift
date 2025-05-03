@@ -215,7 +215,12 @@ struct VoucherView: View {
                                                 saveVouchers()
                                             }
                                         } label: {
-                                            Label(voucher.isActivated ? t("Deactivate", in: "Voucher_screen") : t("Activate", in: "Voucher_screen"), systemImage: "checkmark.circle")
+                                            Label(
+                                                voucher.isActivated
+                                                    ? t("Deactivate", in: "Voucher_screen")
+                                                    : t("Activate", in: "Voucher_screen"),
+                                                systemImage: voucher.isActivated ? "xmark.circle" : "checkmark.circle"
+                                            )
                                         }
                                         .tint(.blue)
                                     }

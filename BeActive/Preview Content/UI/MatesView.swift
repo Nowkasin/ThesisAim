@@ -58,7 +58,8 @@ struct MatesView: View {
         Mate(name: "Cat", cost: 7000, imageUrl: URL(string: "https://i.imgur.com/5ym20Wl.png")!),
         Mate(name: "Happy Cat", cost: 9000, imageUrl: URL(string: "https://i.imgur.com/0JJOJbK.png")!),
         Mate(name: "Lovely Cat", cost: 11000, imageUrl: URL(string: "https://i.imgur.com/TRIDeEw.png")!),
-        Mate(name: "Mocha", cost: 999999, imageUrl: URL(string: "https://i.imgur.com/EmIC3a0.png")!)
+        Mate(name: "Mocha", cost: 999999, imageUrl: URL(string: "https://i.imgur.com/EmIC3a0.png")!),
+        Mate(name: "Death Bear", cost: 0, imageUrl: URL(string: "https://i.imgur.com/vBeXvPT.png")!)
     ]
 
     let columns = [
@@ -67,15 +68,28 @@ struct MatesView: View {
     ]
     
     private func maybeShowPromo() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let today = formatter.string(from: Date())
+        print("📢 maybeShowPromo called")
 
-        if lastPromoDate == today { return }
+        let hour = Calendar.current.component(.hour, from: Date())
+        guard let deathBear = mates.first(where: { $0.name == "Death Bear" }) else { return }
 
-        if Int.random(in: 1...5) == 1 {
-            let eligibleMates = mates.filter { $0.name != "Mocha" }
+        let hasDeathBear = isMateAlreadyUnlocked(deathBear)
+
+        // Show only during 00:00–02:59 if not yet unlocked
+        if (0...2).contains(hour), !hasDeathBear {
+            print("🎯 Showing Death Bear")
+            withAnimation {
+                promoMate = deathBear
+                showPromo = true
+            }
+            return
+        }
+
+        // Otherwise show normal mate with 1-in-3 chance
+        if Int.random(in: 1...3) == 1 {
+            let eligibleMates = mates.filter { $0.name != "Mocha" && $0.name != "Death Bear" }
             if let randomMate = eligibleMates.randomElement() {
+                print("✅ Showing normal mate: \(randomMate.name)")
                 withAnimation {
                     promoMate = randomMate
                     showPromo = true
@@ -85,220 +99,253 @@ struct MatesView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .topTrailing) {
-                VStack {
-                    Spacer()
+        ZStack(alignment: .topTrailing) {
+            // 🔁 Dev Reset Promo Button — comment this block when not needed
+//            Button("🔁 Reset Promo (Dev)") {
+//                lastPromoDate = ""
+//                print("🧼 Promo reset for today")
+//            }
+//            .padding(.top, 50)
+//            .padding(.trailing, 20)
+//            .zIndex(1)
 
-                    Picker("", selection: $selectedTab) {
-                        Text(t("Shop", in: "Mate_screen")).tag(0)
-                        Text(t("History", in: "Mate_screen")).tag(1)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding(.horizontal)
+            NavigationView {
+                ZStack(alignment: .topTrailing) {
+                    VStack {
+                        Spacer()
 
-                    if selectedTab == 0 {
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                Text(t("Mates Shop", in: "Mate_screen"))
-                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.mint)
-                                    .padding(.top, 20)
+                        Picker("", selection: $selectedTab) {
+                            Text(t("Shop", in: "Mate_screen")).tag(0)
+                            Text(t("History", in: "Mate_screen")).tag(1)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding(.horizontal)
 
-                                LazyVGrid(columns: columns, spacing: 20) {
-                                    ForEach(mates) { mate in
-                                        MateCard(mate: mate) {
-                                            if isMateAlreadyUnlocked(mate) {
-                                                showAlreadyOwnedAlert = true
-                                            } else {
-                                                checkFirestoreScore { dbScore in
-                                                    if dbScore >= mate.cost {
-                                                        selectedMate = mate
-                                                        showConfirm = true
-                                                    } else {
-                                                        showInsufficientPoints = true
+                        if selectedTab == 0 {
+                            ScrollView {
+                                VStack(spacing: 20) {
+                                    Text(t("Mates Shop", in: "Mate_screen"))
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.mint)
+                                        .padding(.top, 20)
+
+                                    LazyVGrid(columns: columns, spacing: 20) {
+                                        ForEach(mates.filter { $0.name != "Death Bear" }) { mate in
+                                            MateCard(mate: mate) {
+                                                if isMateAlreadyUnlocked(mate) {
+                                                    showAlreadyOwnedAlert = true
+                                                } else {
+                                                    checkFirestoreScore { dbScore in
+                                                        if dbScore >= mate.cost {
+                                                            selectedMate = mate
+                                                            showConfirm = true
+                                                        } else {
+                                                            showInsufficientPoints = true
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                Group {
-                                    if scoreManager.purchasedMates.isEmpty {
-                                        Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
-                                            .foregroundColor(.gray)
-                                            .padding(.top, 30)
-                                    }
-                                }
-                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                                .foregroundColor(.blue)
-                                .padding(.bottom, 20)
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 40)
-                            Color.clear.frame(height: 80)
-                        }
-                    } else {
-                        VStack(spacing: 20) {
-                            Text(t("Unlocked Mates", in: "Mate_screen"))
-                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
-                                .fontWeight(.bold)
-                                .foregroundColor(.mint)
-                                .padding(.top)
-
-                            if scoreManager.purchasedMates.isEmpty {
-                                Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
-                                    .foregroundColor(.gray)
-                                    .padding()
-                            } else {
-                                List(scoreManager.purchasedMates) { mate in
-                                    HStack(spacing: 15) {
-                                        KFImage(mate.imageUrl)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 50, height: 50)
-                                            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                                        VStack(alignment: .leading) {
-                                            Text(mate.name)
-                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
-                                            Text("-\(mate.cost) \(t("Coins", in: "Mate_screen"))")
-                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
-                                                .foregroundColor(.red)
+                                    Group {
+                                        if scoreManager.purchasedMates.isEmpty {
+                                            Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
+                                                .foregroundColor(.gray)
+                                                .padding(.top, 30)
                                         }
+                                    }
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                    .foregroundColor(.blue)
+                                    .padding(.bottom, 20)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 40)
+                                Color.clear.frame(height: 80)
+                            }
+                        } else {
+                            VStack(spacing: 20) {
+                                Text(t("Unlocked Mates", in: "Mate_screen"))
+                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 34))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.mint)
+                                    .padding(.top)
 
-                                        Spacer()
+                                if scoreManager.purchasedMates.isEmpty {
+                                    Text(t("🧸 You haven’t unlocked any mates yet.", in: "Mate_screen"))
+                                        .foregroundColor(.gray)
+                                        .padding()
+                                } else {
+                                    List(scoreManager.purchasedMates) { mate in
+                                        HStack(spacing: 15) {
+                                            KFImage(mate.imageUrl)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 50, height: 50)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                                            VStack(alignment: .leading) {
+                                                Text(mate.name)
+                                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                                                Text("-\(mate.cost) \(t("Coins", in: "Mate_screen"))")
+                                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 15))
+                                                    .foregroundColor(.red)
+                                            }
+
+                                            Spacer()
+                                        }
+                                    }
+                                    .listStyle(PlainListStyle())
+                                    Color.clear.frame(height: 60)
+                                }
+
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .background(Color(.systemBackground).ignoresSafeArea())
+                }
+                .alert(t("Unlock Mate?", in: "Mate_screen"), isPresented: $showConfirm, actions: {
+                    Button(t("Unlock", in: "Mate_screen"), role: .destructive) {
+                        if let mate = selectedMate {
+                            if isMateAlreadyUnlocked(mate) {
+                                showAlreadyOwnedAlert = true
+                            } else {
+                                scoreManager.purchaseMate(mate) { success in
+                                    if success {
+                                        saveMateToFirestore(mate: mate)
+                                        scoreManager.purchasedMates.append(mate)
+                                        purchasedMateIDs.insert(mate.id)
+                                        saveMates()
+                                    } else {
+                                        showInsufficientPoints = true
                                     }
                                 }
-                                .listStyle(PlainListStyle())
-                                Color.clear.frame(height: 60)
-                            }
-
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-                .background(Color(.systemBackground).ignoresSafeArea())
-            }
-            .alert(t("Unlock Mate?", in: "Mate_screen"), isPresented: $showConfirm, actions: {
-                Button(t("Unlock", in: "Mate_screen"), role: .destructive) {
-                    if let mate = selectedMate {
-                        if isMateAlreadyUnlocked(mate) {
-                            showAlreadyOwnedAlert = true
-                        } else {
-                            scoreManager.purchaseMate(mate) { success in
-                                if success {
-                                    saveMateToFirestore(mate: mate)
-                                    scoreManager.purchasedMates.append(mate)
-                                    purchasedMateIDs.insert(mate.id)
-                                    saveMates()
-                                } else {
-                                    showInsufficientPoints = true
-                                }
                             }
                         }
                     }
-                }
-                Button(t("Cancel", in: "Mate_screen"), role: .cancel) {}
-            }, message: {
-                Text(
-                    String(
-                        format: t("Do you want to unlock %@ for %d coins?", in: "Mate_screen"),
-                        selectedMate?.name ?? "",
-                        selectedMate?.cost ?? 0
+                    Button(t("Cancel", in: "Mate_screen"), role: .cancel) {}
+                }, message: {
+                    Text(
+                        String(
+                            format: t("Do you want to unlock %@ for %d coins?", in: "Mate_screen"),
+                            selectedMate?.name ?? "",
+                            selectedMate?.cost ?? 0
+                        )
                     )
-                )
-            })
-            .alert(t("Insufficient Coins", in: "Mate_screen"), isPresented: $showInsufficientPoints, actions: {
-                Button(t("OK", in: "Mate_screen"), role: .cancel) {}
-            }, message: {
-                Text(t("You don’t have enough coins to unlock this mate.", in: "Mate_screen"))
-            })
-            .alert(t("Already Unlocked", in: "Mate_screen"), isPresented: $showAlreadyOwnedAlert, actions: {
-                Button(t("OK", in: "Mate_screen"), role: .cancel) {}
-            }, message: {
-                Text(t("You already have this mate. You can’t buy it again.", in: "Mate_screen"))
-            })
-            .onAppear {
-                loadMates()
-                fetchUnlockedMatesFromFirestore()
-                maybeShowPromo()
+                })
+                .alert(t("Insufficient Coins", in: "Mate_screen"), isPresented: $showInsufficientPoints, actions: {
+                    Button(t("OK", in: "Mate_screen"), role: .cancel) {}
+                }, message: {
+                    Text(t("You don’t have enough coins to unlock this mate.", in: "Mate_screen"))
+                })
+                .alert(t("Already Unlocked", in: "Mate_screen"), isPresented: $showAlreadyOwnedAlert, actions: {
+                    Button(t("OK", in: "Mate_screen"), role: .cancel) {}
+                }, message: {
+                    Text(t("You already have this mate. You can’t buy it again.", in: "Mate_screen"))
+                })
+                .onAppear {
+                    loadMates()
+                    fetchUnlockedMatesFromFirestore()
+                }
             }
-        }
-        .overlay(
-            Group {
-                if showPromo, let mate = promoMate {
-                    ZStack {
-                        Color.black.opacity(0.4)
-                            .ignoresSafeArea()
-                            .transition(.opacity)
+            .overlay(
+                Group {
+                    if showPromo, let mate = promoMate {
+                        ZStack {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                                .transition(.opacity)
 
-                        ZStack(alignment: .topTrailing) {
-                            VStack(spacing: 8) {
-                                KFImage(mate.imageUrl)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 120, height: 120)
+                            ZStack(alignment: .topTrailing) {
+                                VStack(spacing: 8) {
+                                    KFImage(mate.imageUrl)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 120, height: 120)
 
-                                Text(t("Meet your next friend", in: "Mate_screen"))
-                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
-                                    .padding(.top, 2)
+                                    Text(t("Meet your next friend", in: "Mate_screen"))
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
+                                        .padding(.top, 2)
 
-                                Text("\(mate.name) Mate")
-                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.gray)
-                                    .padding(.top, 0)
+                                    Text("\(mate.name) Mate")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.gray)
+                                        .padding(.top, 0)
 
-                                Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
-                                    .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                                    .foregroundColor(.red)
-                                    .padding(.top, 2)
+                                    Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")
+                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
+                                        .foregroundColor(.red)
+                                        .padding(.top, 2)
+
+                                    if mate.name == "Death Bear" {
+                                        Button(action: {
+                                            withAnimation {
+                                                if !isMateAlreadyUnlocked(mate) {
+                                                    scoreManager.purchasedMates.append(mate)
+                                                    purchasedMateIDs.insert(mate.id)
+                                                    saveMateToFirestore(mate: mate)
+                                                    saveMates()
+                                                }
+                                                showPromo = false
+                                            }
+                                        }) {
+                                            Text(t("Unlock", in: "Mate_screen"))
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 14))
+                                                .padding(.vertical, 8)
+                                                .padding(.horizontal, 20)
+                                                .background(Color.green)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                        .padding(.top, 10)
+                                    } else {
+                                        Button(action: {
+                                            withAnimation {
+                                                let formatter = DateFormatter()
+                                                formatter.dateFormat = "yyyy-MM-dd"
+                                                lastPromoDate = formatter.string(from: Date())
+                                                showPromo = false
+                                            }
+                                        }) {
+                                            Text(t("Don’t show again today", in: "Mate_screen"))
+                                                .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
+                                                .underline()
+                                                .foregroundColor(.gray)
+                                        }
+                                        .padding(.top, 10)
+                                    }
+                                }
+                                .frame(width: 260)
+                                .padding(.vertical, 20)
+                                .background(Color.white)
+                                .cornerRadius(20)
+                                .shadow(radius: 10)
+                                .transition(.scale)
+                                .animation(.spring(), value: showPromo)
 
                                 Button(action: {
                                     withAnimation {
-                                        let formatter = DateFormatter()
-                                        formatter.dateFormat = "yyyy-MM-dd"
-                                        lastPromoDate = formatter.string(from: Date())
                                         showPromo = false
                                     }
                                 }) {
-                                    Text(t("Don’t show again today", in: "Mate_screen"))
-                                        .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 13))
-                                        .underline()
-                                        .foregroundColor(.gray)
+                                    Image(systemName: "xmark")
+                                        .foregroundColor(.black)
+                                        .frame(width: 30, height: 30)
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 2)
                                 }
-                                .padding(.top, 10)
+                                .offset(x: 10, y: -10)
                             }
-                            .frame(width: 260)
-                            .padding(.vertical, 20)
-                            .background(Color.white)
-                            .cornerRadius(20)
-                            .shadow(radius: 10)
-                            .transition(.scale)
-                            .animation(.spring(), value: showPromo)
-
-                            Button(action: {
-                                withAnimation {
-                                    showPromo = false
-                                }
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.black)
-                                    .frame(width: 30, height: 30)
-                                    .background(Color.white)
-                                    .clipShape(Circle())
-                                    .shadow(radius: 2)
-                            }
-                            .offset(x: 10, y: -10)
                         }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 
     private func isMateAlreadyUnlocked(_ mate: Mate) -> Bool {
@@ -358,6 +405,7 @@ struct MatesView: View {
                 scoreManager.purchasedMates = unlockedMates
                 purchasedMateIDs = Set(unlockedMates.map { $0.id })
                 saveMates()
+                maybeShowPromo()
             }
         }
     }

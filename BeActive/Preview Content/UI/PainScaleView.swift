@@ -42,6 +42,7 @@ struct PainScaleView: View {
             VStack(alignment: .leading, spacing: 30) {
                 Text(t("Pain Scale", in: "Pain_screen"))
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 36))
+                    .fontWeight(.semibold)
                     .foregroundColor(.pink)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)

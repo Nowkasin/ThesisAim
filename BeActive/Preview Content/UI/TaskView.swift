@@ -79,6 +79,8 @@ struct TaskView: View {
         case "Happy Bear": return "https://i.imgur.com/mTEiOqd.png"
         case "Lovely Bear": return "https://i.imgur.com/OT2vJPe.png"
             
+        case "Death Bear": return "https://i.imgur.com/vBeXvPT.png"
+            
         default: return "https://i.imgur.com/TR7HwEa.png"
         }
     }
@@ -584,6 +586,7 @@ struct TaskView: View {
         case "Mocha": return "🦈"
         case "Happy Bear": return "🐻‍❄️"
         case "Lovely Bear": return "🧸"
+        case "Death Bear": return "👻"
         default: return "🐻"
         }
     }

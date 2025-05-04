@@ -80,6 +80,7 @@ struct TabCardControlView: View {
         case "Mocha": return "https://i.imgur.com/sY0fdeH.png"
         case "Happy Bear": return "https://i.imgur.com/mTEiOqd.png"
         case "Lovely Bear": return "https://i.imgur.com/OT2vJPe.png"
+        case "Death Bear": return "https://i.imgur.com/vBeXvPT.png"
         default: return "https://i.imgur.com/TR7HwEa.png"
         }
     }

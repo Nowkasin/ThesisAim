@@ -70,12 +70,16 @@ struct MatesView: View {
     private func maybeShowPromo() {
         print("📢 maybeShowPromo called")
 
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+
         let hour = Calendar.current.component(.hour, from: Date())
         guard let deathBear = mates.first(where: { $0.name == "Death Bear" }) else { return }
 
         let hasDeathBear = isMateAlreadyUnlocked(deathBear)
 
-        // Show only during 00:00–02:59 if not yet unlocked
+        // Show Death Bear between 00:00–02:59 only if not unlocked
         if (0...2).contains(hour), !hasDeathBear {
             print("🎯 Showing Death Bear")
             withAnimation {
@@ -85,7 +89,13 @@ struct MatesView: View {
             return
         }
 
-        // Otherwise show normal mate with 1-in-3 chance
+        // Suppress normal mate promos only if user clicked "Don't show again today"
+        if lastPromoDate == today {
+            print("⛔ Promo suppressed by user choice today")
+            return
+        }
+
+        // Show normal mate with 1-in-3 chance
         if Int.random(in: 1...3) == 1 {
             let eligibleMates = mates.filter { $0.name != "Mocha" && $0.name != "Death Bear" }
             if let randomMate = eligibleMates.randomElement() {

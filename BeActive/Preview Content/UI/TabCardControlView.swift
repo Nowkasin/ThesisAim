@@ -35,11 +35,13 @@ struct TabCardControlView: View {
                             .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] }
                     }
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.semibold)
                     .foregroundColor(.primary)
 
                     Spacer()
 
                     ScoreView()
+                        .offset(x: 20) // Move ScoreView 20 points to the right
                 }
                 .padding(.horizontal, 20)
 

@@ -42,6 +42,7 @@ struct RegisterView: View {
                         Text(t("register", in: "register_screen"))
                             .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 32))
                             .foregroundColor(.primary)
+                            .fontWeight(.semibold)
                             .padding(.top, 40)
                             .padding(.bottom, 30)
 //                            .opacity(appear ? 1 : 0)

@@ -36,7 +36,7 @@ struct ScoreView: View {
 
                 Text("\(scoreManager.totalScore)")
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
-                    .fontWeight(.bold)
+                    .fontWeight(.semibold)
                     .padding(8)
                     .background(Color.gray)
                     .foregroundColor(.white)

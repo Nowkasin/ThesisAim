@@ -71,7 +71,7 @@ struct Login: View {
                 } else {
                     SplashScreen(
                         isActive: $isSplashScreenActive,
-                        imageUrl: URL(string: "https://i.imgur.com/TR7HwEa.png")!
+                        imageUrl: URL(string: "https://i.imgur.com/e1w6vHJ.png")!
                     )
                     .transition(.opacity)
                 }
@@ -86,6 +86,7 @@ struct Login: View {
                 
                 Text(t("log_in", in: "login_screen"))
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 36))
+                    .fontWeight(.semibold)
                     .foregroundColor(.primary)
                     .padding(.leading, 20)
                     .padding(.bottom, 40)

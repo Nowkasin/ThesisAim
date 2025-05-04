@@ -167,6 +167,7 @@ struct HomeView: View {
         HStack {
             Text("\(welcomeArray[currentIndex])")
                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: DeviceHelper.adaptiveFontSize(baseSize: 32)))
+                .fontWeight(.semibold)
                 .foregroundColor(.primary)
                 .onAppear { startWelcomeTimer() }
 
@@ -190,6 +191,7 @@ struct HomeView: View {
         VStack(alignment: .leading) {
             Text(t("Reminders", in: "home_screen"))
                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                .fontWeight(.semibold)
                 .foregroundColor(.primary)
                 .padding(.horizontal)
                 .padding(.bottom, 5)

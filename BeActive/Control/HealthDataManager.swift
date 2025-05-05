@@ -15,7 +15,7 @@ class HealthDataManager: ObservableObject {
     private var timer: Timer?
 
     init() {
-        self.timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+        self.timer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
             Task {
                 await self.fetchHealthData()
             }

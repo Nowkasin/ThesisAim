@@ -180,6 +180,69 @@ class AlertsManager {
         scheduleNextHeartRateAlertAfterDelay()
     }
 
+    func triggerLowHeartRateAlert() {
+        print("🚨 Attempting to trigger low heart rate alert...")
+
+        let content = UNMutableNotificationContent()
+        content.title = t("title", in: "Noti_Screen.LowHeartNoti")
+        content.body = t("body", in: "Noti_Screen.LowHeartNoti")
+        content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        let request = UNNotificationRequest(identifier: "lowHeartRateAlert_\(UUID().uuidString)", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error triggering low heart rate alert: \(error.localizedDescription)")
+            } else {
+                print("✅ Low heart rate alert scheduled immediately")
+            }
+        }
+    }
+
+    func triggerVeryLowHeartRateAlert() {
+        print("🚨 Attempting to trigger very low heart rate alert...")
+
+        let content = UNMutableNotificationContent()
+        content.title = t("title", in: "Noti_Screen.VeryLowHeartNoti")
+        content.body = t("body", in: "Noti_Screen.VeryLowHeartNoti")
+        content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        let request = UNNotificationRequest(identifier: "veryLowHeartRateAlert_\(UUID().uuidString)", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error triggering very low heart rate alert: \(error.localizedDescription)")
+            } else {
+                print("✅ Very low heart rate alert scheduled immediately")
+            }
+        }
+    }
+
+    func triggerVeryHighHeartRateAlert() {
+        print("🚨 Attempting to trigger very high heart rate alert...")
+
+        let content = UNMutableNotificationContent()
+        content.title = t("title", in: "Noti_Screen.VeryHighHeartNoti")
+        content.body = t("body", in: "Noti_Screen.VeryHighHeartNoti")
+        content.sound = UNNotificationSound.defaultCriticalSound(withAudioVolume: 1.0)
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        let request = UNNotificationRequest(identifier: "veryHighHeartRateAlert_\(UUID().uuidString)", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error triggering very high heart rate alert: \(error.localizedDescription)")
+            } else {
+                print("✅ Very high heart rate alert scheduled immediately")
+            }
+        }
+    }
+
     private func scheduleNextHeartRateAlertAfterDelay() {
         print("⏳ Starting 90-second cooldown for heart rate alert")
 

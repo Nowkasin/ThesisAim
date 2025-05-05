@@ -100,7 +100,7 @@ class HealthManager: ObservableObject {
 
     
     private func startTimer() {
-        timer = Timer.publish(every: 30, on: .main, in: .common) // Change to 30 seconds
+        timer = Timer.publish(every: 15, on: .main, in: .common) // Change to 15 seconds
             .autoconnect()
             .sink { [weak self] _ in
                 self?.fetchTodaySteps()
@@ -314,16 +314,28 @@ class HealthManager: ObservableObject {
 
     // ✅ ฟังก์ชันตรวจสอบ Heart Rate
     private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
+        let isHeartRateVeryHigh = heartRate > 150
         let isHeartRateHigh = heartRate >= 120
+        let isHeartRateLow = heartRate <= 50
+        let isHeartRateVeryLow = heartRate < 40
         let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
 
         print("🔍 Checking Heart Rate Warning...")
         print("💓 Heart Rate: \(heartRate) BPM")
         print("🚶‍♂️ Step Count: \(stepCount)")
 
-        if isHeartRateHigh && isNotMoving {
+        if isHeartRateVeryHigh && isNotMoving {
+            print("🚨 Triggering Very High Heart Rate Alert!")
+            AlertsManager().triggerVeryHighHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจสูงมาก
+        } else if isHeartRateHigh && isNotMoving {
             print("🚨 Triggering Heart Rate Alert!")
             AlertsManager().triggerHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจสูง
+        } else if isHeartRateVeryLow && isNotMoving {
+            print("🚨 Triggering Very Low Heart Rate Alert!")
+            AlertsManager().triggerVeryLowHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจต่ำมาก
+        } else if isHeartRateLow && isNotMoving {
+            print("⚠️ Triggering Low Heart Rate Alert!")
+            AlertsManager().triggerLowHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจต่ำ
         } else {
             print("✅ Heart Rate is normal.")
         }

@@ -449,6 +449,7 @@ struct MateCard: View {
 
                 Text(mate.name)
                     .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 17))
+                    .fontWeight(.semibold)
                     .foregroundColor(.black)
 
                 Text("\(mate.cost) \(t("Coins", in: "Mate_screen"))")

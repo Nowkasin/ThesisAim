@@ -9,9 +9,11 @@ import Foundation
 import UserNotifications
 
 class AlertsManager {
+    static let shared = AlertsManager()
+    private init() {}
     var isWaterAlertActive = false
     var isAlertActive = false
-    var isHeartRateAlertActive = false
+    private var lastHeartRateAlertTime: Date?
     var wakeUpTime: DateComponents? // เวลาตื่นที่ user กำหนด
     var bedTime: DateComponents? // เวลานอนที่ user กำหนด
     var intervalHours: Int? // ความถี่ในการแจ้งเตือน
@@ -153,12 +155,11 @@ class AlertsManager {
     func triggerHeartRateAlert() {
         print("🚨 Attempting to trigger heart rate alert...")
 
-        if isHeartRateAlertActive {
-            print("⚠️ Heart rate alert is already active, skipping new alert.")
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 180 {
+            print("⏱ Cooldown active — skipping alert.")
             return
         }
-
-        isHeartRateAlertActive = true
+        lastHeartRateAlertTime = Date()
 
         let content = UNMutableNotificationContent()
         content.title = t("title", in: "Noti_Screen.HeartNoti")
@@ -176,12 +177,15 @@ class AlertsManager {
                 print("✅ Heart rate alert (with banner + sound) scheduled immediately")
             }
         }
-
-        scheduleNextHeartRateAlertAfterDelay()
     }
 
     func triggerLowHeartRateAlert() {
         print("🚨 Attempting to trigger low heart rate alert...")
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 300 {
+            print("⏱ Cooldown active — skipping alert.")
+            return
+        }
+        lastHeartRateAlertTime = Date()
 
         let content = UNMutableNotificationContent()
         content.title = t("title", in: "Noti_Screen.LowHeartNoti")
@@ -203,6 +207,11 @@ class AlertsManager {
 
     func triggerVeryLowHeartRateAlert() {
         print("🚨 Attempting to trigger very low heart rate alert...")
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 90 {
+            print("⏱ Cooldown active — skipping alert.")
+            return
+        }
+        lastHeartRateAlertTime = Date()
 
         let content = UNMutableNotificationContent()
         content.title = t("title", in: "Noti_Screen.VeryLowHeartNoti")
@@ -224,6 +233,11 @@ class AlertsManager {
 
     func triggerVeryHighHeartRateAlert() {
         print("🚨 Attempting to trigger very high heart rate alert...")
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 90 {
+            print("⏱ Cooldown active — skipping alert.")
+            return
+        }
+        lastHeartRateAlertTime = Date()
 
         let content = UNMutableNotificationContent()
         content.title = t("title", in: "Noti_Screen.VeryHighHeartNoti")
@@ -240,15 +254,6 @@ class AlertsManager {
             } else {
                 print("✅ Very high heart rate alert scheduled immediately")
             }
-        }
-    }
-
-    private func scheduleNextHeartRateAlertAfterDelay() {
-        print("⏳ Starting 90-second cooldown for heart rate alert")
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 90) {
-            self.isHeartRateAlertActive = false
-            print("✅ 90 seconds passed, isHeartRateAlertActive set to false")
         }
     }
 }

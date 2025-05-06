@@ -31,7 +31,7 @@ struct SleepScheduleView: View {
 
     @State private var savedSchedules: [SleepSchedule] = []
 
-    var alertsManager = AlertsManager()
+    var alertsManager = AlertsManager.shared
     @Environment(\.presentationMode) var presentationMode
 
     let storageKey = "savedSleepSchedules"

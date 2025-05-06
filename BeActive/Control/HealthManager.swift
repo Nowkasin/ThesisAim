@@ -44,6 +44,8 @@ class HealthManager: ObservableObject {
     private var timer: AnyCancellable?
     private var startTime: Date?
     private var alertStartTime: Date?
+    // Track last heart rate alert zone to avoid repeat alerts
+    private var lastHeartRateAlertZone: String?
     
     // Properties for handling alerts
     
@@ -84,7 +86,7 @@ class HealthManager: ObservableObject {
         let water = HKQuantityType(.dietaryWater)
         let healthTypes: Set = [steps, calories, heartRate, distance, water]
 
-        self.alertsManager = AlertsManager()
+        self.alertsManager = AlertsManager.shared
 
         // ขออนุญาตเข้าถึง HealthKit และเริ่มการสังเกตข้อมูลสุขภาพ
         Task {
@@ -172,7 +174,8 @@ class HealthManager: ObservableObject {
             }
             
             let stepCount = quantity.doubleValue(for: .count())
-            let goalValue = "10,000"
+            let goalValue = "10,000 \(t("Steps", in: "Chart.Summary"))"
+
             
             // คำนวณคะแนนเดินแบบคำนวณครั้งเดียวจากจำนวนก้าวทั้งหมด
             // โดยที่ 100 ก้าว = 1 คะแนน
@@ -221,7 +224,7 @@ class HealthManager: ObservableObject {
             }
 
             let caloriesBurned = quantity.doubleValue(for: .kilocalorie())
-            let goalValue = "900"
+            let goalValue = "900 \(t("Kcal", in: "Chart.Summary"))"
 
             DispatchQueue.main.async {
                 if ScoreManager.shared.stepScore > 0 {
@@ -274,7 +277,7 @@ class HealthManager: ObservableObject {
             }
 
             let heartRate = latestSample.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            let goalValue = "60-100 BPM"
+            let goalValue = "60-100 \(t("BPM", in: "Chart.Summary"))"
 
             DispatchQueue.main.async {
                 let translatedTitle = t("Today Heart Rate", in: "Chart_screen")
@@ -315,8 +318,8 @@ class HealthManager: ObservableObject {
     // ✅ ฟังก์ชันตรวจสอบ Heart Rate
     private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
         let isHeartRateVeryHigh = heartRate > 150
-        let isHeartRateHigh = heartRate >= 120
-        let isHeartRateLow = heartRate <= 50
+        let isHeartRateHigh = heartRate > 120 && heartRate <= 150
+        let isHeartRateLow = heartRate < 60 && heartRate >= 40
         let isHeartRateVeryLow = heartRate < 40
         let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
 
@@ -324,20 +327,43 @@ class HealthManager: ObservableObject {
         print("💓 Heart Rate: \(heartRate) BPM")
         print("🚶‍♂️ Step Count: \(stepCount)")
 
-        if isHeartRateVeryHigh && isNotMoving {
-            print("🚨 Triggering Very High Heart Rate Alert!")
-            AlertsManager().triggerVeryHighHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจสูงมาก
-        } else if isHeartRateHigh && isNotMoving {
-            print("🚨 Triggering Heart Rate Alert!")
-            AlertsManager().triggerHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจสูง
-        } else if isHeartRateVeryLow && isNotMoving {
-            print("🚨 Triggering Very Low Heart Rate Alert!")
-            AlertsManager().triggerVeryLowHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจต่ำมาก
-        } else if isHeartRateLow && isNotMoving {
-            print("⚠️ Triggering Low Heart Rate Alert!")
-            AlertsManager().triggerLowHeartRateAlert() // ✅ แจ้งเตือนเมื่ออัตราการเต้นของหัวใจต่ำ
+        // Replace alert logic with zone tracking to avoid repeated alerts
+        var newZone: String? = nil
+
+        if isNotMoving {
+            if isHeartRateVeryHigh {
+                newZone = "veryHigh"
+            } else if isHeartRateHigh {
+                newZone = "high"
+            } else if isHeartRateVeryLow {
+                newZone = "veryLow"
+            } else if isHeartRateLow {
+                newZone = "low"
+            }
+        }
+
+        if let zone = newZone, zone != lastHeartRateAlertZone {
+            lastHeartRateAlertZone = zone
+            switch zone {
+            case "veryHigh":
+                print("🚨 Triggering Very High Heart Rate Alert!")
+                alertsManager?.triggerVeryHighHeartRateAlert()
+            case "high":
+                print("🚨 Triggering Heart Rate Alert!")
+                alertsManager?.triggerHeartRateAlert()
+            case "veryLow":
+                print("🚨 Triggering Very Low Heart Rate Alert!")
+                alertsManager?.triggerVeryLowHeartRateAlert()
+            case "low":
+                print("⚠️ Triggering Low Heart Rate Alert!")
+                alertsManager?.triggerLowHeartRateAlert()
+            default:
+                break
+            }
+        } else if newZone != nil {
+            print("🔁 Same heart rate zone, skipping alert.")
         } else {
-            print("✅ Heart Rate is normal.")
+            print("✅ Heart Rate is normal or user is moving, no alert triggered.")
         }
 
         // ✅ อัปเดตค่า previousStepCount เพื่อตรวจสอบว่ามีการเดินหรือไม่
@@ -368,7 +394,7 @@ class HealthManager: ObservableObject {
 
             let distanceInMeters = quantity.doubleValue(for: .meter())
             let distanceInKilometers = distanceInMeters / 1000.0
-            let goalValue = "5 KM"
+            let goalValue = "5 \(t("KM", in: "Chart.Summary"))"
 
             DispatchQueue.main.async {
                 let score = Int(distanceInKilometers) * 10

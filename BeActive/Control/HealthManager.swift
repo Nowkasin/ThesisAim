@@ -9,6 +9,7 @@ import Foundation
 import HealthKit
 import Combine
 import SwiftUI
+import CoreMotion
 // Extension for date handling
 extension Date {
     static var startOfDay: Date {
@@ -60,6 +61,14 @@ class HealthManager: ObservableObject {
     // เป็นส่วนการแสดงข้อมูลในกรณีที่ได้รับข้อมูลมาจาก health
     @Published var activities: [String: Activity] = [:]
 
+    // MARK: - Gyro Inactivity Detection
+    private var motionManager = CMMotionManager()
+    private var accelerometerManager = CMMotionManager()
+    private var inactivityTimer: Timer?
+    private var lastMovementDate = Date()
+    // Use a background operation queue for motion updates
+    private let motionQueue = OperationQueue()
+
     init() {
         // เซ็ตค่า Mock Data เริ่มต้น
         setMockActivity(id: 0, key: "todaySteps", titleKey: "Today Steps", goalValue: "10,000", image: "figure.walk", tintColor: .gray, amount: "0")
@@ -88,6 +97,9 @@ class HealthManager: ObservableObject {
 
         self.alertsManager = AlertsManager.shared
 
+        // เริ่มจับความเคลื่อนไหวด้วย Gyro ก่อนขออนุญาต HealthKit
+        startGyroMonitoring()
+
         // ขออนุญาตเข้าถึง HealthKit และเริ่มการสังเกตข้อมูลสุขภาพ
         Task {
             do {
@@ -100,7 +112,48 @@ class HealthManager: ObservableObject {
         }
     }
 
-    
+    // MARK: - Gyro & Accelerometer Monitoring & Inactivity
+    private func startGyroMonitoring() {
+        guard motionManager.isGyroAvailable, accelerometerManager.isAccelerometerAvailable else {
+            print("Gyroscope or Accelerometer not available.")
+            return
+        }
+
+        motionManager.gyroUpdateInterval = 1.0
+        // Use the background operation queue instead of .main
+        motionManager.startGyroUpdates(to: motionQueue) { [weak self] data, error in
+            guard let self = self, let rotationRate = data?.rotationRate else { return }
+            let magnitude = sqrt(rotationRate.x * rotationRate.x + rotationRate.y * rotationRate.y + rotationRate.z * rotationRate.z)
+            if magnitude > 0.5 {
+                self.lastMovementDate = Date()
+                print("✅ Gyro movement at: \(self.lastMovementDate)") // ไปปิดไว้ได้ รกจอมาก
+            }
+        }
+
+        accelerometerManager.accelerometerUpdateInterval = 1.0
+        // Use the background operation queue instead of .main
+        accelerometerManager.startAccelerometerUpdates(to: motionQueue) { [weak self] data, error in
+            guard let self = self, let acceleration = data?.acceleration else { return }
+            let magnitude = sqrt(acceleration.x * acceleration.x + acceleration.y * acceleration.y + acceleration.z * acceleration.z)
+            if abs(magnitude - 1.0) > 0.4 { // accounting for gravity
+                self.lastMovementDate = Date()
+                print("✅ Accelerometer movement at: \(self.lastMovementDate)") // ไปปิดไว้ได้ รกจอมาก
+            }
+        }
+
+        inactivityTimer = Timer.scheduledTimer(withTimeInterval: 3600.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            let timeSinceLastMovement = Date().timeIntervalSince(self.lastMovementDate)
+            print("⏱ Time since last movement: \(timeSinceLastMovement)")
+            if timeSinceLastMovement >= 3600.0 {
+                print("🚨 No movement detected for 1 hour.")
+                self.alertsManager?.triggerInactivityAlert()
+            } else {
+                print("✅ Movement detected within 1 hour.")
+            }
+        }
+    }
+
     private func startTimer() {
         timer = Timer.publish(every: 15, on: .main, in: .common) // Change to 15 seconds
             .autoconnect()

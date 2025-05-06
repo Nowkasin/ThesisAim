@@ -14,6 +14,7 @@ class AlertsManager {
     var isWaterAlertActive = false
     var isAlertActive = false
     private var lastHeartRateAlertTime: Date?
+    private var lastInactivityAlertTime: Date?
     var wakeUpTime: DateComponents? // เวลาตื่นที่ user กำหนด
     var bedTime: DateComponents? // เวลานอนที่ user กำหนด
     var intervalHours: Int? // ความถี่ในการแจ้งเตือน
@@ -253,6 +254,35 @@ class AlertsManager {
                 print("❌ Error triggering very high heart rate alert: \(error.localizedDescription)")
             } else {
                 print("✅ Very high heart rate alert scheduled immediately")
+            }
+        }
+    }
+    
+    // MARK: - Inactivity Alert for Gyro-based Inactivity
+    /// Sends an instant notification for inactivity detected by gyro (HealthManager can call this).
+    func triggerInactivityAlert() {
+        if let lastTime = lastInactivityAlertTime, Date().timeIntervalSince(lastTime) < 3600 { // เวลาที่แจ้งเตือนจะกันไม่ให้มันเบิ้ล
+            print("⏱ Cooldown active — skipping inactivity alert.")
+            return
+        }
+        lastInactivityAlertTime = Date()
+
+        let content = UNMutableNotificationContent()
+        content.title = t("title", in: "Noti_Screen.InactiveNoti")
+        content.body = t("body", in: "Noti_Screen.InactiveNoti")
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "inactivityAlert_\(UUID().uuidString)",
+            content: content,
+            trigger: nil // Trigger immediately
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error sending inactivity alert: \(error.localizedDescription)")
+            } else {
+                print("✅ Inactivity alert sent immediately.")
             }
         }
     }

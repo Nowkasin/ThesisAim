@@ -296,6 +296,7 @@ struct HomeView: View {
         return colors[weekday]
     }
 
+    /*
     func triggerNotification(message: String) {
         let content = UNMutableNotificationContent()
         content.title = (t("Time to Move!", in: "home_screen"))
@@ -311,6 +312,7 @@ struct HomeView: View {
             }
         }
     }
+    */
 }
 
 struct ReminderCard: View {

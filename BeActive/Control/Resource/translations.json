@@ -162,7 +162,7 @@
         },
         "Noti_Screen":{
             "WaterNoti":{
-                "title" : "Drink water now!",
+                "title" : "💧 Drink water now!",
                 "body" : "Time to drink some water!"
             },
             "WalkNoti":{
@@ -184,6 +184,10 @@
             "VeryLowHeartNoti": {
                 "title": "🚨 Very low heart rate!",
                 "body": "Your heart rate is critically low. Please rest and consult a doctor if you feel unwell."
+            },
+            "InactiveNoti": {
+                "title": "👨🏻‍💻 Still sitting there?",
+                "body": "You haven’t moved in a while. Time to stretch or walk a bit!"
             },
             "noti_task_completed_title": "Task Completed 🎉",
             "noti_task_completed_body": "You’ve earned 20 points for finishing your task!",
@@ -544,7 +548,7 @@
         },
         "Noti_Screen":{
             "WaterNoti":{
-                "title" : "ดื่มน้ำได้แล้ว!",
+                "title" : "💧 ดื่มน้ำได้แล้ว!",
                 "body" : "ถึงเวลาดื่มน้ำแล้วนะ!"
             },
             "WalkNoti":{
@@ -566,6 +570,10 @@
             "VeryLowHeartNoti": {
                 "title": "🚨 อัตราการเต้นหัวใจต่ำมาก!",
                 "body": "อัตราการเต้นของหัวใจของคุณต่ำเกินไป กรุณาพักผ่อนหรือติดต่อแพทย์"
+            },
+            "InactiveNoti": {
+                "title": "👨🏻‍💻 ยังนั่งทำงานอยู่หรอ?",
+                "body": "คุณไม่ได้ขยับตัวเป็นเวลานาน ถึงเวลาออกไปยืดเส้นยืดสายหรือเดินเล่นได้แล้ว!"
             },
             "noti_task_completed_title": "ภารกิจสำเร็จ 🎉",
             "noti_task_completed_body": "คุณได้รับ 20 แต้มจากการทำภารกิจเสร็จสิ้น!",

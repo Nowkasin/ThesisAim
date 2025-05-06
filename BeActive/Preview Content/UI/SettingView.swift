@@ -13,7 +13,7 @@ struct SettingsView: View {
     @State private var showSleepScheduleView = false
     @ObservedObject var language = Language.shared
 
-    let pdfURL = URL(string: "https://drive.google.com/file/d/1A9kjdgd_D3VCNjyi0J3H_vhF3_3asPWE/view?usp=sharing")!
+    let pdfURL = URL(string: "https://drive.google.com/drive/folders/1mvRi0p2DaLxE_LmAiD70kpMxLoWX1wLl?usp=sharing")!
 
     var body: some View {
         ZStack {

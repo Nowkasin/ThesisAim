@@ -46,16 +46,17 @@ struct BreathingView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 20) {
                 VStack(spacing: 4) {
                     Text(t(selectedTechnique.name, in: "breath_screen"))
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 28))
+                        .fontWeight(.semibold)
 
                     Text(t(selectedTechnique.description, in: "breath_screen"))
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 18))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.teal.opacity(0.7))
                 }
 
                 ZStack {
@@ -79,7 +80,7 @@ struct BreathingView: View {
                         if isBreathing {
                             Text("\(phaseTimeLeft)s")
                                 .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.teal.opacity(0.7))
                         }
                     }
                 }
@@ -89,7 +90,7 @@ struct BreathingView: View {
                 if isBreathing {
                     Text("\(t("Total Remaining", in: "breath_screen")): \(totalTimeLeft)\(t(" s", in: "breath_screen"))")
                         .font(.custom(language.currentLanguage == "th" ? "Kanit-Regular" : "RobotoCondensed-Regular", size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.teal.opacity(0.7))
                         .padding(.top, 24)
                 }
 
@@ -110,7 +111,7 @@ struct BreathingView: View {
                             .foregroundColor(.gray)
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(Color(.systemGray6))
                     .cornerRadius(12)
                     .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 }

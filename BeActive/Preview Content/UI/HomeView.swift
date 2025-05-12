@@ -156,6 +156,51 @@ struct HomeView: View {
                 
                 buildReminders()
                 Color.clear.frame(height: 80)
+
+//                // MARK: - 🔧 Developer Testing Section (Remove or comment out in production)
+//                VStack(spacing: 10) {
+//                    Text("🔧 Test Alerts")
+//                        .font(.headline)
+//                        .padding(.top)
+//
+//                    Button("Test Heart Rate Alert") {
+//                        AlertsManager.shared.triggerHeartRateAlert()
+//                    }
+//                    .padding()
+//                    .background(Color.red.opacity(0.2))
+//                    .cornerRadius(10)
+//
+//                    Button("Test Very High Heart Rate Alert") {
+//                        AlertsManager.shared.triggerVeryHighHeartRateAlert()
+//                    }
+//                    .padding()
+//                    .background(Color.orange.opacity(0.2))
+//                    .cornerRadius(10)
+//
+//                    Button("Test Low Heart Rate Alert") {
+//                        AlertsManager.shared.triggerLowHeartRateAlert()
+//                    }
+//                    .padding()
+//                    .background(Color.blue.opacity(0.2))
+//                    .cornerRadius(10)
+//
+//                    Button("Test Very Low Heart Rate Alert") {
+//                        AlertsManager.shared.triggerVeryLowHeartRateAlert()
+//                    }
+//                    .padding()
+//                    .background(Color.purple.opacity(0.2))
+//                    .cornerRadius(10)
+//
+//                    Button("Test Inactivity Alert") {
+//                        AlertsManager.shared.triggerInactivityAlert()
+//                    }
+//                    .padding()
+//                    .background(Color.gray.opacity(0.2))
+//                    .cornerRadius(10)
+//                }
+//                .padding(.horizontal)
+//                // MARK: - End of Developer Testing Section
+//                Color.clear.frame(height: 80)
             }
         }
         .onAppear { requestNotificationPermission() }

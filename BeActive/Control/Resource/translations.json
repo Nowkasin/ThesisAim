@@ -158,7 +158,12 @@
             "Language": "Language",
             "Message" : "Message",
             "How to use": "How to use",
-            "Water Notification" : "Water Notification"
+            "Water Notification" : "Water Notification",
+            "Delete Account": "Delete Account",
+            "Confirm Deletion": "Confirm Deletion",
+            "Are you sure you want to permanently delete your account?": "Are you sure you want to permanently delete your account?",
+            "Delete": "Delete",
+            "Cancel": "Cancel"
         },
         "Noti_Screen":{
             "WaterNoti":{
@@ -544,7 +549,12 @@
             "Language": "ภาษา",
             "Message" : "ข้อความ",
             "How to use": "วิธีใช้งาน",
-            "Water Notification" : "การแจ้งเตือนน้ำ"
+            "Water Notification" : "การแจ้งเตือนน้ำ",
+            "Delete Account": "ลบบัญชีผู้ใช้",
+            "Confirm Deletion": "ยืนยันการลบบัญชี",
+            "Are you sure you want to permanently delete your account?": "คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ?",
+            "Delete": "ลบ",
+            "Cancel": "ยกเลิก"
         },
         "Noti_Screen":{
             "WaterNoti":{

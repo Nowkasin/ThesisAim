@@ -7,11 +7,15 @@
 
 import SwiftUI
 
+import FirebaseAuth
+import FirebaseFirestore
+
 struct SettingsView: View {
     @Binding var isShowing: Bool
     @State private var showLanguageView = false
     @State private var showSleepScheduleView = false
     @ObservedObject var language = Language.shared
+    @State private var showDeleteConfirmation = false
 
     let pdfURL = URL(string: "https://drive.google.com/drive/folders/1mvRi0p2DaLxE_LmAiD70kpMxLoWX1wLl?usp=sharing")!
 
@@ -81,6 +85,21 @@ struct SettingsView: View {
                     .padding(.horizontal)
                 }
 
+                // Delete Account button
+                settingButton(icon: "trash", title: t("Delete Account", in: "Setting_screen")) {
+                    confirmDeleteAccount()
+                }
+                .alert(isPresented: $showDeleteConfirmation) {
+                    Alert(
+                        title: Text(t("Confirm Deletion", in: "Setting_screen")),
+                        message: Text(t("Are you sure you want to permanently delete your account?", in: "Setting_screen")),
+                        primaryButton: .destructive(Text(t("Delete", in: "Setting_screen"))) {
+                            deleteAccount()
+                        },
+                        secondaryButton: .cancel(Text(t("Cancel", in: "Setting_screen")))
+                    )
+                }
+
                 Spacer()
             }
             .frame(maxWidth: .infinity)
@@ -115,6 +134,53 @@ struct SettingsView: View {
                     .fill(Color.gray.opacity(0.2))
             )
             .padding(.horizontal)
+        }
+    }
+    // MARK: - Delete Account helpers
+    func confirmDeleteAccount() {
+        showDeleteConfirmation = true
+    }
+
+    func deleteAccount() {
+        guard let user = Auth.auth().currentUser else { return }
+        let uid = user.uid
+        let db = Firestore.firestore()
+
+        // Step 1: Delete subcollection 'mates'
+        let matesRef = db.collection("users").document(uid).collection("mates")
+        matesRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("❌ Failed to fetch mates: \(error.localizedDescription)")
+                return
+            }
+
+            let batch = db.batch()
+            snapshot?.documents.forEach { batch.deleteDocument($0.reference) }
+
+            batch.commit { batchError in
+                if let batchError = batchError {
+                    print("❌ Failed to delete mates: \(batchError.localizedDescription)")
+                    return
+                }
+
+                // Step 2: Delete user document
+                db.collection("users").document(uid).delete { userDocError in
+                    if let userDocError = userDocError {
+                        print("❌ Failed to delete user document: \(userDocError.localizedDescription)")
+                        return
+                    }
+
+                    // Step 3: Delete Firebase Auth account
+                    user.delete { authError in
+                        if let authError = authError {
+                            print("❌ Failed to delete auth account: \(authError.localizedDescription)")
+                        } else {
+                            print("✅ Fully deleted user account and all data")
+                            // Optional: navigate to login screen
+                        }
+                    }
+                }
+            }
         }
     }
 }

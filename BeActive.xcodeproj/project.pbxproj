@@ -470,7 +470,7 @@
 				CODE_SIGN_ENTITLEMENTS = BeActive/BeActive.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"BeActive/Preview Content\"";
 				DEVELOPMENT_TEAM = M58MND63UU;
 				ENABLE_PREVIEWS = YES;
@@ -513,7 +513,7 @@
 				CODE_SIGN_ENTITLEMENTS = BeActive/BeActive.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"BeActive/Preview Content\"";
 				DEVELOPMENT_TEAM = M58MND63UU;
 				ENABLE_PREVIEWS = YES;

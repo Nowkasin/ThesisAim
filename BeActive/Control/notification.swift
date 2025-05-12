@@ -137,7 +137,7 @@ class AlertsManager {
             content.body = t("body", in: "Noti_Screen.WalkNoti")
             content.sound = .default
 
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: true)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
             let request = UNNotificationRequest(identifier: "moveReminder", content: content, trigger: trigger)
 
             UNUserNotificationCenter.current().add(request) { error in
@@ -156,7 +156,7 @@ class AlertsManager {
     func triggerHeartRateAlert() {
         print("🚨 Attempting to trigger heart rate alert...")
 
-        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 180 {
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 90 {
             print("⏱ Cooldown active — skipping alert.")
             return
         }
@@ -182,7 +182,7 @@ class AlertsManager {
 
     func triggerLowHeartRateAlert() {
         print("🚨 Attempting to trigger low heart rate alert...")
-        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 300 {
+        if let lastTime = lastHeartRateAlertTime, Date().timeIntervalSince(lastTime) < 90 {
             print("⏱ Cooldown active — skipping alert.")
             return
         }
@@ -261,7 +261,7 @@ class AlertsManager {
     // MARK: - Inactivity Alert for Gyro-based Inactivity
     /// Sends an instant notification for inactivity detected by gyro (HealthManager can call this).
     func triggerInactivityAlert() {
-        if let lastTime = lastInactivityAlertTime, Date().timeIntervalSince(lastTime) < 3600 { // เวลาที่แจ้งเตือนจะกันไม่ให้มันเบิ้ล
+        if let lastTime = lastInactivityAlertTime, Date().timeIntervalSince(lastTime) < 60 { // เวลาที่แจ้งเตือนจะกันไม่ให้มันเบิ้ล
             print("⏱ Cooldown active — skipping inactivity alert.")
             return
         }
@@ -283,6 +283,28 @@ class AlertsManager {
                 print("❌ Error sending inactivity alert: \(error.localizedDescription)")
             } else {
                 print("✅ Inactivity alert sent immediately.")
+            }
+        }
+    }
+    func triggerNormalHeartRateNotice() {
+        let content = UNMutableNotificationContent()
+        content.title = t("title", in: "Noti_Screen.NormalHeartNoti")
+        content.body = t("body", in: "Noti_Screen.NormalHeartNoti")
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        let request = UNNotificationRequest(
+            identifier: "normalHeartRateNotice_\(UUID().uuidString)",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error sending normal heart rate notice: \(error.localizedDescription)")
+            } else {
+                print("✅ Normal heart rate notice sent.")
             }
         }
     }

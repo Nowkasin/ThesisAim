@@ -141,15 +141,15 @@ class HealthManager: ObservableObject {
             }
         }
 
-        inactivityTimer = Timer.scheduledTimer(withTimeInterval: 3600.0, repeats: true) { [weak self] _ in
+        inactivityTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             let timeSinceLastMovement = Date().timeIntervalSince(self.lastMovementDate)
             print("⏱ Time since last movement: \(timeSinceLastMovement)")
-            if timeSinceLastMovement >= 3600.0 {
-                print("🚨 No movement detected for 1 hour.")
+            if timeSinceLastMovement >= 60.0 {
+                print("🚨 No movement detected for 1 min.")
                 self.alertsManager?.triggerInactivityAlert()
             } else {
-                print("✅ Movement detected within 1 hour.")
+                print("✅ Movement detected within 1 min.")
             }
         }
     }
@@ -372,7 +372,8 @@ class HealthManager: ObservableObject {
     private func evaluateHeartRateWarning(heartRate: Double, stepCount: Double) {
         let isHeartRateVeryHigh = heartRate > 150
         let isHeartRateHigh = heartRate > 120 && heartRate <= 150
-        let isHeartRateLow = heartRate < 60 && heartRate >= 40
+        let isHeartRateLow = heartRate >= 40 && heartRate < 60
+        let isHeartRateNormal = heartRate >= 60 && heartRate <= 100
         let isHeartRateVeryLow = heartRate < 40
         let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
 
@@ -415,8 +416,10 @@ class HealthManager: ObservableObject {
             }
         } else if newZone != nil {
             print("🔁 Same heart rate zone, skipping alert.")
+        } else if isHeartRateNormal {
+            print("✅ Heart Rate is within normal range (60-100 BPM).")
         } else {
-            print("✅ Heart Rate is normal or user is moving, no alert triggered.")
+            print("✅ Heart Rate is outside normal range but user is moving, no alert triggered.")
         }
 
         // ✅ อัปเดตค่า previousStepCount เพื่อตรวจสอบว่ามีการเดินหรือไม่

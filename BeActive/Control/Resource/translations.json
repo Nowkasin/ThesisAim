@@ -185,6 +185,10 @@
                 "title": "🚨 Very low heart rate!",
                 "body": "Your heart rate is critically low. Please rest and consult a doctor if you feel unwell."
             },
+            "NormalHeartNoti": {
+                "title": "✅ Normal Heart Rate",
+                "body": "Your heart rate is within the healthy range. Keep it up!"
+            },
             "InactiveNoti": {
                 "title": "👨🏻‍💻 Still sitting there?",
                 "body": "You haven’t moved in a while. Time to stretch or walk a bit!"
@@ -570,6 +574,10 @@
             "VeryLowHeartNoti": {
                 "title": "🚨 อัตราการเต้นหัวใจต่ำมาก!",
                 "body": "อัตราการเต้นของหัวใจของคุณต่ำเกินไป กรุณาพักผ่อนหรือติดต่อแพทย์"
+            },
+            "NormalHeartNoti": {
+                "title": "✅ อัตราการเต้นหัวใจปกติ",
+                "body": "อัตราการเต้นหัวใจของคุณอยู่ในเกณฑ์ปกติแล้ว เยี่ยมมาก!"
             },
             "InactiveNoti": {
                 "title": "👨🏻‍💻 ยังนั่งทำงานอยู่หรอ?",

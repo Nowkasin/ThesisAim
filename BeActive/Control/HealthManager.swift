@@ -375,7 +375,6 @@ class HealthManager: ObservableObject {
         let isHeartRateLow = heartRate >= 40 && heartRate < 60
         let isHeartRateNormal = heartRate >= 60 && heartRate <= 100
         let isHeartRateVeryLow = heartRate < 40
-        let isNotMoving = (previousStepCount != -1) && (stepCount <= previousStepCount)
 
         print("🔍 Checking Heart Rate Warning...")
         print("💓 Heart Rate: \(heartRate) BPM")
@@ -384,16 +383,16 @@ class HealthManager: ObservableObject {
         // Replace alert logic with zone tracking to avoid repeated alerts
         var newZone: String? = nil
 
-        if isNotMoving {
-            if isHeartRateVeryHigh {
-                newZone = "veryHigh"
-            } else if isHeartRateHigh {
-                newZone = "high"
-            } else if isHeartRateVeryLow {
-                newZone = "veryLow"
-            } else if isHeartRateLow {
-                newZone = "low"
-            }
+        if isHeartRateVeryHigh {
+            newZone = "veryHigh"
+        } else if isHeartRateHigh {
+            newZone = "high"
+        } else if isHeartRateVeryLow {
+            newZone = "veryLow"
+        } else if isHeartRateLow {
+            newZone = "low"
+        } else if isHeartRateNormal {
+            newZone = "normal"
         }
 
         if let zone = newZone, zone != lastHeartRateAlertZone {
@@ -411,15 +410,16 @@ class HealthManager: ObservableObject {
             case "low":
                 print("⚠️ Triggering Low Heart Rate Alert!")
                 alertsManager?.triggerLowHeartRateAlert()
+            case "normal":
+                print("✅ Triggering Normal Heart Rate Notice!")
+                alertsManager?.triggerNormalHeartRateNotice()
             default:
                 break
             }
         } else if newZone != nil {
             print("🔁 Same heart rate zone, skipping alert.")
-        } else if isHeartRateNormal {
-            print("✅ Heart Rate is within normal range (60-100 BPM).")
         } else {
-            print("✅ Heart Rate is outside normal range but user is moving, no alert triggered.")
+            print("✅ Heart Rate is outside normal range, no alert triggered.")
         }
 
         // ✅ อัปเดตค่า previousStepCount เพื่อตรวจสอบว่ามีการเดินหรือไม่

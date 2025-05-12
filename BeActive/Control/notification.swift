@@ -15,6 +15,7 @@ class AlertsManager {
     var isAlertActive = false
     private var lastHeartRateAlertTime: Date?
     private var lastInactivityAlertTime: Date?
+    private var lastNormalHeartRateNoticeTime: Date?
     var wakeUpTime: DateComponents? // เวลาตื่นที่ user กำหนด
     var bedTime: DateComponents? // เวลานอนที่ user กำหนด
     var intervalHours: Int? // ความถี่ในการแจ้งเตือน
@@ -287,6 +288,11 @@ class AlertsManager {
         }
     }
     func triggerNormalHeartRateNotice() {
+        if let lastTime = lastNormalHeartRateNoticeTime, Date().timeIntervalSince(lastTime) < 90 {
+            print("⏱ Cooldown active — skipping normal HR notice.")
+            return
+        }
+        lastNormalHeartRateNoticeTime = Date()
         let content = UNMutableNotificationContent()
         content.title = t("title", in: "Noti_Screen.NormalHeartNoti")
         content.body = t("body", in: "Noti_Screen.NormalHeartNoti")

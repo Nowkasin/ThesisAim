@@ -17,6 +17,9 @@ struct SettingsView: View {
     @ObservedObject var language = Language.shared
     @State private var showDeleteConfirmation = false
 
+    @AppStorage("currentUserId") var currentUserId: String = ""
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+
     let pdfURL = URL(string: "https://drive.google.com/drive/folders/1mvRi0p2DaLxE_LmAiD70kpMxLoWX1wLl?usp=sharing")!
 
     var body: some View {
@@ -177,6 +180,8 @@ struct SettingsView: View {
                         } else {
                             print("✅ Fully deleted user account and all data")
                             // Optional: navigate to login screen
+                            self.currentUserId = ""
+                            self.isLoggedIn = false
                         }
                     }
                 }
